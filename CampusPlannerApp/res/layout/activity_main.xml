@@ -6,12 +6,39 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.uoft.campusplannerapp.MainActivity" >
-
+    tools:context="ccom.uoft.campusplannerapp.MainActivity" >
+    
     <TextView
-        android:id="@+id/register"
+        android:id="@+id/welcomeid"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/hello_world" />
+        android:layout_alignParentTop="true"
+        android:layout_alignRight="@+id/linearLayout1"
+        android:layout_marginTop="136dp"
+        android:text="@string/welcome_message"
+        android:textSize="30sp" />
+    
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" 
+        android:id="@+id/linearLayout1"
+        android:layout_below = "@id/welcomeid">
+        
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.45"
+            android:text="@string/login"
+            android:onClick="login_button">
+        </Button>
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.45"
+            android:text="@string/signup"
+            android:onClick="signup_button">
+        </Button>
+    </LinearLayout>
 
+    
 </RelativeLayout>

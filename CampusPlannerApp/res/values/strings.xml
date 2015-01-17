@@ -1,8 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">CampusPlannerApp</string>
+    <string name="app_name">LoginTestApp</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="welcome_message">Campus Planner App</string>
+    <string name="login">LogIn</string>
+    <string name="signup">SignUp</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="first_name">First Name</string>
+    <string name="last_name">Last Name</string>
+    <string name="student_number">Student Number</string>
+    <string name="utmail">UTmail</string>
 
 </resources>
