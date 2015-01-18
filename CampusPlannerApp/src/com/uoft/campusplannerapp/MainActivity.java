@@ -4,43 +4,26 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import android.os.AsyncTask;
-import android.os.Bundle;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.util.Log;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import com.uoft.campusplannerapp.HTTPConsole;
 
 public class MainActivity extends ActionBarActivity {
@@ -72,8 +55,16 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        http_console = new HTTPConsole();
+        http_console = new HTTPConsole(this);
+    	pref = this.getSharedPreferences("User",MODE_PRIVATE);
+    	String user = pref.getString("user", null);
+        @SuppressWarnings("unused")
+		String temp = get_reg_id();
+    	if (user == null) {
+            setContentView(R.layout.activity_main);
+    	} else {
+    		setContentView(R.layout.locate_friend_or_message);
+    	}
     }
     
     public boolean login_button(View view){
@@ -83,18 +74,29 @@ public class MainActivity extends ActionBarActivity {
 	
 	public boolean grab_login_data(View view){
 		EditText username = (EditText)findViewById(R.id.username_id);
-		String s_username = username.getText().toString();
-		
 		EditText password = (EditText)findViewById(R.id.password_id);
-		String s_password = password.getText().toString();
+		String s_username;
+		String s_password;
+		try {
+			s_username = username.getText().toString();
+			s_password = password.getText().toString();
+		} catch (Exception e) {
+			create_alert(this,"All fields are required");
+			return false;
+		}
 		
 		/* Encrypt the Password */
 		String encrypt_pw = encrypt_password(s_password);
 		/* Send password and user name to server for verification */
-		String t_reg_id = get_reg_id();
-		boolean verification = http_console.LoginRequest(s_username, encrypt_pw, t_reg_id);
+		boolean verification = http_console.LoginRequest(s_username, encrypt_pw, regid);
 		if (verification == false) {
 			create_alert(this , "Username or PW invalid");
+		}else {
+			Editor edit = pref.edit();
+			edit.putString("user", s_username);
+			edit.commit();
+			create_alert(this, "LogIn Successful");
+	        setContentView(R.layout.locate_friend_or_message);
 		}
 		return true;
 	}
@@ -106,16 +108,19 @@ public class MainActivity extends ActionBarActivity {
 	
 	public boolean grab_signup_data(View view){
 		EditText first_name = (EditText)findViewById(R.id.first_name);
-		String s_first_name = first_name.getText().toString();
-		
 		EditText last_name = (EditText)findViewById(R.id.last_name);
-		String s_last_name = last_name.getText().toString();
-		
 		EditText utmail = (EditText)findViewById(R.id.utmail);
-		String s_utmail = utmail.getText().toString();
-		
 		EditText password = (EditText)findViewById(R.id.n_password_id);
-		String s_password = password.getText().toString();
+		String s_first_name, s_last_name, s_utmail, s_password;
+		try {
+			s_first_name = first_name.getText().toString();
+			s_last_name = last_name.getText().toString();
+			s_utmail = utmail.getText().toString();
+			s_password = password.getText().toString();
+		} catch (Exception e) {
+			create_alert(this,"All fields are required");
+			return false;
+		}
 		
 		/* validate password */
 		boolean a = ValidatePassword(s_password);
@@ -141,12 +146,29 @@ public class MainActivity extends ActionBarActivity {
 		}
 		return true;
 	}
+	
+	public boolean ask_for_location(View view){
+		EditText email = (EditText)findViewById(R.id.friend);
+		try{
+			String friend_email = email.getText().toString();
+			String user = pref.getString("user", null);
+			if (user == null) {
+				create_alert(this,"You are not signed in");
+			}
+			String Loc = http_console.LocateFriend(user, friend_email);
+			create_alert(this,"Friend is at " + Loc );
+			return true;
+		} catch (Exception e) {
+			create_alert(this,"Please enter friends email");
+			return false;
+		}
+	}
 
 	private boolean ValidateEmail(String s_utmail) {
 		if (s_utmail.contains("utoronto.ca")  || s_utmail.contains("toronto.edu"))
-			return false;
-		else 
 			return true;
+		else 
+			return false;
 	}
 
 	private boolean ValidatePassword(String s_password) {
@@ -212,12 +234,9 @@ public class MainActivity extends ActionBarActivity {
     }
     
     private String get_reg_id() {
-    	pref = this.getSharedPreferences("RegIds",MODE_PRIVATE);
         String oldRegId = pref.getString("regid",null);
         String oldVersionId = pref.getString("version", null);
         version = getApplicationVersion();
-        String msg = "RegId is" + oldRegId + "version is" + oldVersionId + version;
-        create_alert(this, msg);
         if ((oldRegId == null) || !(oldVersionId.equals(version))) {
         	register_gcm();
         } else {

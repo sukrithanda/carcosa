@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -17,29 +16,59 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.AsyncTask;
 import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.google.android.gms.gcm.GoogleCloudMessaging;
-
 public class HTTPConsole {
-	private final String LOGIN_PAGE = "http://104.236.85.199:8080/login";
-	private final String SIGNUP_PAGE = "http://104.236.85.199:8080/sigup";
+	private final String LOGIN_PAGE = "http://104.236.85.199:8080/user/login";
+	private final String SIGNUP_PAGE = "http://104.236.85.199:8080/user/signup";
 	private final String GET_FRIEND = "http://104.236.85.199:8080/get_friend";
 	private final String ADD_FRIEND = "http://104.236.85.199:8080/add_friend";
-	private final String LOCATE_FRIEND = "http://104.236.85.199:8080/locate_fried";
+	private final String LOCATE_FRIEND = "http://104.236.85.199:8080/location/locateFriend";
 	private final String REMOVE_FRIEND = "http://104.236.85.199:8080/remove_friend";
 	private final String REMOVE_USER = "http://104.236.85.199:8080/remove_user";
 	private final String SEND_REGID = "http://104.236.85.199:8080/send_regid";
 	private final String SEND_MESSAGE = "http://104.236.85.199:8080/send_message";
 	private final String SEND_PRIVATE = "http://104.236.85.199:8080/send_message";
 	private final String HELLO_WORLD = "http://104.236.85.199:8080/hello-world";
+	private final String SEND_LOCATION = "http://104.236.85.199:8080/location/putLocation";
+	// userEmail , building, floor, x,y
+
+	private Context ctx;
+	
+	public HTTPConsole(Context ctx){
+		this.ctx = ctx;
+	}
+	
+	public void SetLoc(String message){
+		SharedPreferences pref = ctx.getSharedPreferences("Locations",Context.MODE_PRIVATE);
+		Editor edit = pref.edit();
+		edit.putString("result", message);
+		edit.commit();
+	}
+	
+	private String PollAndGetLoc(){
+		SharedPreferences pref = ctx.getSharedPreferences("Locations",Context.MODE_PRIVATE);
+		String result = pref.getString("result", null);
+		while (result == null){
+			try {
+				Thread.sleep(1000);
+				Log.i("Sidd", "Slept");
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			Log.i("Sidd", "Polling and Polling");
+			result = pref.getString("result", null);
+		}
+		return result;
+	}
 	
 	public String HelloWorld(){
 		return SendGetRequest(HELLO_WORLD);
@@ -47,28 +76,37 @@ public class HTTPConsole {
 	
 	public Boolean LoginRequest(String email, String password, String reg_id){
 		String URL = LOGIN_PAGE + "?email=" + email + "&password=" + password + "&regid=" + reg_id;
-		if (SendGetRequest(URL).equals("Invalid Request")){
+		String result = SendGetRequest(URL);
+		if (result.equals("Invalid Request")){
 			return false;
 		} else {
-			return true;
+			try {
+				JSONObject obj = new JSONObject(result);
+				String user = obj.getString("email");
+				String first_name = obj.getString("first_name");
+				String last_name = obj.getString("last_name");
+				String token = obj.getString("token");
+				Editor edit = ctx.getSharedPreferences("User", Context.MODE_PRIVATE).edit();
+				edit.putString("user", user);
+				edit.putString("first_name", first_name);
+				edit.putString("last_name", last_name);
+				edit.putString("token", token);
+				edit.commit();
+				return true;
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return true;
+			}
 		}
-//		try {
-//			JSONObject obj = new JSONObject(result);
-//			int status = Integer.parseInt(obj.getString("status"));
-//			if (status == 0){
-//				
-//			}
-//		} catch (JSONException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//			return false;
-//		}
+
 	}
 	
 	public Boolean SignupRequest(String email, String password, String first_name, String last_name){
-		String URL = SIGNUP_PAGE + "?email=" + email + "&password=" + password + "&first_name=" + 
-						first_name + "&last_name" + last_name;
-		if (SendGetRequest(URL).equals("Invalid Request")){
+		String URL = SIGNUP_PAGE + "?first=" + first_name + "&last=" + last_name + "&email=" + 
+						email + "&password=" + password;
+		String ans = SendGetRequest(URL);
+		if (ans.equals("Invalid Request")){
 			return false;
 		} else {
 			return true;
@@ -93,12 +131,13 @@ public class HTTPConsole {
 		}
 	}
 	
-	public List<Integer> LocateFriend(String friend_email) {
-		String URL = LOCATE_FRIEND + "?friend_email=" + friend_email;
+	public String LocateFriend(String user_email,String friend_email) {
+		String URL = LOCATE_FRIEND + "?userEmail=" + user_email + "&friendEmail=" + friend_email;
 		if (SendGetRequest(URL).equals("Invalid Request")){
 			return null;
 		} else {
-			return null;
+			//return null;
+			return PollAndGetLoc();
 		}
 	}
 	
@@ -112,7 +151,7 @@ public class HTTPConsole {
 	}
 	
 	public boolean RemoveUser(String user_email) {
-		String URL = REMOVE_FRIEND + "?user_email=" + user_email;
+		String URL = REMOVE_USER + "?user_email=" + user_email;
 		if (SendGetRequest(URL).equals("Invalid Request")){
 			return false;
 		} else {
@@ -143,7 +182,7 @@ public class HTTPConsole {
 	
 
 	public boolean SendPrivate(String user_email, String private_key) {
-		String URL = SEND_REGID + "?user_email=" + user_email + "&private_key=" + private_key;
+		String URL = SEND_PRIVATE + "?user_email=" + user_email + "&private_key=" + private_key;
 		if (SendGetRequest(URL).equals("Invalid Request")){
 			return false;
 		} else {
@@ -151,7 +190,19 @@ public class HTTPConsole {
 		}
 	}
 	
-	private Boolean SendPostRequest(String URL, List<NameValuePair> nameValuePairs) {
+	public boolean SendLocation(String email, String building, String floor, String x, String y) {
+		String URL = SEND_LOCATION + "?friendEmail=" + email + "&building=" + building + "&floor=" + floor + 
+				"&x=" + x+ "&y=" + y ;
+		if (SendGetRequest(URL).equals("Invalid Request")){
+			return false;
+		} else {
+			return true;
+		}
+	}
+	
+	
+	@SuppressWarnings("unused")
+	private Boolean SendPostRequest(String URL, final List<NameValuePair> nameValuePairs) {
 		AsyncTask<String, Void, Boolean> a = new AsyncTask<String, Void, Boolean>() {
             @Override
             protected Boolean doInBackground(String... URL) {
@@ -205,19 +256,21 @@ public class HTTPConsole {
 		AsyncTask<String, Void, String> a = new AsyncTask<String, Void, String>() {
             @Override
             protected String doInBackground(String... URL) {
-            	boolean sts = false; 
         		HttpClient client = new DefaultHttpClient();
         	    HttpGet request = new HttpGet(URL[0]);
         	    HttpResponse response;
         	    String result = null;
         	    try {
-        	        response = client.execute(request);         
+        	        response = client.execute(request);
+        	        Log.e("com.uoft.campusplannerapp", "Hi "+response.getStatusLine().toString());
         	        HttpEntity entity = response.getEntity();
-
+        	        
         	        if (entity != null) {
 
         	            // A Simple JSON Response Read
         	            InputStream instream = entity.getContent();
+        	            Log.e("com.uoft.campusplannerapp", "Hi "+response.getStatusLine().toString());
+        	            System.out.println(response.getStatusLine().toString());
         	            if (response.getStatusLine().getStatusCode() == 200) {
             	            result = convertStreamToString(instream);
         	            } else {
@@ -243,7 +296,7 @@ public class HTTPConsole {
             protected void onPostExecute(String msg) {
             	return;
             }
-        }.execute(null, null, null);
+        }.execute(URL);
         try {
 			return a.get();
 		} catch (InterruptedException e) {

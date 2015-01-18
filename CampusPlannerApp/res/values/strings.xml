@@ -13,5 +13,7 @@
     <string name="last_name">Last Name</string>
     <string name="student_number">Student Number</string>
     <string name="utmail">UTmail</string>
+    <string name="fr_email">FriendEmail</string>
+    <string name="locate">FriendEmail</string>
 
 </resources>
