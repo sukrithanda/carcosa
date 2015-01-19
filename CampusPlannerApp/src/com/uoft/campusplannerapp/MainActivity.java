@@ -1,9 +1,5 @@
 package com.uoft.campusplannerapp;
 
-import android.support.v7.app.ActionBarActivity;
-import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import java.io.IOException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -11,9 +7,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.Locale;
-import com.google.android.gms.gcm.GoogleCloudMessaging;
 
-import android.os.AsyncTask;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -21,10 +15,16 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
-import com.uoft.campusplannerapp.HTTPConsole;
+
+import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 public class MainActivity extends ActionBarActivity {
 	
@@ -63,7 +63,9 @@ public class MainActivity extends ActionBarActivity {
     	if (user == null) {
             setContentView(R.layout.activity_main);
     	} else {
-    		setContentView(R.layout.locate_friend_or_message);
+    		//setContentView(R.layout.locate_friend_or_message);
+	        setContentView(new MovingImage(this));
+
     	}
     }
     
@@ -96,7 +98,9 @@ public class MainActivity extends ActionBarActivity {
 			edit.putString("user", s_username);
 			edit.commit();
 			create_alert(this, "LogIn Successful");
-	        setContentView(R.layout.locate_friend_or_message);
+	        //setContentView(R.layout.locate_friend_or_message);
+	        setContentView(new MovingImage(this));
+
 		}
 		return true;
 	}
