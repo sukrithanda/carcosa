@@ -1,5 +1,9 @@
 package com.uoft.campusplannerapp;
  
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
+
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -21,20 +25,24 @@ public class MovingImage extends SurfaceView implements
 	private static final String TAG = MovingImage.class.getSimpleName();
 	
 	private MainThread thread;
-	private Droid droid;
-	private ScaleGestureDetector detector;
+	//List private Droid[] droid;
+    List<Droid> droid = new LinkedList<Droid>();
+
 
 
 	public MovingImage(Context context) {
+		
 		super(context);
 		// adding the callback (this) to the surface holder to intercept events
 		getHolder().addCallback(this);
 
 		// create droid and load bitmap
-		droid = new Droid(BitmapFactory.decodeResource(getResources(), R.drawable.navpointer), 50, 50);
-		
-		
-		
+		//droid = new Droid(BitmapFactory.decodeResource(getResources(), R.drawable.navpointer), 50, 50);
+		createDroid(50, 50);
+		createDroid(100, 50);
+		createDroid(200, 50);
+
+
 		// create the game loop thread
 		thread = new MainThread(getHolder(), this);
 		
@@ -43,7 +51,22 @@ public class MovingImage extends SurfaceView implements
 		// make the GamePanel focusable so it can handle events
 		setFocusable(true);
 	}
-
+	
+	public Droid createDroid(int x, int y){
+		Random randomGenerator = new Random();
+	    int randomInt = randomGenerator.nextInt(2);
+	    int icon;
+		if (randomInt == 0)
+	    	 icon = R.drawable.navpointer;
+		else if (randomInt == 1)
+	    	 icon = R.drawable.navpointer2;
+		else
+	    	 icon = R.drawable.navpointer2;
+		
+		Droid l = new Droid(BitmapFactory.decodeResource(getResources(), icon), x, y);
+		droid.add(l);
+		return l;
+	}
 	@Override
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,
 			int height) {
@@ -74,8 +97,8 @@ public class MovingImage extends SurfaceView implements
 		Log.d(TAG, "Thread was shut down cleanly");
 	}
 	
-	@Override
-	public boolean onTouchEvent(MotionEvent event) {
+	//@Override
+	/*public boolean onTouchEvent(MotionEvent event) {
 		if (event.getAction() == MotionEvent.ACTION_DOWN) {
 			// delegating event handling to the droid
 			droid.handleActionDown((int)event.getX(), (int)event.getY());
@@ -104,14 +127,16 @@ public class MovingImage extends SurfaceView implements
 		//detector.onTouchEvent(event);
 		//return true;
 		
-	}
+	}*/
 
 	public void render(Canvas canvas) {
 		Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.bahen7);
-		//canvas = new Canvas(bitmap.copy(Bitmap.Config.ARGB_8888, true));
-		canvas.drawBitmap(bitmap, 0, 0, null);
-		//canvas.drawColor(Color.BLACK);
-		droid.draw(canvas);
+		Bitmap scaled = Bitmap.createScaledBitmap(bitmap, this.getWidth(), this.getHeight(), true);
+
+		canvas.drawBitmap(scaled, 0, 0, null);
+		for (Droid l : droid){
+			l.draw(canvas);
+		}
 	}
 
 	/**
@@ -144,10 +169,16 @@ public class MovingImage extends SurfaceView implements
 		droid.update();*/
 		int i;
 		for (i = 0; i >100; i++){
-			droid.setY(i);
+			for (Droid l : droid){
+				l.setY(i);
+			}
+			//droid.setY(i);
 		}
 		
-		droid.update();
+		for (Droid l : droid){
+			l.update();
+		}
+		//droid.update();
 		
 		//Need to use this to call localizeme()
 	}
