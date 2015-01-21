@@ -2,11 +2,21 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#FF6600"
     android:orientation="vertical" >
 	
     <TextView
         android:layout_width="match_parent"
+        android:layout_height="20dp"       
+        android:textColor="#FFFFFF" 
+        android:textSize="20"
+        android:lineSpacingMultiplier="2"
+        android:text="@string/register_message" />
+    
+    <TextView
+        android:layout_width="match_parent"
         android:layout_height="20dp"
+        android:textColor="#FFFFFF"
         android:text="@string/first_name" >
 
     </TextView>
@@ -21,6 +31,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="20dp"
+        android:textColor="#FFFFFF"
         android:text="@string/last_name" />
 
     <EditText
@@ -36,6 +47,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="20dp"
+        android:textColor="#FFFFFF"
         android:text="@string/utmail" />
 
     <EditText
@@ -50,6 +62,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="20dp"
+        android:textColor="#FFFFFF"
         android:text="@string/password" />
 
     <EditText
