@@ -1,22 +1,25 @@
 package com.uoft.campusplannerapp;
 
+import java.util.regex.Pattern;
+
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
-import android.app.AlertDialog;
 import android.app.IntentService;
-import android.content.Context;
-import android.content.DialogInterface;
+import android.app.NotificationManager;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-import android.widget.Toast;
 import com.uoft.campusplannerapp.HTTPConsole;
+import com.uoft.campusplannerapp.LocateDevice;
 
 public class MessageHandler extends IntentService {
 
 	String mes, msg;
-    private Handler handler;
+    @SuppressWarnings("unused")
+	private Handler handler;
     HTTPConsole http ; 
 	public MessageHandler() {
 		super("GcmMessageHandler");
@@ -34,19 +37,7 @@ public class MessageHandler extends IntentService {
         handler = new Handler();
         http = new HTTPConsole(this);
     }
-	private static void create_alert(Context ctx, String msg) {
-    	AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
-    	builder.setMessage(msg)
-    	       .setCancelable(false)
-    	       .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-    	           public void onClick(DialogInterface dialog, int id) {
-    	                //do things
-    	           }
-    	       });
-    	AlertDialog alert = builder.create();
-    	alert.show();
-    }
-    @Override
+	@Override
     protected void onHandleIntent(Intent intent) {
         Bundle extras = intent.getExtras();
 
@@ -61,12 +52,36 @@ public class MessageHandler extends IntentService {
         if (title.equals("getLocation")) {
         	String email = extras.getString("message");
         	Log.i("com.uoft.campusplannerapp", "Location requested by" + email);
-        	http.SendLocation(email, "BA", "3", "100", "100");
+        	LocateDevice loc = new LocateDevice();
+        	loc.GetLocation();
+        	http.SendLocation(email, loc.getBldg(), "" + loc.getFloor(), "" + loc.getX(), "" + loc.getY());
         } else if (title.equals("putLocation")) {
         	String message = extras.getString("message");
         	http.SetLoc(message);
         	Log.i("com.uoft.campusplannerapp", message);
+        } else if (title.equals("message")) {
+        	String from_message = extras.getString("message");
+        	String from = from_message.split(Pattern.quote(";"))[0];
+        	String message = from_message.split(Pattern.quote(";"))[1];
+			String mod_msg = message.replaceAll("%20", " ");
+        	Log.i("Sidd", from_message + "^^^^^" + message + "^^^^^" + mod_msg);
+        	Uri notisnd = Uri.parse("" + R.raw.fallbackring);
+        	NotificationCompat.Builder mBuilder =
+        		    new NotificationCompat.Builder(this)
+        		    .setSmallIcon(R.drawable.ic_launcher)
+        		    .setContentTitle(from)
+        		    .setSound(notisnd)
+        		    .setContentText(mod_msg);
+        	int mNotificationId = 001;
+        	
+        	// Attach Chat activity as On Click
+            // Gets an instance of the NotificationManager service
+    	     NotificationManager mNotifyMgr = 
+    	             (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+    	     // Builds the notification and issues it.
+    	     mNotifyMgr.notify(mNotificationId, mBuilder.build());
         }
+        
 
         ServerBroadcastReceiver.completeWakefulIntent(intent);
 

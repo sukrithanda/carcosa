@@ -4,8 +4,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.regex.Pattern;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -20,25 +22,31 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.util.Log;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import com.uoft.campusplannerapp.FriendClass;
 
 public class HTTPConsole {
 	private final String LOGIN_PAGE = "http://104.236.85.199:8080/user/login";
 	private final String SIGNUP_PAGE = "http://104.236.85.199:8080/user/signup";
-	private final String GET_FRIEND = "http://104.236.85.199:8080/get_friend";
-	private final String ADD_FRIEND = "http://104.236.85.199:8080/add_friend";
+	private final String GET_FRIEND = "http://104.236.85.199:8080/friend/getFriends";
+	private final String ADD_FRIEND = "http://104.236.85.199:8080/friend/addFriend";
 	private final String LOCATE_FRIEND = "http://104.236.85.199:8080/location/locateFriend";
 	private final String REMOVE_FRIEND = "http://104.236.85.199:8080/remove_friend";
 	private final String REMOVE_USER = "http://104.236.85.199:8080/remove_user";
 	private final String SEND_REGID = "http://104.236.85.199:8080/send_regid";
-	private final String SEND_MESSAGE = "http://104.236.85.199:8080/send_message";
-	private final String SEND_PRIVATE = "http://104.236.85.199:8080/send_message";
+	private final String SEND_MESSAGE = "http://104.236.85.199:8080/message/sendMessage";
+	private final String SEND_PRIVATE = "http://104.236.85.199:8080/send_private";
 	private final String HELLO_WORLD = "http://104.236.85.199:8080/hello-world";
 	private final String SEND_LOCATION = "http://104.236.85.199:8080/location/putLocation";
+	private final String SIGNOUT = "http://104.236.85.199:8080/user/logout";
 	// userEmail , building, floor, x,y
+	
+	private String message; 
 
 	private Context ctx;
 	
@@ -50,26 +58,29 @@ public class HTTPConsole {
 		SharedPreferences pref = ctx.getSharedPreferences("Locations",Context.MODE_PRIVATE);
 		Editor edit = pref.edit();
 		edit.putString("result", message);
+		edit.putString("set", "true");
 		edit.commit();
 	}
 	
-	private String PollAndGetLoc(){
-		SharedPreferences pref = ctx.getSharedPreferences("Locations",Context.MODE_PRIVATE);
-		String result = pref.getString("result", null);
-		while (result == null){
-			try {
-				Thread.sleep(1000);
-				Log.i("Sidd", "Slept");
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			Log.i("Sidd", "Polling and Polling");
-			result = pref.getString("result", null);
-		}
-		return result;
+	Runnable r = new Runnable(){
+		@Override
+		public void run(){
+//			Log.i("Sidd", "Wait over");
+			SharedPreferences pref = ctx.getSharedPreferences("Locations",Context.MODE_PRIVATE);
+			//return pref.getString("result", "OperationFailed");
+			message = pref.getString("result", null);
+			Log.i("Sidd", "what");
+			return;
 	}
-	
+	};
+
+	private void InitializeLoc(){
+		SharedPreferences pref = ctx.getSharedPreferences("Locations",Context.MODE_PRIVATE);
+		Editor edit = pref.edit();
+		edit.putString("result", null);
+		edit.putString("set", "false");
+		edit.commit();
+	}
 	public String HelloWorld(){
 		return SendGetRequest(HELLO_WORLD);
 	}
@@ -83,14 +94,16 @@ public class HTTPConsole {
 			try {
 				JSONObject obj = new JSONObject(result);
 				String user = obj.getString("email");
-				String first_name = obj.getString("first_name");
-				String last_name = obj.getString("last_name");
+				String first_name = obj.getString("firstName");
+				String last_name = obj.getString("lastName");
 				String token = obj.getString("token");
+				String re_password = obj.getString("password");
 				Editor edit = ctx.getSharedPreferences("User", Context.MODE_PRIVATE).edit();
 				edit.putString("user", user);
 				edit.putString("first_name", first_name);
 				edit.putString("last_name", last_name);
 				edit.putString("token", token);
+				edit.putString("password", re_password);
 				edit.commit();
 				return true;
 			} catch (JSONException e) {
@@ -113,17 +126,37 @@ public class HTTPConsole {
 		}
 	}
 	
-	public List<String> GetFriend(String email){
-		String URL = GET_FRIEND + "?email=" + email;
-		if (SendGetRequest(URL).equals("Invalid Request")){
+	public List<FriendClass> GetFriend(String email){
+		String URL = GET_FRIEND + "?userEmail=" + email;
+		List<FriendClass> my_friends = new ArrayList<FriendClass>();
+		String friends = SendGetRequest(URL);
+		if (friends.equals("Invalid Request")){
 			return null;
 		} else {
-			return null;
+	    	String jsonString = "{\"friends\":" + friends.split(Pattern.quote("\n"))[0] + "}";
+			Log.i("Sidd", jsonString);
+			try {
+				JSONObject jsnobject = new JSONObject(jsonString);
+				JSONArray jsonArray = jsnobject.getJSONArray("friends");
+			    for (int i = 0; i < jsonArray.length(); i++) {
+			        JSONObject explrObject = jsonArray.getJSONObject(i);
+			        FriendClass temp = new FriendClass();
+			        temp.setFirst_name(explrObject.getString("firstName"));
+			        temp.setLast_name(explrObject.getString("lastName"));
+			        temp.setEmail(explrObject.getString("email"));
+			        my_friends.add(temp);
+			    }
+				return my_friends;
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return null;
+			}
 		}
 	}
 	
 	public boolean AddFriend(String user_email, String friend_email) {
-		String URL = ADD_FRIEND + "?email=" + user_email + "&friend_email=" + friend_email ;
+		String URL = ADD_FRIEND + "?userEmail=" + user_email + "&friendEmail=" + friend_email ;
 		if (SendGetRequest(URL).equals("Invalid Request")){
 			return false;
 		} else {
@@ -133,11 +166,12 @@ public class HTTPConsole {
 	
 	public String LocateFriend(String user_email,String friend_email) {
 		String URL = LOCATE_FRIEND + "?userEmail=" + user_email + "&friendEmail=" + friend_email;
-		if (SendGetRequest(URL).equals("Invalid Request")){
+		InitializeLoc();
+		String result = SendGetRequest(URL);
+		if (result.equals("Invalid Request")){
 			return null;
 		} else {
-			//return null;
-			return PollAndGetLoc();
+			return result;
 		}
 	}
 	
@@ -171,7 +205,7 @@ public class HTTPConsole {
 	
 
 	public boolean SendMessage(String user_email, String friend_email, String message) {
-		String URL = SEND_MESSAGE + "?user_email=" + user_email + "&friend_email=" + friend_email + 
+		String URL = SEND_MESSAGE + "?userEmail=" + user_email + "&friendEmail=" + friend_email + 
 				"&message=" + message;
 		if (SendGetRequest(URL).equals("Invalid Request")){
 			return false;
@@ -200,6 +234,26 @@ public class HTTPConsole {
 		}
 	}
 	
+	public boolean Logout(){
+		SharedPreferences pref = ctx.getSharedPreferences("User",Context.MODE_PRIVATE);
+		String pw = pref.getString("password",null);
+		String email = pref.getString("user",null);
+		String URL = SIGNOUT + "?email=" + email + "&password=" + pw;
+		String ans = SendGetRequest(URL);
+		if (ans.equals("Invalid Request")){
+			return false;
+		} else {
+			Editor edit = pref.edit();
+			edit.putString("user", null);
+			edit.putString("password", null);
+			edit.putString("token", null);
+			edit.putString("first_name", null);
+			edit.putString("last_name", null);
+			edit.commit();
+			return true;
+		}
+		
+	}
 	
 	@SuppressWarnings("unused")
 	private Boolean SendPostRequest(String URL, final List<NameValuePair> nameValuePairs) {

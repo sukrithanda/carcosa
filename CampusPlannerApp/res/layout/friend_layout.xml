@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:orientation="vertical"
+    tools:context="ccom.uoft.campusplannerapp.FriendActivity" 
+    android:layout_weight="10">
+    
+    <TextView
+        android:id="@+id/friendlisttext"
+        android:layout_width="wrap_content"
+        android:layout_height="0dip"
+        android:layout_weight="1"
+        android:text="@string/friend_list"
+        android:textSize="30sp" />
+
+	<ScrollView
+	    android:id="@+id/listscroll"
+	    android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:layout_weight="7">
+        <LinearLayout 
+            android:id="@+id/friendlistlinear"
+		    android:layout_width="match_parent"
+	        android:layout_height="0dip"
+	        android:orientation="vertical">
+        </LinearLayout>
+	</ScrollView>
+	
+	<TextView
+        android:id="@+id/addfriendtext"
+        android:layout_width="wrap_content"
+        android:layout_height="0dip"
+        android:layout_weight="1"
+        android:text="@string/add_friend"
+        android:textSize="30sp" />
+
+
+    <Button
+           android:layout_width="match_parent"
+           android:layout_height="0dip"
+           android:text="@string/add_friend"
+           android:onClick="add_friend"
+           android:layout_weight="1">
+       </Button>
+
+    
+</LinearLayout>

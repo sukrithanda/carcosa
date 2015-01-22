@@ -15,6 +15,9 @@
     <string name="utmail">UTmail</string>
     <string name="fr_email">FriendEmail</string>
     <string name="locate">FriendEmail</string>
+    <string name="signout">Signout</string>
+    <string name="locate_friend">Locate Your Friend</string>
+    <string name="friend_list">Your Friends</string>
+    <string name="add_friend">Add Friend</string>
     <string name="register_message">Register your Account</string>
-
 </resources>

@@ -3,17 +3,26 @@ package com.uoft.campusplannerapp;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
-
+import java.util.regex.Pattern;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.widget.LinearLayout;
+
+
+import com.uoft.campusplannerapp.LocateDevice;
 
 /*
  * This is the main surface that handles the ontouch events and draws
@@ -25,24 +34,27 @@ public class MovingImage extends SurfaceView implements
 	private static final String TAG = MovingImage.class.getSimpleName();
 	
 	private MainThread thread;
-	//List private Droid[] droid;
-    List<Droid> droid = new LinkedList<Droid>();
-
-
+	//private Droid droid;
+	List<Droid> droid = new LinkedList<Droid>();
+	private ScaleGestureDetector detector;
+	private Context ctx;
+	private Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.bahen7);
+	private Handler handler; 
 
 	public MovingImage(Context context) {
-		
 		super(context);
+		ctx = context;
 		// adding the callback (this) to the surface holder to intercept events
 		getHolder().addCallback(this);
+		LocateDevice Loc = new LocateDevice();
+		Loc.GetLocation();
+		setBitMap(Loc.getFloor());
 
 		// create droid and load bitmap
-		//droid = new Droid(BitmapFactory.decodeResource(getResources(), R.drawable.navpointer), 50, 50);
-		createDroid(50, 50);
-		createDroid(100, 50);
-		createDroid(200, 50);
-
-
+		//droid = new Droid(BitmapFactory.decodeResource(getResources(), R.drawable.navpointer), Loc.getX(), Loc.getY());
+		createDroid(Loc.getX(), Loc.getY());
+		
+		
 		// create the game loop thread
 		thread = new MainThread(getHolder(), this);
 		
@@ -77,7 +89,13 @@ public class MovingImage extends SurfaceView implements
 		// at this point the surface is created and
 		// we can safely start the game loop
 		thread.setRunning(true, getResources());
-		thread.start();
+		try {
+			thread.start();
+		} catch (Exception e){
+			thread.setRunning(false, getResources());
+			Intent i = new Intent(ctx.getApplicationContext(), FriendActivity.class);
+        	ctx.startActivity(i);
+		}
 	}
 
 	@Override
@@ -97,46 +115,52 @@ public class MovingImage extends SurfaceView implements
 		Log.d(TAG, "Thread was shut down cleanly");
 	}
 	
-	//@Override
-	/*public boolean onTouchEvent(MotionEvent event) {
-		if (event.getAction() == MotionEvent.ACTION_DOWN) {
-			// delegating event handling to the droid
-			droid.handleActionDown((int)event.getX(), (int)event.getY());
-			
-			// check if in the lower part of the screen we exit
-			if (event.getY() > getHeight() - 50) {
-				thread.setRunning(false, getResources());
-				((Activity)getContext()).finish();
-			} else {
-				Log.d(TAG, "Coords: x=" + event.getX() + ",y=" + event.getY());
-			}
-		} if (event.getAction() == MotionEvent.ACTION_MOVE) {
-			// the gestures
-			if (droid.isTouched()) {
-				// the droid was picked up and is being dragged
-				droid.setX((int)event.getX());
-				droid.setY((int)event.getY());
-			}
-		} if (event.getAction() == MotionEvent.ACTION_UP) {
-			// touch was released
-			if (droid.isTouched()) {
-				droid.setTouched(false);
-			}
-		}
-		return true;
-		//detector.onTouchEvent(event);
-		//return true;
-		
-	}*/
+//	@Override
+//	public boolean onTouchEvent(MotionEvent event) {
+//		if (event.getAction() == MotionEvent.ACTION_DOWN) {
+//			// delegating event handling to the droid
+//			droid.handleActionDown((int)event.getX(), (int)event.getY());
+//			
+//			// check if in the lower part of the screen we exit
+//			if (event.getY() > getHeight() - 50) {
+//				thread.setRunning(false, getResources());
+//				((Activity)getContext()).finish();
+//			} else {
+//				Log.d(TAG, "Coords: x=" + event.getX() + ",y=" + event.getY());
+//			}
+//		} if (event.getAction() == MotionEvent.ACTION_MOVE) {
+//			// the gestures
+//			if (droid.isTouched()) {
+//				// the droid was picked up and is being dragged
+//				droid.setX((int)event.getX());
+//				droid.setY((int)event.getY());
+//			}
+//		} if (event.getAction() == MotionEvent.ACTION_UP) {
+//			// touch was released
+//			if (droid.isTouched()) {
+//				droid.setTouched(false);
+//			}
+//		}
+//		return true;
+//		//detector.onTouchEvent(event);
+//		//return true;
+//		
+//	}
 
-	public void render(Canvas canvas) {
-		Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.bahen7);
+	public Boolean render(Canvas canvas) {
+		//Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.bahen7);
 		Bitmap scaled = Bitmap.createScaledBitmap(bitmap, this.getWidth(), this.getHeight(), true);
-
+		//canvas = new Canvas(bitmap.copy(Bitmap.Config.ARGB_8888, true));
+		if (canvas == null){
+			return false;
+		}
 		canvas.drawBitmap(scaled, 0, 0, null);
-		for (Droid l : droid){
+		//canvas.drawColor(Color.BLACK);
+		//droid.draw(canvas);
+		for (Droid l : droid) {
 			l.draw(canvas);
 		}
+		return true;
 	}
 
 	/**
@@ -144,6 +168,34 @@ public class MovingImage extends SurfaceView implements
 	 * and calls their update method if they have one or calls specific
 	 * engine's update method.
 	 */
+	private void setBitMap(int floor) {
+		switch (floor){
+		case 1:
+			bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.bahen1);
+			break;
+		case 2:
+			bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.bahen2);
+			break;
+		case 3:
+			bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.bahen3);
+			break;
+		case 4:
+			bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.bahen4);
+			break;
+		case 5:
+			bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.bahen5);
+			break;
+		case 6:
+			bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.bahen6);
+			break;
+		case 7:
+			bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.bahen7);
+			break;
+		case 8:
+			bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.bahen8);
+			break;
+		}
+	}
 	public void update() {
 		// check collision with right wall if heading right
 	/*	if (droid.getSpeed().getxDirection() == Speed.DIRECTION_RIGHT
@@ -172,14 +224,35 @@ public class MovingImage extends SurfaceView implements
 			for (Droid l : droid){
 				l.setY(i);
 			}
-			//droid.setY(i);
 		}
-		
-		for (Droid l : droid){
-			l.update();
+		SharedPreferences pref = ctx.getSharedPreferences("Locations", Context.MODE_PRIVATE);
+		String set = pref.getString("set", "false");
+		if (set.equals("true")){
+		String result = pref.getString("result", null);
+			if (result != null){
+				String[] params = result.split(Pattern.quote("&"));
+				try {
+					String friend = params[0].split(Pattern.quote("="))[1];
+					String bldg = params[1].split(Pattern.quote("="))[1];
+					String floor = params[2].split(Pattern.quote("="))[1];
+					String x = params[3].split(Pattern.quote("="))[1];
+					String y = params[4].split(Pattern.quote("="))[1];
+					
+					setBitMap(Integer.parseInt(floor));
+					int ix = Integer.parseInt(x);
+					int iy = Integer.parseInt(y);
+					droid.get(0).setX(ix);
+					droid.get(0).setY(iy);
+					Editor edit = pref.edit();
+					edit.putString("set", "false");
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				for (Droid l :droid) {
+					l.update();
+				}
+			}
 		}
-		//droid.update();
-		
 		//Need to use this to call localizeme()
 	}
 

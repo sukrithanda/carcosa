@@ -1,5 +1,9 @@
 package com.uoft.campusplannerapp;
 
+import android.support.v7.app.ActionBarActivity;
+import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import java.io.IOException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -7,24 +11,22 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.Locale;
+import com.google.android.gms.gcm.GoogleCloudMessaging;
 
+import android.os.AsyncTask;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
-
-import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.uoft.campusplannerapp.HTTPConsole;
+import com.uoft.campusplannerapp.CreateAlert;;
 
 public class MainActivity extends ActionBarActivity {
 	
@@ -38,24 +40,13 @@ public class MainActivity extends ActionBarActivity {
     KeyPair key;
     PublicKey publicKey;
     PrivateKey privateKey;
+    CreateAlert alert;
     
-    private static void create_alert(Context ctx, String msg) {
-    	AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
-    	builder.setMessage(msg)
-    	       .setCancelable(false)
-    	       .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-    	           public void onClick(DialogInterface dialog, int id) {
-    	                //do things
-    	           }
-    	       });
-    	AlertDialog alert = builder.create();
-    	alert.show();
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         http_console = new HTTPConsole(this);
+        alert = new CreateAlert(this);
     	pref = this.getSharedPreferences("User",MODE_PRIVATE);
     	String user = pref.getString("user", null);
         @SuppressWarnings("unused")
@@ -83,7 +74,7 @@ public class MainActivity extends ActionBarActivity {
 			s_username = username.getText().toString();
 			s_password = password.getText().toString();
 		} catch (Exception e) {
-			create_alert(this,"All fields are required");
+			alert.create_alert("Error","All fields are required");
 			return false;
 		}
 		
@@ -92,12 +83,11 @@ public class MainActivity extends ActionBarActivity {
 		/* Send password and user name to server for verification */
 		boolean verification = http_console.LoginRequest(s_username, encrypt_pw, regid);
 		if (verification == false) {
-			create_alert(this , "Username or PW invalid");
+			alert.create_alert("Error" , "Username or PW invalid");
 		}else {
 			Editor edit = pref.edit();
 			edit.putString("user", s_username);
 			edit.commit();
-			create_alert(this, "LogIn Successful");
 	        //setContentView(R.layout.locate_friend_or_message);
 	        setContentView(new MovingImage(this));
 
@@ -122,7 +112,7 @@ public class MainActivity extends ActionBarActivity {
 			s_utmail = utmail.getText().toString();
 			s_password = password.getText().toString();
 		} catch (Exception e) {
-			create_alert(this,"All fields are required");
+			alert.create_alert("Error","All fields are required");
 			return false;
 		}
 		
@@ -131,21 +121,21 @@ public class MainActivity extends ActionBarActivity {
 		boolean b = ValidateEmail(s_utmail);
 		if (a == false) {
 			/* If validation failed */
-			create_alert(this, "Invalid PW. PW must contain atleast 1 upper case, 1 lower case and 1 number " +
+			alert.create_alert("Error", "Invalid PW. PW must contain atleast 1 upper case, 1 lower case and 1 number " +
 					"and must be atleast 8 characters");
 			
 		} else if (b == false) {
 			/* If validation failed */
-			create_alert(this, "Invalid Email. You must use your UofT email to sign up");
+			alert.create_alert("Error", "Invalid Email. You must use your UofT email to sign up");
 		} else {
 			/* Encrypt the Password */
 			String encrypted_pw = encrypt_password(s_password); 
 			
 			boolean verification = http_console.SignupRequest(s_utmail,encrypted_pw,s_first_name,s_last_name);
 			if (verification == false){
-				create_alert(this, "Invalid Email. Try with a UofT email");
+				alert.create_alert("Error", "Invalid Email. Try with a UofT email");
 			} else {
-				create_alert(this, "Validation email sent. Click the link in your email to compelete setup");
+				alert.create_alert("Error", "Validation email sent. Click the link in your email to compelete setup");
 			}
 		}
 		return true;
@@ -157,13 +147,15 @@ public class MainActivity extends ActionBarActivity {
 			String friend_email = email.getText().toString();
 			String user = pref.getString("user", null);
 			if (user == null) {
-				create_alert(this,"You are not signed in");
+				alert.create_alert("Error","You are not signed in");
 			}
 			String Loc = http_console.LocateFriend(user, friend_email);
-			create_alert(this,"Friend is at " + Loc );
+			Log.i("Sidd","Print location now");
+			//create_alert(this,"Friend is at " + Loc );
+	        setContentView(new MovingImage(this));
 			return true;
 		} catch (Exception e) {
-			create_alert(this,"Please enter friends email");
+			alert.create_alert("Error","Please enter friends email");
 			return false;
 		}
 	}
@@ -297,6 +289,16 @@ public class MainActivity extends ActionBarActivity {
         int id = item.getItemId();
         if (id == R.id.action_settings) {
             return true;
+        } else if (id == R.id.signout) {
+            boolean sts = http_console.Logout();
+            if (sts == true){
+            	setContentView(R.layout.activity_main);
+            } else { 
+            	alert.create_alert("Error","Signout Failed. Try again later");
+            }
+        } else if (id == R.id.friend) {
+        	Intent i = new Intent(getApplicationContext(), FriendActivity.class);
+        	startActivity(i);
         }
         return super.onOptionsItemSelected(item);
     }
