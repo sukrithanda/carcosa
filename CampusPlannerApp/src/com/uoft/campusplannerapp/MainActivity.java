@@ -14,9 +14,6 @@ import java.util.Locale;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import android.os.AsyncTask;
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -41,20 +38,21 @@ public class MainActivity extends ActionBarActivity {
     PublicKey publicKey;
     PrivateKey privateKey;
     CreateAlert alert;
+    DatabaseHandler db;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         http_console = new HTTPConsole(this);
         alert = new CreateAlert(this);
+        db = new DatabaseHandler(this);
+        User usero = db.getUser();
     	pref = this.getSharedPreferences("User",MODE_PRIVATE);
-    	String user = pref.getString("user", null);
         @SuppressWarnings("unused")
 		String temp = get_reg_id();
-    	if (user == null) {
+    	if (usero == null) {
             setContentView(R.layout.activity_main);
     	} else {
-    		//setContentView(R.layout.locate_friend_or_message);
 	        setContentView(new MovingImage(this));
 
     	}
@@ -85,10 +83,6 @@ public class MainActivity extends ActionBarActivity {
 		if (verification == false) {
 			alert.create_alert("Error" , "Username or PW invalid");
 		}else {
-			Editor edit = pref.edit();
-			edit.putString("user", s_username);
-			edit.commit();
-	        //setContentView(R.layout.locate_friend_or_message);
 	        setContentView(new MovingImage(this));
 
 		}
@@ -145,13 +139,13 @@ public class MainActivity extends ActionBarActivity {
 		EditText email = (EditText)findViewById(R.id.friend);
 		try{
 			String friend_email = email.getText().toString();
-			String user = pref.getString("user", null);
+			User usero = db.getUser();
+			String user = usero.getEmail();
 			if (user == null) {
 				alert.create_alert("Error","You are not signed in");
 			}
 			String Loc = http_console.LocateFriend(user, friend_email);
-			Log.i("Sidd","Print location now");
-			//create_alert(this,"Friend is at " + Loc );
+			Log.i("Sidd","Print location now " + Loc);
 	        setContentView(new MovingImage(this));
 			return true;
 		} catch (Exception e) {
@@ -230,15 +224,22 @@ public class MainActivity extends ActionBarActivity {
     }
     
     private String get_reg_id() {
-        String oldRegId = pref.getString("regid",null);
         String oldVersionId = pref.getString("version", null);
-        version = getApplicationVersion();
-        if ((oldRegId == null) || !(oldVersionId.equals(version))) {
-        	register_gcm();
-        } else {
-        	regid = oldRegId; 
-        }
-        return regid;
+    	User user = db.getUser();
+    	if (user == null || oldVersionId == null){
+    		register_gcm();
+    		return regid;
+    	} else {
+	    	String oldRegId = user.getRegId();
+	    	String 
+	        version = getApplicationVersion();
+	        if ((oldRegId == null) || !(oldVersionId.equals(version))) {
+	        	register_gcm();
+	        } else {
+	        	regid = oldRegId; 
+	        }
+	        return regid;
+    	}
         
     }
     
@@ -253,8 +254,7 @@ public class MainActivity extends ActionBarActivity {
                     }
                     regid = gcm.register(PROJECT_NUMBER);
 
-                	SharedPreferences.Editor edit = pref.edit();
-                	edit.putString("regid", regid);
+                	Editor edit = pref.edit();
                 	edit.putString("version", version);
                 	msg = "RegId is" + regid + "version is" + version;
                 	edit.commit();
@@ -292,6 +292,7 @@ public class MainActivity extends ActionBarActivity {
         } else if (id == R.id.signout) {
             boolean sts = http_console.Logout();
             if (sts == true){
+            	db.deleteDatabses();
             	setContentView(R.layout.activity_main);
             } else { 
             	alert.create_alert("Error","Signout Failed. Try again later");
@@ -299,7 +300,7 @@ public class MainActivity extends ActionBarActivity {
         } else if (id == R.id.friend) {
         	Intent i = new Intent(getApplicationContext(), FriendActivity.class);
         	startActivity(i);
-        }
+        } 
         return super.onOptionsItemSelected(item);
     }
 }
