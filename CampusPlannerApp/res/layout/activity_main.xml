@@ -54,4 +54,14 @@
         android:textColor="#FFFFFF"
         android:textSize="30sp" />
 
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/welcomeid"
+        android:onClick="menu_button"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="42dp"
+        android:text="@string/Test" />
+
 </RelativeLayout>

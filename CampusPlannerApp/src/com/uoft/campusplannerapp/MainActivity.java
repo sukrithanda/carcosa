@@ -1,5 +1,6 @@
 package com.uoft.campusplannerapp;
 
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -10,6 +11,8 @@ import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
@@ -24,7 +27,11 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.DatePicker;
+
 import com.uoft.campusplannerapp.HTTPConsole;
 import com.uoft.campusplannerapp.CreateAlert;;
 
@@ -42,6 +49,11 @@ public class MainActivity extends ActionBarActivity {
     PrivateKey privateKey;
     CreateAlert alert;
     
+    private Spinner spinner2;
+    private List<FriendClass> my_friends;
+    private String user; 
+
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,6 +70,44 @@ public class MainActivity extends ActionBarActivity {
 	        setContentView(new MovingImage(this));
 
     	}
+    }
+    
+	public void showTimePickerDialog(View v) {
+	    DialogFragment newFragment = new TimePickerFragment();
+	    newFragment.show(getSupportFragmentManager(), "timePicker");
+	}
+    
+	public void showDatePickerDialog(View v) {
+	    DialogFragment newFragment = new DatePickerFragment();
+	    newFragment.show(getSupportFragmentManager(), "datePicker");
+	}
+	
+    public boolean menu_button(View view){
+    	setContentView(R.layout.event_organizer);  	
+    	addItemOnSpinner2();
+    	return true;  	
+    }
+    
+    public void addItemOnSpinner2() {
+		SharedPreferences pref = getSharedPreferences("User", Context.MODE_PRIVATE);
+	    user = pref.getString("user", "none");
+	    List<String> list = new ArrayList<String>();
+    	spinner2 = (Spinner) findViewById(R.id.spinner2);
+    	my_friends = http_console.GetFriend(user);
+    	int i;
+    	//for (i = 0; i < my_friends.size(); i++)
+    	//{
+    		//FriendClass fr = my_friends.get(0);  			
+    	//}
+
+    		//list.add(fr.getFirst_name() + " " + fr.getLast_name());
+    		list.add("Tanvi Mehta");
+    		list.add("Siddharth Zaveri");
+    		list.add("Sukrit Handa");
+
+    	ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, list);
+    	dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+    	spinner2.setAdapter(dataAdapter);
     }
     
     public boolean login_button(View view){
