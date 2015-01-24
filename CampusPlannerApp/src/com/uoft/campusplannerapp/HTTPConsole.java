@@ -19,16 +19,14 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.os.AsyncTask;
-import android.os.Handler;
 import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import com.uoft.campusplannerapp.FriendClass;
+import com.uoft.campusplannerapp.DatabaseHandler;
 
 public class HTTPConsole {
 	private final String LOGIN_PAGE = "http://104.236.85.199:8080/user/login";
@@ -44,9 +42,6 @@ public class HTTPConsole {
 	private final String HELLO_WORLD = "http://104.236.85.199:8080/hello-world";
 	private final String SEND_LOCATION = "http://104.236.85.199:8080/location/putLocation";
 	private final String SIGNOUT = "http://104.236.85.199:8080/user/logout";
-	// userEmail , building, floor, x,y
-	
-	private String message; 
 
 	private Context ctx;
 	
@@ -55,31 +50,30 @@ public class HTTPConsole {
 	}
 	
 	public void SetLoc(String message){
-		SharedPreferences pref = ctx.getSharedPreferences("Locations",Context.MODE_PRIVATE);
-		Editor edit = pref.edit();
-		edit.putString("result", message);
-		edit.putString("set", "true");
-		edit.commit();
+		Log.i("Sidd", message);
+		String[] params = message.split(Pattern.quote("&"));
+		String friend = params[0].split(Pattern.quote("="))[1];
+		String bldg = params[1].split(Pattern.quote("="))[1];
+		String floor = params[2].split(Pattern.quote("="))[1];
+		String x = params[3].split(Pattern.quote("="))[1];
+		String y = params[4].split(Pattern.quote("="))[1];
+		Log.i("Sidd", friend+bldg+floor+x+y);
+		Location loc = new Location();
+		loc.setBldg(bldg);
+		loc.setFloor(Integer.parseInt(floor));
+		loc.setX(Integer.parseInt(x));
+		loc.setY(Integer.parseInt(y));
+		loc.setEmail(friend);
+		
+		DatabaseHandler db = new DatabaseHandler(ctx);
+		db.addLocation(loc);
+		
+		
 	}
-	
-	Runnable r = new Runnable(){
-		@Override
-		public void run(){
-//			Log.i("Sidd", "Wait over");
-			SharedPreferences pref = ctx.getSharedPreferences("Locations",Context.MODE_PRIVATE);
-			//return pref.getString("result", "OperationFailed");
-			message = pref.getString("result", null);
-			Log.i("Sidd", "what");
-			return;
-	}
-	};
 
 	private void InitializeLoc(){
-		SharedPreferences pref = ctx.getSharedPreferences("Locations",Context.MODE_PRIVATE);
-		Editor edit = pref.edit();
-		edit.putString("result", null);
-		edit.putString("set", "false");
-		edit.commit();
+		DatabaseHandler db = new DatabaseHandler(ctx);
+		db.deleteLocations();
 	}
 	public String HelloWorld(){
 		return SendGetRequest(HELLO_WORLD);
@@ -93,21 +87,17 @@ public class HTTPConsole {
 		} else {
 			try {
 				JSONObject obj = new JSONObject(result);
+				String user_id = obj.getString("user_id");
+				Integer i_user_id = Integer.parseInt(user_id);
 				String user = obj.getString("email");
 				String first_name = obj.getString("firstName");
 				String last_name = obj.getString("lastName");
 				String token = obj.getString("token");
-				String re_password = obj.getString("password");
-				Editor edit = ctx.getSharedPreferences("User", Context.MODE_PRIVATE).edit();
-				edit.putString("user", user);
-				edit.putString("first_name", first_name);
-				edit.putString("last_name", last_name);
-				edit.putString("token", token);
-				edit.putString("password", re_password);
-				edit.commit();
+				User usero = new User(i_user_id,first_name,last_name,user,token,reg_id, password);
+				DatabaseHandler db = new DatabaseHandler(ctx);
+				db.addUser(usero);
 				return true;
 			} catch (JSONException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 				return true;
 			}
@@ -146,9 +136,10 @@ public class HTTPConsole {
 			        temp.setEmail(explrObject.getString("email"));
 			        my_friends.add(temp);
 			    }
+			    DatabaseHandler db = new DatabaseHandler(ctx);
+				db.addFriendList(my_friends);
 				return my_friends;
 			} catch (JSONException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 				return null;
 			}
@@ -235,21 +226,14 @@ public class HTTPConsole {
 	}
 	
 	public boolean Logout(){
-		SharedPreferences pref = ctx.getSharedPreferences("User",Context.MODE_PRIVATE);
-		String pw = pref.getString("password",null);
-		String email = pref.getString("user",null);
-		String URL = SIGNOUT + "?email=" + email + "&password=" + pw;
+		DatabaseHandler db = new DatabaseHandler(ctx);
+		User user = db.getUser();
+		String URL = SIGNOUT + "?email=" + user.getEmail() + "&password=" + user.getPassword();
 		String ans = SendGetRequest(URL);
 		if (ans.equals("Invalid Request")){
 			return false;
 		} else {
-			Editor edit = pref.edit();
-			edit.putString("user", null);
-			edit.putString("password", null);
-			edit.putString("token", null);
-			edit.putString("first_name", null);
-			edit.putString("last_name", null);
-			edit.commit();
+			db.deleteUser();
 			return true;
 		}
 		
@@ -266,9 +250,6 @@ public class HTTPConsole {
         	
         	    try {
         	        // Add your data
-//        	        List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
-//        	        nameValuePairs.add(new BasicNameValuePair("data1", data1));
-//        	        nameValuePairs.add(new BasicNameValuePair("data2", data2));
         	        httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
         	
         	        // Execute HTTP Post Request
@@ -282,9 +263,7 @@ public class HTTPConsole {
         	        
         	        
         	    } catch (ClientProtocolException e) {
-        	        // TODO Auto-generated catch block
         	    } catch (IOException e) {
-        	        // TODO Auto-generated catch block
         	    }
         		return false;
 
@@ -336,10 +315,8 @@ public class HTTPConsole {
 
         	        }
         	    } catch (ClientProtocolException e1) {
-        	        // TODO Auto-generated catch block
         	        e1.printStackTrace();
         	    } catch (IOException e1) {
-        	        // TODO Auto-generated catch block
         	        e1.printStackTrace();
         	    }
         	    return result;

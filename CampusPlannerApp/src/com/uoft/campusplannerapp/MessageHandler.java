@@ -13,7 +13,7 @@ import android.os.Handler;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import com.uoft.campusplannerapp.HTTPConsole;
-import com.uoft.campusplannerapp.LocateDevice;
+import com.uoft.campusplannerapp.Location;
 
 public class MessageHandler extends IntentService {
 
@@ -52,7 +52,7 @@ public class MessageHandler extends IntentService {
         if (title.equals("getLocation")) {
         	String email = extras.getString("message");
         	Log.i("com.uoft.campusplannerapp", "Location requested by" + email);
-        	LocateDevice loc = new LocateDevice();
+        	Location loc = new Location();
         	loc.GetLocation();
         	http.SendLocation(email, loc.getBldg(), "" + loc.getFloor(), "" + loc.getX(), "" + loc.getY());
         } else if (title.equals("putLocation")) {

@@ -26,6 +26,7 @@ public class MainThread extends Thread {
 	// The actual view that handles inputs
 	// and draws to the surface
 	private MovingImage gamePanel;
+	@SuppressWarnings("unused")
 	private Resources res; 
 
 	// flag to hold game state 
@@ -72,6 +73,7 @@ public class MainThread extends Thread {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private MainThread thread;
 	
 	
