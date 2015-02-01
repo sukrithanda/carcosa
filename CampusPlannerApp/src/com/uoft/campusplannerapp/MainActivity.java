@@ -1,9 +1,5 @@
 package com.uoft.campusplannerapp;
 
-import android.support.v7.app.ActionBarActivity;
-import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import java.io.IOException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -11,24 +7,41 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.Locale;
-import com.google.android.gms.gcm.GoogleCloudMessaging;
 
-import android.os.AsyncTask;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
-import com.uoft.campusplannerapp.HTTPConsole;
-import com.uoft.campusplannerapp.CreateAlert;;
+import android.view.ViewGroup;
+import android.support.v4.widget.DrawerLayout;
+import android.widget.TextView;
 
-public class MainActivity extends ActionBarActivity {
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
+
+
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+
+public class MainActivity extends ActionBarActivity  implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 	
 	GoogleCloudMessaging gcm;
     String regid;
@@ -40,28 +53,112 @@ public class MainActivity extends ActionBarActivity {
     KeyPair key;
     PublicKey publicKey;
     PrivateKey privateKey;
-    CreateAlert alert;
     
+	private Fragment mVisible;
+	private SupportMapFragment mMapFragment;
+	private Fragment mFriendsFragment;
+	private GoogleMap map;
+	/**
+	 * Fragment managing the behaviors, interactions and presentation of the
+	 * navigation drawer.
+	 */
+	private NavigationDrawerFragment mNavigationDrawerFragment;
+
+	/**
+	 * Used to store the last screen title. For use in
+	 * {@link #restoreActionBar()}.
+	 */
+	private CharSequence mTitle;
+    
+    private static void create_alert(Context ctx, String msg) {
+    	AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
+    	builder.setMessage(msg)
+    	       .setCancelable(false)
+    	       .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+    	           public void onClick(DialogInterface dialog, int id) {
+    	                //do things
+    	           }
+    	       });
+    	AlertDialog alert = builder.create();
+    	alert.show();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         http_console = new HTTPConsole(this);
-        alert = new CreateAlert(this);
     	pref = this.getSharedPreferences("User",MODE_PRIVATE);
     	String user = pref.getString("user", null);
         @SuppressWarnings("unused")
 		String temp = get_reg_id();
+        
     	if (user == null) {
             setContentView(R.layout.activity_main);
     	} else {
-    		//setContentView(R.layout.locate_friend_or_message);
-	        setContentView(new MovingImage(this));
+    		setContentView(R.layout.map_main);    	
+    	    	
+    	mNavigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager()
+				.findFragmentById(R.id.navigation_drawer);
+    	DrawerLayout m = (DrawerLayout)findViewById(R.id.drawer_layout);
+    
+		// Set up the drawer.
+		mNavigationDrawerFragment.setUp(R.id.navigation_drawer,m);
+				//(DrawerLayout)findViewById(R.id.drawer_layout));
 
+		setUpFragments();
+		mVisible = mMapFragment;
+		mTitle = getString(R.string.title_map);
     	}
+    	
     }
+    
+	@Override
+    protected void onResume() {
+        super.onResume();
+    }
+	
+	// Set different Fragments Here
+		@Override
+		public void onNavigationDrawerItemSelected(int position) {
+			// update the main content by replacing fragments
+
+			switch(position)
+			{
+				case 0:
+					showFragment(mMapFragment);
+					mTitle = getString(R.string.title_map);
+					break;
+				default:
+					showFragment(mFriendsFragment);
+					mTitle = getString(R.string.title_friends);
+			}
+		}
+	
+
+		public void onSectionAttached(int number) {
+			switch (number) {
+			case 1:
+				mTitle = getString(R.string.title_map);
+				break;
+			case 2:
+				mTitle = getString(R.string.title_friends);
+				break;
+			}
+		}	
+		
+		public void restoreActionBar() {
+			ActionBar actionBar = getSupportActionBar();
+			actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+			actionBar.setDisplayShowTitleEnabled(true);
+			actionBar.setTitle(mTitle);
+		}
+		
+		
     
     public boolean login_button(View view){
 		setContentView(R.layout.login_page);
+       // setContentView(R.layout.map_layout);
+
 		return true;
 	}
 	
@@ -74,7 +171,7 @@ public class MainActivity extends ActionBarActivity {
 			s_username = username.getText().toString();
 			s_password = password.getText().toString();
 		} catch (Exception e) {
-			alert.create_alert("Error","All fields are required");
+			create_alert(this,"All fields are required");
 			return false;
 		}
 		
@@ -83,13 +180,25 @@ public class MainActivity extends ActionBarActivity {
 		/* Send password and user name to server for verification */
 		boolean verification = http_console.LoginRequest(s_username, encrypt_pw, regid);
 		if (verification == false) {
-			alert.create_alert("Error" , "Username or PW invalid");
+			create_alert(this , "Username or PW invalid");
 		}else {
 			Editor edit = pref.edit();
 			edit.putString("user", s_username);
 			edit.commit();
-	        //setContentView(R.layout.locate_friend_or_message);
-	        setContentView(new MovingImage(this));
+			create_alert(this, "LogIn Successful");
+	        setContentView(R.layout.map_main);
+	      
+	        mNavigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager()
+					.findFragmentById(R.id.navigation_drawer);
+	    	DrawerLayout m = (DrawerLayout)findViewById(R.id.drawer_layout);
+	    
+			// Set up the drawer.
+			mNavigationDrawerFragment.setUp(R.id.navigation_drawer,m);
+
+			setUpFragments();
+			mVisible = mMapFragment;
+			mTitle = getString(R.string.title_map);
+	        
 
 		}
 		return true;
@@ -112,7 +221,7 @@ public class MainActivity extends ActionBarActivity {
 			s_utmail = utmail.getText().toString();
 			s_password = password.getText().toString();
 		} catch (Exception e) {
-			alert.create_alert("Error","All fields are required");
+			create_alert(this,"All fields are required");
 			return false;
 		}
 		
@@ -121,21 +230,21 @@ public class MainActivity extends ActionBarActivity {
 		boolean b = ValidateEmail(s_utmail);
 		if (a == false) {
 			/* If validation failed */
-			alert.create_alert("Error", "Invalid PW. PW must contain atleast 1 upper case, 1 lower case and 1 number " +
+			create_alert(this, "Invalid PW. PW must contain atleast 1 upper case, 1 lower case and 1 number " +
 					"and must be atleast 8 characters");
 			
 		} else if (b == false) {
 			/* If validation failed */
-			alert.create_alert("Error", "Invalid Email. You must use your UofT email to sign up");
+			create_alert(this, "Invalid Email. You must use your UofT email to sign up");
 		} else {
 			/* Encrypt the Password */
 			String encrypted_pw = encrypt_password(s_password); 
 			
 			boolean verification = http_console.SignupRequest(s_utmail,encrypted_pw,s_first_name,s_last_name);
 			if (verification == false){
-				alert.create_alert("Error", "Invalid Email. Try with a UofT email");
+				create_alert(this, "Invalid Email. Try with a UofT email");
 			} else {
-				alert.create_alert("Error", "Validation email sent. Click the link in your email to compelete setup");
+				create_alert(this, "Validation email sent. Click the link in your email to compelete setup");
 			}
 		}
 		return true;
@@ -147,15 +256,13 @@ public class MainActivity extends ActionBarActivity {
 			String friend_email = email.getText().toString();
 			String user = pref.getString("user", null);
 			if (user == null) {
-				alert.create_alert("Error","You are not signed in");
+				create_alert(this,"You are not signed in");
 			}
 			String Loc = http_console.LocateFriend(user, friend_email);
-			Log.i("Sidd","Print location now");
-			//create_alert(this,"Friend is at " + Loc );
-	        setContentView(new MovingImage(this));
+			create_alert(this,"Friend is at " + Loc );
 			return true;
 		} catch (Exception e) {
-			alert.create_alert("Error","Please enter friends email");
+			create_alert(this,"Please enter friends email");
 			return false;
 		}
 	}
@@ -276,30 +383,150 @@ public class MainActivity extends ActionBarActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
+    	if(mNavigationDrawerFragment != null && !mNavigationDrawerFragment.isDrawerOpen()) {
+			// Only show items in the action bar relevant to this screen
+			// if the drawer is not showing. Otherwise, let the drawer
+			// decide what to show in the action bar.
+			getMenuInflater().inflate(R.menu.main, menu);
+			restoreActionBar();
+			return true;
+		}
+		return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        } else if (id == R.id.signout) {
-            boolean sts = http_console.Logout();
-            if (sts == true){
-            	setContentView(R.layout.activity_main);
-            } else { 
-            	alert.create_alert("Error","Signout Failed. Try again later");
-            }
-        } else if (id == R.id.friend) {
-        	Intent i = new Intent(getApplicationContext(), FriendActivity.class);
-        	startActivity(i);
-        }
-        return super.onOptionsItemSelected(item);
+    	// Handle action bar item clicks here. The action bar will
+		// automatically handle clicks on the Home/Up button, so long
+		// as you specify a parent activity in AndroidManifest.xml.
+		int id = item.getItemId();
+		if (id == R.id.action_settings) {
+			return true;
+		}
+		return super.onOptionsItemSelected(item);
     }
+    
+    /**
+	 * A placeholder fragment containing a simple view.
+	 */
+	public static class FriendsFragment extends Fragment {
+		public static final String TAG = "friends";
+		/**
+		 * The fragment argument representing the section number for this
+		 * fragment.
+		 */
+		private static final String ARG_SECTION_NUMBER = "section_number";
+
+		/**
+		 * Returns a new instance of this fragment for the given section number.
+		 */
+		public static FriendsFragment newInstance(String friendName) {
+			FriendsFragment fragment = new FriendsFragment();
+			Bundle args = new Bundle();
+			args.putString(ARG_SECTION_NUMBER, friendName);
+			fragment.setArguments(args);
+			return fragment;
+		}
+
+		public FriendsFragment() {
+		}
+
+		@Override
+		public View onCreateView(LayoutInflater inflater, ViewGroup container,
+				Bundle savedInstanceState) {
+			View rootView = inflater.inflate(R.layout.fragment_main, container,
+					false);
+
+			TextView textView = (TextView) rootView
+					.findViewById(R.id.section_label);
+			textView.setText(getArguments().getString(
+					ARG_SECTION_NUMBER));
+			return rootView;
+		}
+
+		@Override
+		public void onAttach(Activity activity) {
+			super.onAttach(activity);
+			((MainActivity) activity).onSectionAttached(getArguments().getInt(
+					ARG_SECTION_NUMBER));
+		}
+	}
+	
+	/**
+	 * A placeholder fragment containing a simple view.
+	 */
+	public static  class MFragment extends SupportMapFragment {
+		public static final String TAG = "map";
+		/**
+		 * The fragment argument representing the section number for this
+		 * fragment.
+		 */
+
+		/**
+		 * Returns a new instance of this fragment for the given section number.
+		 */
+
+		public MFragment() {
+			super();
+		}
+
+		@Override
+		
+		public View onCreateView(LayoutInflater inflater, ViewGroup container,
+				Bundle savedInstanceState) {
+			super.onCreateView(inflater, container, savedInstanceState);
+			View rootView = inflater.inflate(R.layout.fragment_map, container,
+					false);
+			
+			return rootView;
+		}
+
+		@Override
+		public void onAttach(Activity activity) {
+			super.onAttach(activity);
+		}
+	}
+	
+	private void showFragment(Fragment fragmentIn) {
+        if (fragmentIn == null) return;
+
+        final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
+
+        if (mVisible != null) ft.hide(mVisible);
+
+        ft.show(fragmentIn).commit();
+        mVisible = fragmentIn;
+    }
+
+	private void setUpFragments() {
+        final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+
+        // If the activity is killed while in BG, it's possible that the
+        // fragment still remains in the FragmentManager, so, we don't need to
+        // add it again.
+        mMapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        if (mMapFragment == null) {
+            mMapFragment = MFragment.newInstance();
+            ft.add(R.id.container, mMapFragment, MFragment.TAG);
+        }
+        else{
+        	map= mMapFragment.getMap();
+        	map.setIndoorEnabled(false);
+           ft.replace(R.id.container, mMapFragment, MFragment.TAG);
+        }
+        ft.show(mMapFragment);
+
+        mFriendsFragment = (FriendsFragment) getSupportFragmentManager().findFragmentByTag(FriendsFragment.TAG);
+        if (mFriendsFragment == null) {
+            mFriendsFragment = FriendsFragment.newInstance("Gary");
+            ft.add(R.id.container, mFriendsFragment, FriendsFragment.TAG);
+        }
+        ft.hide(mFriendsFragment);
+
+        ft.commit();
+    }
+
+
+  
 }

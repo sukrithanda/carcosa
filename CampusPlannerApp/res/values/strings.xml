@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">LoginTestApp</string>
+    <string name="app_name">CampusPlannerApp</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="welcome_message">Sign up and start scheduling faster!</string>
@@ -20,4 +20,11 @@
     <string name="friend_list">Your Friends</string>
     <string name="add_friend">Add Friend</string>
     <string name="register_message">Register your Account</string>
+    
+    <string name="title_map">Map</string>
+    <string name="title_chat">Chat</string>
+    <string name="title_friends">Friends</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="action_example">Example action</string>    
 </resources>
