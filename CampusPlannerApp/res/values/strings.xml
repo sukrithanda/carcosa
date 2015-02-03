@@ -20,11 +20,25 @@
     <string name="friend_list">Your Friends</string>
     <string name="add_friend">Add Friend</string>
     <string name="register_message">Register your Account</string>
+     <string name="event_prompt">Choose an event</string>
+    <string name="create_meeting">Create an event</string>
+    
+        <string-array name="eventType_array">
+        <item>Office Hours</item>
+        <item>Group Study</item>
+        <item>Computer Lab</item>
+    </string-array>
     
     <string name="title_map">Map</string>
     <string name="title_chat">Chat</string>
     <string name="title_friends">Friends</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="action_example">Example action</string>    
+    <string name="action_example">Example action</string>   
+    
+    <string name="Test">TestEx</string>
+    <string name="pick_time">Select Time</string>
+    <string name="title_activity_time_pick">TimePickActivity</string>
+    <string name="title_activity_time_pickr">TimePickrActivity</string>
+    <string name="pick_date">Select a date</string>
 </resources>
