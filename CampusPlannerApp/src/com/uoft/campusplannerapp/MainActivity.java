@@ -1,17 +1,30 @@
 package com.uoft.campusplannerapp;
 
+
+import android.support.v4.app.DialogFragment;
+import android.support.v7.app.ActionBarActivity;
+import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import java.io.IOException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+
+import android.os.AsyncTask;
+import android.content.Context;
+import android.content.Intent;
+
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageInfo;
@@ -25,7 +38,9 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+
 import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
 import android.widget.TextView;
@@ -41,6 +56,12 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 
+import android.widget.Spinner;
+import android.widget.DatePicker;
+
+import com.uoft.campusplannerapp.HTTPConsole;
+import com.uoft.campusplannerapp.CreateAlert;;
+
 public class MainActivity extends ActionBarActivity  implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 	
 	GoogleCloudMessaging gcm;
@@ -53,6 +74,13 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
     KeyPair key;
     PublicKey publicKey;
     PrivateKey privateKey;
+
+    CreateAlert alert;
+    DatabaseHandler db;
+    
+    private Spinner spinner2;
+    private List<FriendClass> my_friends;
+    private String user; 
     
 	private Fragment mVisible;
 	private SupportMapFragment mMapFragment;
@@ -87,12 +115,15 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         http_console = new HTTPConsole(this);
+
+        alert = new CreateAlert(this);
+        db = new DatabaseHandler(this);
+        User usero = db.getUser();
     	pref = this.getSharedPreferences("User",MODE_PRIVATE);
-    	String user = pref.getString("user", null);
         @SuppressWarnings("unused")
 		String temp = get_reg_id();
-        
-    	if (user == null) {
+  
+    	if (usero == null) {
             setContentView(R.layout.activity_main);
     	} else {
     		setContentView(R.layout.map_main);    	
@@ -154,6 +185,50 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 		}
 		
 		
+	public void showTimePickerDialog(View v) {
+	    DialogFragment newFragment = new TimePickerFragment();
+	    newFragment.show(getSupportFragmentManager(), "timePicker");
+	}
+    
+	public void showDatePickerDialog(View v) {
+	    DialogFragment newFragment = new DatePickerFragment();
+	    newFragment.show(getSupportFragmentManager(), "datePicker");
+	}
+	
+    public boolean menu_button(View view){
+    	setContentView(R.layout.event_organizer);  	
+    	addItemOnSpinner2();
+    	return true;  	
+    }
+    
+    public void addItemOnSpinner2() {
+    	User usero = db.getUser();
+    	if (usero == null) {
+    		alert.create_alert("Error", "You need to Sign in first");
+    		String user = "tanvim.mehta@utoronto.ca";
+        	my_friends = http_console.GetFriend(user);
+    		
+    	} else {
+    		my_friends = http_console.GetFriend(usero.getEmail());
+    	}
+	    List<String> list = new ArrayList<String>();
+    	spinner2 = (Spinner) findViewById(R.id.spinner2);
+    	int i;
+    	for (i = 0; i < my_friends.size(); i++)
+    	{
+    		FriendClass fr = my_friends.get(i);  		
+    		list.add(fr.getFirst_name() + " " + fr.getLast_name());
+    	}
+
+    		//list.add(fr.getFirst_name() + " " + fr.getLast_name());
+//    		list.add("Tanvi Mehta");
+//    		list.add("Siddharth Zaveri");
+//    		list.add("Sukrit Handa");
+
+    	ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, list);
+    	dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+    	spinner2.setAdapter(dataAdapter);
+    }
     
     public boolean login_button(View view){
 		setContentView(R.layout.login_page);
@@ -199,6 +274,7 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 			mVisible = mMapFragment;
 			mTitle = getString(R.string.title_map);
 	        
+	       // setContentView(new MovingImage(this));
 
 		}
 		return true;
@@ -254,12 +330,18 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 		EditText email = (EditText)findViewById(R.id.friend);
 		try{
 			String friend_email = email.getText().toString();
-			String user = pref.getString("user", null);
+			User usero = db.getUser();
+			String user = usero.getEmail();
 			if (user == null) {
 				create_alert(this,"You are not signed in");
 			}
 			String Loc = http_console.LocateFriend(user, friend_email);
+
 			create_alert(this,"Friend is at " + Loc );
+
+			//Log.i("Sidd","Print location now " + Loc);
+	      //  setContentView(new MovingImage(this));
+
 			return true;
 		} catch (Exception e) {
 			create_alert(this,"Please enter friends email");
@@ -337,15 +419,22 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
     }
     
     private String get_reg_id() {
-        String oldRegId = pref.getString("regid",null);
         String oldVersionId = pref.getString("version", null);
-        version = getApplicationVersion();
-        if ((oldRegId == null) || !(oldVersionId.equals(version))) {
-        	register_gcm();
-        } else {
-        	regid = oldRegId; 
-        }
-        return regid;
+    	User user = db.getUser();
+    	if (user == null || oldVersionId == null){
+    		register_gcm();
+    		return regid;
+    	} else {
+	    	String oldRegId = user.getRegId();
+	    	String 
+	        version = getApplicationVersion();
+	        if ((oldRegId == null) || !(oldVersionId.equals(version))) {
+	        	register_gcm();
+	        } else {
+	        	regid = oldRegId; 
+	        }
+	        return regid;
+    	}
         
     }
     
@@ -360,8 +449,7 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
                     }
                     regid = gcm.register(PROJECT_NUMBER);
 
-                	SharedPreferences.Editor edit = pref.edit();
-                	edit.putString("regid", regid);
+                	Editor edit = pref.edit();
                 	edit.putString("version", version);
                 	msg = "RegId is" + regid + "version is" + version;
                 	edit.commit();
@@ -399,11 +487,24 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
     	// Handle action bar item clicks here. The action bar will
 		// automatically handle clicks on the Home/Up button, so long
 		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
+    	int id = item.getItemId();
+        if (id == R.id.action_settings) {
+            return true;
+        } else if (id == R.id.signout) {
+            boolean sts = http_console.Logout();
+            if (sts == true){
+            	db.deleteDatabses();
+            	setContentView(R.layout.activity_main);
+            } else { 
+            	alert.create_alert("Error","Signout Failed. Try again later");
+            }
+        } else if (id == R.id.friend) {
+        	Intent i = new Intent(getApplicationContext(), FriendActivity.class);
+        	startActivity(i);
+        } else if (id == R.id.meeting) {
+        	menu_button(null);
+        } 
+        return super.onOptionsItemSelected(item);
     }
     
     /**
@@ -525,6 +626,27 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
         ft.hide(mFriendsFragment);
 
         ft.commit();
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+    /*    int id = item.getItemId();
+        if (id == R.id.action_settings) {
+            return true;
+        } else if (id == R.id.signout) {
+            boolean sts = http_console.Logout();
+            if (sts == true){
+            	db.deleteDatabses();
+            	setContentView(R.layout.activity_main);
+            } else { 
+            	alert.create_alert("Error","Signout Failed. Try again later");
+            }
+        } else if (id == R.id.friend) {
+        	Intent i = new Intent(getApplicationContext(), FriendActivity.class);
+        	startActivity(i);
+        } else if (id == R.id.meeting) {
+        	menu_button(null);
+        } 
+        return super.onOptionsItemSelected(item);*/
     }
 
 

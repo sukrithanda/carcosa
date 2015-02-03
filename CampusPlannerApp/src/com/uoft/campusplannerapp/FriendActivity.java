@@ -7,9 +7,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,31 +15,36 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
-
 import com.uoft.campusplannerapp.HTTPConsole;
 import com.uoft.campusplannerapp.CreateAlert;
 import com.uoft.campusplannerapp.FriendClass;
 import com.uoft.campusplannerapp.MovingImage;
+import com.uoft.campusplannerapp.DatabaseHandler;
+import com.uoft.campusplannerapp.User;
 
 public class FriendActivity extends Activity {
 	private HTTPConsole http_console;
 	private CreateAlert alert;
 	private List<FriendClass> my_friends;
 	private String user; 
+	private DatabaseHandler db;
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);
 	    http_console = new HTTPConsole(this);
+	    db = new DatabaseHandler(this);
 	    setContentView(R.layout.friend_layout);
 	    alert = new CreateAlert(this);
 	    get_friends();
 	}
 	
 	private void get_friends(){
-		SharedPreferences pref = getSharedPreferences("User", Context.MODE_PRIVATE);
-	    user = pref.getString("user", "none");
+		User u = db.getUser();
+		if (u == null) { 
+			return;
+		}
+		user = u.getEmail();
 	    my_friends = http_console.GetFriend(user);
 	    if (my_friends != null){
 		    LinearLayout sv = (LinearLayout)findViewById(R.id.friendlistlinear);
@@ -52,7 +55,6 @@ public class FriendActivity extends Activity {
 		    	Button btn = new Button(this);
 		    	btn.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.MATCH_PARENT));
 		    	btn.setText(fr.getFirst_name() + " " + fr.getLast_name());
-		    	final int id = btn.getId();
 		    	btn.setOnClickListener(new View.OnClickListener() {
 		            @Override
 		            public void onClick(View v) {
@@ -115,25 +117,7 @@ public class FriendActivity extends Activity {
 		alert.create_input_alert_for_add_friend("Add Friend", "Enter email", user);
 		return true;
 	}
-	
-	private void GetLocAndPlot(View v){
-		Button btn = (Button) v;
-		String name = btn.getText().toString();
-		String names[] = name.split(Pattern.quote(" "));
-		String email = "none";
-		int i = 0; 
-		for (i = 0; i < my_friends.size(); i++){
-			FriendClass friend = my_friends.get(i);
-			if (friend.getFirst_name().equals(names[0]) && friend.getLast_name().equals(names[1])){
-				email = friend.getEmail();
-				break;
-			}
-		}
-		http_console.LocateFriend(user, email);
-		setContentView(new MovingImage(this));
-		
-		
-	}
+
 	@Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.

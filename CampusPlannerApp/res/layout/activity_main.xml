@@ -16,7 +16,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_alignRight="@+id/linearLayout1"
         android:layout_marginTop="136dp"
         android:textColor="#FFFFFF"
         android:gravity="center"
@@ -74,6 +73,16 @@
     -->
 
 
+
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/welcomeid"
+        android:onClick="menu_button"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="42dp"
+        android:text="@string/Test" />
 
 </RelativeLayout>
 
