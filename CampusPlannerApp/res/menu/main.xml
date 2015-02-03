@@ -18,10 +18,6 @@
         android:orderInCategory="100"
         android:title="@string/friend_list"
         app:showAsAction="never"/>
-      <item
-        android:id="@+id/meeting"
-        android:orderInCategory="100"
-        android:title="@string/create_meeting"
-        app:showAsAction="never"/>
+      
 
 </menu>
