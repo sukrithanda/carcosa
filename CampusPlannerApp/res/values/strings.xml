@@ -21,6 +21,7 @@
     <string name="add_friend">Add Friend</string>
     <string name="register_message">Register your Account</string>
     <string name="event_prompt">Choose an event</string>
+    <string name="create_meeting">Create an event</string>
 
     <string-array name="eventType_array">
         <item>Office Hours</item>
