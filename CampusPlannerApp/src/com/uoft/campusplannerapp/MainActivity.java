@@ -17,6 +17,7 @@ import java.util.Locale;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import android.os.AsyncTask;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -87,21 +88,28 @@ public class MainActivity extends ActionBarActivity {
     }
     
     public void addItemOnSpinner2() {
-		SharedPreferences pref = getSharedPreferences("User", Context.MODE_PRIVATE);
-	    user = pref.getString("user", "none");
+    	User usero = db.getUser();
+    	if (usero == null) {
+    		alert.create_alert("Error", "You need to Sign in first");
+    		String user = "tanvim.mehta@utoronto.ca";
+        	my_friends = http_console.GetFriend(user);
+    		
+    	} else {
+    		my_friends = http_console.GetFriend(usero.getEmail());
+    	}
 	    List<String> list = new ArrayList<String>();
     	spinner2 = (Spinner) findViewById(R.id.spinner2);
-    	my_friends = http_console.GetFriend(user);
     	int i;
-    	//for (i = 0; i < my_friends.size(); i++)
-    	//{
-    		//FriendClass fr = my_friends.get(0);  			
-    	//}
+    	for (i = 0; i < my_friends.size(); i++)
+    	{
+    		FriendClass fr = my_friends.get(i);  		
+    		list.add(fr.getFirst_name() + " " + fr.getLast_name());
+    	}
 
     		//list.add(fr.getFirst_name() + " " + fr.getLast_name());
-    		list.add("Tanvi Mehta");
-    		list.add("Siddharth Zaveri");
-    		list.add("Sukrit Handa");
+//    		list.add("Tanvi Mehta");
+//    		list.add("Siddharth Zaveri");
+//    		list.add("Sukrit Handa");
 
     	ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, list);
     	dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -350,6 +358,8 @@ public class MainActivity extends ActionBarActivity {
         } else if (id == R.id.friend) {
         	Intent i = new Intent(getApplicationContext(), FriendActivity.class);
         	startActivity(i);
+        } else if (id == R.id.meeting) {
+        	menu_button(null);
         } 
         return super.onOptionsItemSelected(item);
     }

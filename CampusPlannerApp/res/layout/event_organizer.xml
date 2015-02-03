@@ -52,7 +52,7 @@
         android:id="@+id/angry_btn"
         android:layout_width="270dp"
         android:layout_height="60dp"
-        android:background="@drawable/submitbuttonshape"
+        android:background="@drawable/signupbuttonshape"
         android:shadowColor="#A8A8A8"
         android:shadowDx="0"
         android:shadowDy="0"
