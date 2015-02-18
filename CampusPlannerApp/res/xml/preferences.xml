@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    
+         
+
+<PreferenceCategory android:title="Startup" android:key="startup" android:summary="Startup settings">
+    
+     <CheckBoxPreference android:key="autostart_enable" android:title="Auto Start" android:summary="Start to localize me when application opens" android:defaultValue="true" />
+  
+   </PreferenceCategory>
+   
+<PreferenceCategory android:title="Algorithms" android:key="algorithms" android:summary="Algorithms settings">
+    
+        <ListPreference 
+            android:key="wifi_localization_algorithm"
+            android:title="Wi-Fi Localization Algorithm"
+            android:summary="Wi-Fi Localization Algorithm"
+            android:defaultValue="1"
+            android:numeric="integer" 
+            android:entries="@array/wifi_localization_algorithms"
+            android:entryValues="@array/wifi_localization_algorithms_Values"
+        /> 
+        
+        
+  </PreferenceCategory>
+  
+   
+</PreferenceScreen>

@@ -15,6 +15,7 @@ import android.view.SurfaceView;
 
 import com.uoft.campusplannerapp.Location;
 import com.uoft.campusplannerapp.DatabaseHandler;
+import com.uoft.campusplannerapp.R;
 
 /*
  * This is the main surface that handles the ontouch events and draws

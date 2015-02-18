@@ -21,6 +21,7 @@ import com.uoft.campusplannerapp.FriendClass;
 import com.uoft.campusplannerapp.MovingImage;
 import com.uoft.campusplannerapp.DatabaseHandler;
 import com.uoft.campusplannerapp.User;
+import com.uoft.campusplannerapp.R;
 
 public class FriendActivity extends Activity {
 	private HTTPConsole http_console;

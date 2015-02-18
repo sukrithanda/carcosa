@@ -40,4 +40,7 @@
     <string name="title_activity_time_pick">TimePickActivity</string>
     <string name="title_activity_time_pickr">TimePickrActivity</string>
     <string name="pick_date">Select a date</string>
+    
+    <string name="menu_start">Start</string>
+    <string name="menu_stop">Stop</string>
 </resources>
