@@ -239,6 +239,60 @@ public class HTTPConsole {
 		
 	}
 	
+
+	public List<ResourceClass> getResources(String type) {
+		List<ResourceClass> rsc = new ArrayList<ResourceClass>();
+		ResourceClass tmp ;
+		if (type.equals("Labs")) {
+			tmp = new ResourceClass();
+			tmp.setResource("BA2025");
+			rsc.add(tmp);
+			tmp = new ResourceClass();
+			tmp.setResource("BA3025");
+			rsc.add(tmp);
+			tmp = new ResourceClass();
+			tmp.setResource("BA4025");
+			rsc.add(tmp);
+			tmp = new ResourceClass();
+			tmp.setResource("BA5025");
+			rsc.add(tmp);
+		} else if (type.equals("Tutorial Rooms")) {
+			tmp = new ResourceClass();
+			tmp.setResource("BA2125");
+			rsc.add(tmp);
+			tmp = new ResourceClass();
+			tmp.setResource("BA2135");
+			rsc.add(tmp);
+			tmp = new ResourceClass();
+			tmp.setResource("BA2145");
+			rsc.add(tmp);
+			tmp = new ResourceClass();
+			tmp.setResource("BA21555");
+			rsc.add(tmp);
+			
+		} else if (type.equals("Libraries")){
+			tmp = new ResourceClass();
+			tmp.setResource("BA1015");
+			rsc.add(tmp);
+			tmp = new ResourceClass();
+			tmp.setResource("BA3175");
+			rsc.add(tmp);
+		} else if (type.equals("Washrooms")) {
+			tmp = new ResourceClass();
+			tmp.setResource("BA2225");
+			rsc.add(tmp);
+			tmp = new ResourceClass();
+			tmp.setResource("BA8885");
+			rsc.add(tmp);
+			
+		} else if (type.equals("Cafeteria")) {
+			tmp = new ResourceClass();
+			tmp.setResource("BA1115");
+			rsc.add(tmp);
+		}
+		return rsc;
+	}
+	
 	@SuppressWarnings("unused")
 	private Boolean SendPostRequest(String URL, final List<NameValuePair> nameValuePairs) {
 		AsyncTask<String, Void, Boolean> a = new AsyncTask<String, Void, Boolean>() {
@@ -360,4 +414,5 @@ public class HTTPConsole {
 	    }
 	    return sb.toString();
 	}
+
 }

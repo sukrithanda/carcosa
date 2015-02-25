@@ -19,18 +19,20 @@
         android:text="@string/friend_list"
         android:textSize="30sp" />
 
-	<ScrollView
-	    android:id="@+id/listscroll"
-	    android:layout_width="match_parent"
-        android:layout_height="0dip"
-        android:layout_weight="7">
-        <LinearLayout 
-            android:id="@+id/friendlistlinear"
-		    android:layout_width="match_parent"
-	        android:layout_height="0dip"
-	        android:orientation="vertical">
-        </LinearLayout>
-	</ScrollView>
+	<LinearLayout 
+		android:id="@+id/friendlistlinear"
+		android:layout_width="match_parent"
+	    android:layout_height="0dip"
+	    android:layout_weight="7"
+	    android:orientation="vertical">
+	   	
+	   	<ListView android:id="@+id/friendlistview"
+	 		android:layout_width="match_parent"
+	 		android:layout_height="0dip"
+	 		android:layout_weight="1">
+	   	</ListView>
+	</LinearLayout>
+
 	
 	<TextView
         android:id="@+id/addfriendtext"
@@ -42,12 +44,18 @@
 
 
     <Button
-           android:layout_width="match_parent"
-           android:layout_height="0dip"
-           android:text="@string/add_friend"
-           android:onClick="add_friend"
-           android:layout_weight="1">
-       </Button>
+        android:id="@+id/addfriendbtn"
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:text="@string/add_friend"
+        android:background="@drawable/loginbuttonshape"
+        android:shadowColor="#000"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="5"
+        android:textColor="#FFFFFF"
+        android:layout_weight="1">
+    </Button>
 
     
 </LinearLayout>

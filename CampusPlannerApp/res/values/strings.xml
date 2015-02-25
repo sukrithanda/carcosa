@@ -31,6 +31,7 @@
     <string name="title_map">Map</string>
     <string name="title_chat">Chat</string>
     <string name="title_friends">Friends</string>
+    <string name="title_resources">Resources</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="action_example">Example action</string>   
@@ -43,4 +44,13 @@
     
     <string name="menu_start">Start</string>
     <string name="menu_stop">Stop</string>
+    <string name="resources">Resource Type</string>
+    <string name="find">Find</string>
+    <string-array name="resourceType">
+        <item>Labs</item>
+        <item>Tutorial Rooms</item>
+        <item>Libraries</item>
+        <item>Washrooms</item>
+        <item>Cafeteria</item>
+    </string-array>
 </resources>

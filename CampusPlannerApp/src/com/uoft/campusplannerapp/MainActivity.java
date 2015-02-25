@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -41,8 +42,6 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.TextView;
-
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -54,15 +53,12 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.uoft.campusplannerapp.CurrentLocationProvider;
 import com.uoft.campusplannerapp.LocalizationCore;
-//import com.uoft.campusplannerapp.R;
-import com.uoft.campusplannerapp.MainActivity.WiFiScanReceiver;
 import com.uoft.campusplannerapp.PrefsActivity;
 import com.uoft.campusplannerapp.R;
 //import com.wifilocalizer.R;
@@ -94,11 +90,10 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
     
     private Spinner spinner2;
     private List<FriendClass> my_friends;
-    private String user; 
-    
-	private Fragment mVisible;
+    private Fragment mVisible;
 	private SupportMapFragment mMapFragment;
 	private Fragment mFriendsFragment;
+	private Fragment mResourceFragment;
 	private GoogleMap map;
 	
 	//LOCALIZER CODE - START
@@ -109,8 +104,6 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
     private GroundOverlay groundOverlay;
     float bearing;
     
-    
-	
 	BitmapDescriptor floor1;
 	BitmapDescriptor floor2;
 	BitmapDescriptor floor3;
@@ -121,11 +114,8 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 	BitmapDescriptor floor8;
 	private int load_floor=1;
 		
-	
 	LocalizationCore localizationcore;
 	
-
-
     private static final int MAX_WIFI_APs = 200;
 	private int counter_wifi=0;
     private int[] wifi_rss_buff= new int[MAX_WIFI_APs];
@@ -137,9 +127,6 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 	WiFiScanReceiver receiver;
 	WifiManager wifiManager = null;
 
-	
-	
-    
 	private float[] gyro_sim = new float[3];
 	private float[] accel_sim = new float[3];
 	private float[] magnet_sim = new float[3];
@@ -272,9 +259,18 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 					showFragment(mMapFragment);
 					mTitle = getString(R.string.title_map);
 					break;
+				case 1:
+					showFragment(mFriendsFragment);
+					mTitle = getString(R.string.title_friends);
+					break;
+				case 2:
+					showFragment(mResourceFragment);
+					mTitle = getString(R.string.title_resources);
+					break;
 				default:
 					showFragment(mFriendsFragment);
 					mTitle = getString(R.string.title_friends);
+					break;
 			}
 		}
 	
@@ -286,6 +282,10 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 				break;
 			case 2:
 				mTitle = getString(R.string.title_friends);
+				break;
+
+			case 3:
+				mTitle = getString(R.string.title_resources);
 				break;
 			}
 		}	
@@ -332,11 +332,6 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
     		FriendClass fr = my_friends.get(i);  		
     		list.add(fr.getFirst_name() + " " + fr.getLast_name());
     	}
-
-    		//list.add(fr.getFirst_name() + " " + fr.getLast_name());
-//    		list.add("Tanvi Mehta");
-//    		list.add("Siddharth Zaveri");
-//    		list.add("Sukrit Handa");
 
     	ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, list);
     	dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -438,29 +433,6 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 		}
 		return true;
 	}
-	
-	public boolean ask_for_location(View view){
-		EditText email = (EditText)findViewById(R.id.friend);
-		try{
-			String friend_email = email.getText().toString();
-			User usero = db.getUser();
-			String user = usero.getEmail();
-			if (user == null) {
-				create_alert(this,"You are not signed in");
-			}
-			String Loc = http_console.LocateFriend(user, friend_email);
-
-			create_alert(this,"Friend is at " + Loc );
-
-			//Log.i("Sidd","Print location now " + Loc);
-	      //  setContentView(new MovingImage(this));
-
-			return true;
-		} catch (Exception e) {
-			create_alert(this,"Please enter friends email");
-			return false;
-		}
-	}
 
 	private boolean ValidateEmail(String s_utmail) {
 		if (s_utmail.contains("utoronto.ca")  || s_utmail.contains("toronto.edu"))
@@ -470,7 +442,6 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 	}
 
 	private boolean ValidatePassword(String s_password) {
-		// TODO Auto-generated method stub
 		if (!s_password.matches(".*\\d+.*")){
 			return false;
 		}
@@ -484,7 +455,7 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 		return true;
 	}
 	
-	public void CreateKeys() {
+	@SuppressLint("TrulyRandom") public void CreateKeys() {
 		try {
 			gen = KeyPairGenerator.getInstance("RSA");
 	        gen.initialize(1024);
@@ -492,7 +463,7 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 	        publicKey = key.getPublic();
 	        privateKey = key.getPrivate();
 	        String privateKeyString = privateKey.toString();
-	        boolean status = http_console.SendPrivate("None",privateKeyString);
+	        http_console.SendPrivate("None",privateKeyString);
 		} catch (NoSuchAlgorithmException n) {
 			
 		}
@@ -610,10 +581,6 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
             	alert.create_alert("Error","Signout Failed. Try again later");
             }
             return true;
-        } else if (id == R.id.friend) {
-        	Intent i = new Intent(getApplicationContext(), FriendActivity.class);
-        	startActivity(i);
-        	return true;
         } else if (id == R.id.meeting) {
         	menu_button(null);
         	return true;
@@ -634,52 +601,6 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
         	  return super.onOptionsItemSelected(item);
           }
     }
-    
-    /**
-	 * A placeholder fragment containing a simple view.
-	 */
-	public static class FriendsFragment extends Fragment {
-		public static final String TAG = "friends";
-		/**
-		 * The fragment argument representing the section number for this
-		 * fragment.
-		 */
-		private static final String ARG_SECTION_NUMBER = "section_number";
-
-		/**
-		 * Returns a new instance of this fragment for the given section number.
-		 */
-		public static FriendsFragment newInstance(String friendName) {
-			FriendsFragment fragment = new FriendsFragment();
-			Bundle args = new Bundle();
-			args.putString(ARG_SECTION_NUMBER, friendName);
-			fragment.setArguments(args);
-			return fragment;
-		}
-
-		public FriendsFragment() {
-		}
-
-		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container,
-				Bundle savedInstanceState) {
-			View rootView = inflater.inflate(R.layout.fragment_main, container,
-					false);
-
-			TextView textView = (TextView) rootView
-					.findViewById(R.id.section_label);
-			textView.setText(getArguments().getString(
-					ARG_SECTION_NUMBER));
-			return rootView;
-		}
-
-		@Override
-		public void onAttach(Activity activity) {
-			super.onAttach(activity);
-			((MainActivity) activity).onSectionAttached(getArguments().getInt(
-					ARG_SECTION_NUMBER));
-		}
-	}
 	
 	/**
 	 * A placeholder fragment containing a simple view.
@@ -770,10 +691,17 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 
         mFriendsFragment = (FriendsFragment) getSupportFragmentManager().findFragmentByTag(FriendsFragment.TAG);
         if (mFriendsFragment == null) {
-            mFriendsFragment = FriendsFragment.newInstance("Gary");
+            mFriendsFragment = FriendsFragment.newInstance(this);
             ft.add(R.id.container, mFriendsFragment, FriendsFragment.TAG);
         }
         ft.hide(mFriendsFragment);
+        
+        mResourceFragment = (ResourceFragment) getSupportFragmentManager().findFragmentByTag(ResourceFragment.TAG);
+        if (mResourceFragment == null) {
+        	mResourceFragment = ResourceFragment.newInstance(this);
+            ft.add(R.id.container, mResourceFragment, ResourceFragment.TAG);
+        }
+        ft.hide(mResourceFragment);
 
         ft.commit();
 
@@ -1087,8 +1015,6 @@ public void onStop() {
 	stop_process();
 }
 
-
-
 @Override
 protected void onPause() {
     super.onPause();
@@ -1200,7 +1126,6 @@ public void SetMyLocation(float latitude,float longitude,int floor,float accurac
 
 @Override
 protected void onActivityResult(int requestCode, int resultCode, Intent data) {
- // TODO Auto-generated method stub
  //super.onActivityResult(requestCode, resultCode, data);
  
  /*

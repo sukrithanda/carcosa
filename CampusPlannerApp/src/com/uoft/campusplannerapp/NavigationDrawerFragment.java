@@ -28,7 +28,6 @@ import com.uoft.campusplannerapp.R;
  * See the <a href="https://developer.android.com/design/patterns/navigation-drawer.html#Interaction">
  * design guidelines</a> for a complete explanation of the behaviors implemented here.
  */
-@SuppressWarnings("deprecation")
 public class NavigationDrawerFragment extends Fragment {
 
     /**
@@ -106,6 +105,7 @@ public class NavigationDrawerFragment extends Fragment {
                 new String[]{
                         getString(R.string.title_map),
                         getString(R.string.title_friends),
+                        getString(R.string.title_resources),
                 }));
         mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
         return mDrawerListView;
