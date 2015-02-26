@@ -10,7 +10,7 @@ import android.support.v4.app.DialogFragment;
 import android.widget.Button;
 import android.widget.DatePicker;
 
-public class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
+public class DatePickerFragment2 extends DialogFragment implements DatePickerDialog.OnDateSetListener {
 	
 	DateInterface i;
 	
@@ -55,7 +55,7 @@ public class DatePickerFragment extends DialogFragment implements DatePickerDial
 	    	
 	    	System.out.println(date);
 	    	
-	    	i.updateDateButton(date);
+	    	i.updateDateButton2(date);
 	    	
 	    }
 	    

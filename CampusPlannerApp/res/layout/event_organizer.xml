@@ -1,64 +1,172 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:orientation="vertical" >
+<ScrollView  xmlns:android="http://schemas.android.com/apk/res/android"
+  	android:layout_width="fill_parent"
+  	android:layout_height="fill_parent">
 
-    <View 
-        android:layout_width="wrap_content"
-        android:layout_height="30dip" />
-    
-    <Spinner
-        android:id="@+id/spinner1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:entries="@array/eventType_array"
-        android:prompt="@string/event_prompt" />
+	<RelativeLayout     
+		android:layout_width="match_parent"
+    	android:layout_height="match_parent"
+    	android:paddingLeft="16dp"
+    	android:paddingRight="16dp" >
+    	
+	    <EditText
+		    android:id="@+id/editText1"
+		    android:layout_width="match_parent"
+		    android:layout_height="49dp"
+		    android:hint="@string/EventHint"
+		    android:ems="10" >
+		</EditText>
 
-    <View 
-        android:layout_width="wrap_content"
-        android:layout_height="30dip" />
-    
-    <Spinner
-        android:id="@+id/spinner2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-    
-    <View 
-        android:layout_width="wrap_content"
-        android:layout_height="30dip" />
-    
-    <Button 
-    	android:layout_width="wrap_content" 
-    	android:layout_height="wrap_content"
-    	android:text="@string/pick_time" 
-    	android:onClick="showTimePickerDialog" />
- 
-    <View 
-        android:layout_width="wrap_content"
-        android:layout_height="30dip" />
-
-    <Button 
-    	android:layout_width="wrap_content" 
-    	android:layout_height="wrap_content"
-    	android:text="@string/pick_date" 
-    	android:onClick="showDatePickerDialog" />
- 
-    <View 
-        android:layout_width="wrap_content"
-        android:layout_height="30dip" />    
-    
-    <Button
-        android:id="@+id/angry_btn"
-        android:layout_width="270dp"
-        android:layout_height="60dp"
-        android:background="@drawable/signupbuttonshape"
-        android:shadowColor="#A8A8A8"
-        android:shadowDx="0"
-        android:shadowDy="0"
-        android:shadowRadius="5"
-        android:text="Submit"
-        android:textColor="#FFFFFF"
-        android:textSize="30sp" />
-
-</LinearLayout>
+	    <View 
+	        android:id="@+id/padding1"
+	        android:layout_width="wrap_content"
+	        android:layout_height="10dip"
+	        android:layout_below="@id/editText1" />
+	    		
+	    <TextView
+	        android:id="@+id/textView1"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_below="@id/padding1"
+	        android:text="@string/eventType"
+	        android:textAppearance="?android:attr/textAppearanceMedium" />
+	    
+	    <View 
+	        android:id="@+id/padding2"
+	        android:layout_width="wrap_content"
+	        android:layout_height="10dip"
+	        android:layout_below="@id/textView1" />
+	    
+	    <Spinner
+	        android:id="@+id/spinner1"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_below="@id/padding2"
+	        android:entries="@array/eventType_array"
+	        android:prompt="@string/event_prompt" />
+	    
+		<View 
+	        android:id="@+id/padding3"
+	        android:layout_width="wrap_content"
+	        android:layout_height="10dip"
+	        android:layout_below="@id/spinner1" />    
+	    
+	    <TextView
+	        android:id="@+id/textView2"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_below="@id/padding3"
+	        android:text="@string/from"
+	        android:textAppearance="?android:attr/textAppearanceMedium" />
+	    
+	    <Button 
+	        android:id="@+id/datepickButton"
+    		android:layout_width="0dp" 
+    		android:layout_height="wrap_content"
+    		android:layout_below="@id/textView2"
+    		android:layout_toLeftOf="@+id/timepickButton"
+    		android:layout_alignParentLeft="true"
+    		android:text="@string/pick_date" 
+    		android:onClick="showDatePickerDialog"
+    		style="?android:attr/borderlessButtonStyle" />
+	    
+	    <Button 
+	        android:id="@id/timepickButton"
+    		android:layout_width="96dp" 
+    		android:layout_height="wrap_content"
+    		android:layout_below="@id/textView2"
+    		android:layout_alignParentRight="true"
+    		android:text="@string/pick_time" 
+    		android:onClick="showTimePickerDialog"
+    		style="?android:attr/borderlessButtonStyle"  />
+	    
+	    <View 
+	        android:id="@+id/padding4"
+	        android:layout_width="wrap_content"
+	        android:layout_height="10dip"
+	        android:layout_below="@id/datepickButton" />   
+	        
+	   <TextView
+	        android:id="@+id/textView3"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_below="@id/padding4"
+	        android:text="@string/to"
+	        android:textAppearance="?android:attr/textAppearanceMedium" />
+	   
+	   <Button 
+	        android:id="@+id/datepickButton2"
+    		android:layout_width="0dp" 
+    		android:layout_height="wrap_content"
+    		android:layout_below="@id/textView3"
+    		android:layout_toLeftOf="@+id/timepickButton2"
+    		android:layout_alignParentLeft="true"
+    		android:text="@string/pick_date" 
+    		android:onClick="showDatePickerDialog2"
+    		style="?android:attr/borderlessButtonStyle" />
+	    
+	    <Button 
+	        android:id="@id/timepickButton2"
+    		android:layout_width="96dp" 
+    		android:layout_height="wrap_content"
+    		android:layout_below="@id/textView3"
+    		android:layout_alignParentRight="true"
+    		android:text="@string/pick_time" 
+    		android:onClick="showTimePickerDialog2"
+    		style="?android:attr/borderlessButtonStyle"  />
+	    
+	    <View 
+	        android:id="@+id/padding5"
+	        android:layout_width="wrap_content"
+	        android:layout_height="10dip"
+	        android:layout_below="@id/datepickButton2" /> 
+	        
+	    <EditText
+		    android:id="@+id/editText2"
+		    android:layout_width="match_parent"
+		    android:layout_height="49dp"
+		    android:layout_below="@id/padding5"
+		    android:hint="@string/FriendHint"
+		    android:ems="10" >
+		</EditText>
+		
+	    <View 
+	        android:id="@+id/padding6"
+	        android:layout_width="wrap_content"
+	        android:layout_height="10dip"
+	        android:layout_below="@id/editText2" /> 
+	        
+	    <EditText
+		    android:id="@+id/editText3"
+		    android:layout_width="match_parent"
+		    android:layout_height="49dp"
+		    android:layout_below="@id/padding6"
+		    android:hint="@string/LocationHint"
+		    android:ems="10" >
+		</EditText>
+		
+	   <View 
+	        android:id="@+id/padding7"
+	        android:layout_width="wrap_content"
+	        android:layout_height="10dip"
+	        android:layout_below="@id/editText3" />  
+	    
+	   <Button 
+	        android:id="@+id/submitButton"
+    		android:layout_width="0dp" 
+    		android:layout_height="wrap_content"
+    		android:layout_below="@id/padding7"
+    		android:layout_toLeftOf="@+id/clearButton"
+    		android:layout_alignParentLeft="true"
+    		android:text="@string/SubmitText"  />	    
+    	
+	   <Button 
+	        android:id="@id/clearButton"
+    		android:layout_width="160dp" 
+    		android:layout_height="wrap_content"
+    		android:layout_below="@id/padding7"
+    		android:layout_alignParentRight="true"
+    		android:text="@string/ClearText" />
+	    
+	</RelativeLayout>
+</ScrollView>

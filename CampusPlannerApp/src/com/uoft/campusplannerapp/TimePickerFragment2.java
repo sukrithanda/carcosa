@@ -11,7 +11,7 @@ import android.text.format.DateFormat;
 import android.view.View;
 import android.widget.TimePicker;
 
-public class TimePickerFragment extends DialogFragment implements TimePickerDialog.OnTimeSetListener {
+public class TimePickerFragment2 extends DialogFragment implements TimePickerDialog.OnTimeSetListener {
 	
 	DateInterface i;
 	
@@ -54,7 +54,7 @@ public class TimePickerFragment extends DialogFragment implements TimePickerDial
     	
     	String time = sb.toString();
     	
-    	i.updateTimeButton(time);
+    	i.updateTimeButton2(time);
 	}
 	
 }

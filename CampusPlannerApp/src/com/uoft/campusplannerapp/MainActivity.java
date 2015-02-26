@@ -12,12 +12,15 @@ import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 
@@ -38,7 +41,9 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 
 import android.view.ViewGroup;
@@ -62,7 +67,7 @@ import android.widget.DatePicker;
 import com.uoft.campusplannerapp.HTTPConsole;
 import com.uoft.campusplannerapp.CreateAlert;;
 
-public class MainActivity extends ActionBarActivity  implements NavigationDrawerFragment.NavigationDrawerCallbacks {
+public class MainActivity extends ActionBarActivity  implements NavigationDrawerFragment.NavigationDrawerCallbacks, DateInterface {
 	
 	GoogleCloudMessaging gcm;
     String regid;
@@ -85,6 +90,9 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 	private Fragment mVisible;
 	private SupportMapFragment mMapFragment;
 	private Fragment mFriendsFragment;
+	private Fragment mOrganizeEventFragment;
+	private Fragment mSetUpOfficeHoursFragment;
+	private Fragment mSignoutFragment;
 	private GoogleMap map;
 	/**
 	 * Fragment managing the behaviors, interactions and presentation of the
@@ -98,6 +106,10 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 	 */
 	private CharSequence mTitle;
     
+	private Calendar dateTime = Calendar.getInstance();
+	private SimpleDateFormat dateFormatter = new SimpleDateFormat("MMMM dd yyyy");
+	private SimpleDateFormat timeFormatter = new SimpleDateFormat("hh:mm a");
+	
     private static void create_alert(Context ctx, String msg) {
     	AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
     	builder.setMessage(msg)
@@ -159,9 +171,22 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 					showFragment(mMapFragment);
 					mTitle = getString(R.string.title_map);
 					break;
-				default:
+
+				case 1:
 					showFragment(mFriendsFragment);
 					mTitle = getString(R.string.title_friends);
+					break;
+					
+				case 2:
+					showFragment(mOrganizeEventFragment);
+					//addItemOnSpinner2();
+					mTitle = getString(R.string.title_OrganizeEvent);
+					break;
+				case 3:
+					showFragment(mSetUpOfficeHoursFragment);
+					//addItemOnSpinner2();
+					mTitle = getString(R.string.title_SetupOfficeHours);
+					break;
 			}
 		}
 	
@@ -174,6 +199,16 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 			case 2:
 				mTitle = getString(R.string.title_friends);
 				break;
+			case 3:
+				mTitle = getString(R.string.title_OrganizeEvent);
+				break;
+			case 4:
+				mTitle = getString(R.string.title_SetupOfficeHours);
+				break;
+			case 5:
+				mTitle = getString(R.string.title_signout);
+				break;
+				
 			}
 		}	
 		
@@ -184,6 +219,31 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 			actionBar.setTitle(mTitle);
 		}
 		
+	
+	public void updateDateButton(String date)
+	{
+		System.out.println("Date in updateDateButton is: "+date);
+		Button dateButton = (Button) findViewById(R.id.datepickButton);
+		dateButton.setText(date);
+	}
+	
+	public void updateTimeButton (String time)
+	{
+		Button timeButton = (Button) findViewById(R.id.timepickButton);
+		timeButton.setText(time);
+	}
+	
+	public void updateDateButton2 (String date)
+	{
+		Button dateButton = (Button) findViewById(R.id.datepickButton2);
+		dateButton.setText(date);
+	}
+	
+	public void updateTimeButton2 (String time)
+	{
+		Button timeButton = (Button) findViewById(R.id.timepickButton2);
+		timeButton.setText(time);
+	}
 		
 	public void showTimePickerDialog(View v) {
 	    DialogFragment newFragment = new TimePickerFragment();
@@ -195,11 +255,16 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 	    newFragment.show(getSupportFragmentManager(), "datePicker");
 	}
 	
-    public boolean menu_button(View view){
-    	setContentView(R.layout.event_organizer);  	
-    	addItemOnSpinner2();
-    	return true;  	
-    }
+	public void showTimePickerDialog2(View v) {
+	    DialogFragment newFragment = new TimePickerFragment2();
+	    newFragment.show(getSupportFragmentManager(), "timePicker");
+	}
+    
+	public void showDatePickerDialog2(View v) {
+	    DialogFragment newFragment = new DatePickerFragment2();
+	    newFragment.show(getSupportFragmentManager(), "datePicker");
+	}
+	
     
     public void addItemOnSpinner2() {
     	User usero = db.getUser();
@@ -212,7 +277,7 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
     		my_friends = http_console.GetFriend(usero.getEmail());
     	}
 	    List<String> list = new ArrayList<String>();
-    	spinner2 = (Spinner) findViewById(R.id.spinner2);
+    	//spinner2 = (Spinner) findViewById(R.id.spinner2);
     	int i;
     	for (i = 0; i < my_friends.size(); i++)
     	{
@@ -501,11 +566,60 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
         } else if (id == R.id.friend) {
         	Intent i = new Intent(getApplicationContext(), FriendActivity.class);
         	startActivity(i);
-        } else if (id == R.id.meeting) {
-        	menu_button(null);
         } 
         return super.onOptionsItemSelected(item);
     }
+    
+    
+    public static class OrganizeEventFragment extends Fragment {
+    	public static final String TAG = "organizeEvent";    
+    	
+    	// Constructor of organizeEvent
+    	public OrganizeEventFragment() {
+    		super();
+    	}
+    	
+		public static OrganizeEventFragment newInstance() {
+			OrganizeEventFragment fragment = new OrganizeEventFragment();
+			return fragment;
+		}
+    	
+		public View onCreateView(LayoutInflater inflater, ViewGroup container,
+				Bundle savedInstanceState) {
+			super.onCreateView(inflater, container, savedInstanceState);
+			View rootView = inflater.inflate(R.layout.event_organizer, container,
+					false);
+			
+			return rootView;
+		}
+		
+		@Override
+		public void onAttach(Activity activity) {
+			super.onAttach(activity);
+		}
+		
+    }
+    
+    public static class SetUpOfficeHoursFragment extends Fragment {
+    	public static final String TAG = "Office Hours";
+    	
+    	public SetUpOfficeHoursFragment() {
+    		super();
+    	}
+    	public static SetUpOfficeHoursFragment newInstance() {
+    		SetUpOfficeHoursFragment fragment = new SetUpOfficeHoursFragment();
+    		return fragment;
+    	}
+		public View onCreateView(LayoutInflater inflater, ViewGroup container,
+				Bundle savedInstanceState) {
+			super.onCreateView(inflater, container, savedInstanceState);
+			View rootView = inflater.inflate(R.layout.setup_officehours, container,
+					false);
+			
+			return rootView;
+		}
+    }
+    
     
     /**
 	 * A placeholder fragment containing a simple view.
@@ -625,7 +739,25 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
         }
         ft.hide(mFriendsFragment);
 
+        mOrganizeEventFragment = (OrganizeEventFragment) getSupportFragmentManager().findFragmentByTag(FriendsFragment.TAG);
+        if (mOrganizeEventFragment == null)
+        {
+        	mOrganizeEventFragment = OrganizeEventFragment.newInstance();
+        	ft.add(R.id.container, mOrganizeEventFragment, OrganizeEventFragment.TAG);
+        }
+        ft.hide(mOrganizeEventFragment);
+
+        
+        mSetUpOfficeHoursFragment = (SetUpOfficeHoursFragment) getSupportFragmentManager().findFragmentByTag(SetUpOfficeHoursFragment.TAG);
+        if (mSetUpOfficeHoursFragment == null)
+        {
+        	mSetUpOfficeHoursFragment = SetUpOfficeHoursFragment.newInstance();
+        	ft.add(R.id.container, mSetUpOfficeHoursFragment, SetUpOfficeHoursFragment.TAG);
+        }
+        ft.hide(mSetUpOfficeHoursFragment);
+ 
         ft.commit();
+        
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.

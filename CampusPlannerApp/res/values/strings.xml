@@ -21,8 +21,16 @@
     <string name="register_message">Register your Account</string>
      <string name="event_prompt">Choose an event</string>
     <string name="create_meeting">Create an event</string>
+    <string name="eventType">Event Type</string>
+    <string name="from">From</string>
+    <string name="to">To</string>
+    <string name="EventHint">Enter event name</string>
+    <string name="FriendHint">Invite Friends</string>
+    <string name="LocationHint">Add Location</string>
+    <string name="SubmitText">Submit</string>
+    <string name="ClearText">Clear</string>
     
-        <string-array name="eventType_array">
+    <string-array name="eventType_array">
         <item>Office Hours</item>
         <item>Group Study</item>
         <item>Computer Lab</item>
@@ -30,7 +38,10 @@
     
     <string name="title_map">Map</string>
     <string name="title_chat">Chat</string>
+    <string name="title_OrganizeEvent">Organize Event</string>
     <string name="title_friends">Friends</string>
+    <string name="title_SetupOfficeHours">Set up Office Hours</string>
+    <string name="title_signout">Signout</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="action_example">Example action</string>   
