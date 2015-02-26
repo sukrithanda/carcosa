@@ -37,11 +37,13 @@
     </string-array>
     
     <string name="title_map">Map</string>
+
     <string name="title_chat">Chat</string>
     <string name="title_OrganizeEvent">Organize Event</string>
     <string name="title_friends">Friends</string>
     <string name="title_SetupOfficeHours">Set up Office Hours</string>
     <string name="title_signout">Signout</string>
+    <string name="title_resources">Resources</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="action_example">Example action</string>   
@@ -51,4 +53,16 @@
     <string name="title_activity_time_pick">TimePickActivity</string>
     <string name="title_activity_time_pickr">TimePickrActivity</string>
     <string name="pick_date">Select a date</string>
+    
+    <string name="menu_start">Start</string>
+    <string name="menu_stop">Stop</string>
+    <string name="resources">Resource Type</string>
+    <string name="find">Find</string>
+    <string-array name="resourceType">
+        <item>Labs</item>
+        <item>Tutorial Rooms</item>
+        <item>Libraries</item>
+        <item>Washrooms</item>
+        <item>Cafeteria</item>
+    </string-array>
 </resources>

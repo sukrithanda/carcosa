@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+        <string-array name="wifi_localization_algorithms">
+        <item name="knn">k-Nearest-Neighbor (kNN)</item>
+        <item name="cs">Compressive Sensing (CS)</item>
+    </string-array>
+    
+    <string-array name="wifi_localization_algorithms_Values">
+        <item name="knn">1</item>
+        <item name="cs">2</item>
+    </string-array>
+    
+    
+</resources>

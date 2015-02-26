@@ -5,8 +5,10 @@ import java.util.Random;
 public class Location {
 	private String bldg ; 
 	private int floor ; 
-	private int x; 
-	private int y; 
+	private float latitude; 
+	private float longitude; 
+	private float bearing; 
+	private float accuracy;
 	private String email; 
 	private boolean plot;
 	
@@ -14,8 +16,8 @@ public class Location {
 		bldg = "BA";
 		Random rand = new Random();
 		floor = rand.nextInt(8) + 1;
-		x = rand.nextInt(1000) + 1;
-		y = rand.nextInt(1000) + 1;
+		latitude = rand.nextInt(1000) + 1;
+		longitude = rand.nextInt(1000) + 1;
 	}
 	
 	public String getBldg(){
@@ -26,12 +28,12 @@ public class Location {
 		return floor; 
 	}
 	
-	public int getX(){
-		return x;
+	public float getX(){
+		return latitude;
 	}
 	
-	public int getY(){
-		return y;
+	public float getY(){
+		return longitude;
 	}
 	
 	public void setBldg(String bldg){
@@ -43,11 +45,11 @@ public class Location {
 	}
 	
 	public void setX(int x){
-		this.x = x;
+		this.latitude = x;
 	}
 
 	public void setY(int y){
-		this.y = y;
+		this.longitude = y;
 	}
 
 	public String getEmail() {
@@ -69,6 +71,22 @@ public class Location {
 
 	public boolean getPlot() {
 		return plot;
+	}
+
+	public float getBearing() {
+		return bearing;
+	}
+
+	public void setBearing(float bearing) {
+		this.bearing = bearing;
+	}
+
+	public float getAccuracy() {
+		return accuracy;
+	}
+
+	public void setAccuracy(float accuracy) {
+		this.accuracy = accuracy;
 	}
 
 

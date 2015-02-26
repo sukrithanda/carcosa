@@ -21,13 +21,13 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
+import com.uoft.campusplannerapp.R;
 
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.
  * See the <a href="https://developer.android.com/design/patterns/navigation-drawer.html#Interaction">
  * design guidelines</a> for a complete explanation of the behaviors implemented here.
  */
-@SuppressWarnings("deprecation")
 public class NavigationDrawerFragment extends Fragment {
 
     /**
@@ -105,9 +105,12 @@ public class NavigationDrawerFragment extends Fragment {
                 new String[]{
                         getString(R.string.title_map),
                         getString(R.string.title_friends),
+                        getString(R.string.title_resources),
                         getString(R.string.title_OrganizeEvent),
                         getString(R.string.title_SetupOfficeHours),
-                        getString(R.string.title_signout)
+                        getString(R.string.title_signout),
+
+
                 }));
         mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
         return mDrawerListView;

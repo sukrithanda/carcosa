@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" 
+    android:layout_weight="100">
+
+    <Spinner
+        android:id="@+id/resourceSpinner"
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:entries="@array/resourceType"
+        android:prompt="@string/resources" 
+        android:layout_weight="15"/>
+
+    <Button 
+   	    android:id="@+id/findresourcebtn"
+    	android:layout_width="wrap_content" 
+    	android:layout_height="0dip"
+        android:background="@drawable/loginbuttonshape"
+    	android:text="@string/find" 
+    	android:shadowColor="#000"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="5"
+        android:textColor="#FFFFFF"
+        android:layout_weight="15"/>
+    
+    
+   	<ListView 
+   	    android:id="@+id/resourcelistview"
+ 		android:layout_width="match_parent"
+ 		android:layout_height="0dip"
+ 		android:layout_weight="70"/>
+
+</LinearLayout>
