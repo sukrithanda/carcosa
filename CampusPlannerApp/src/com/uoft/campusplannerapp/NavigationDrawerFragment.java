@@ -108,7 +108,7 @@ public class NavigationDrawerFragment extends Fragment {
                         getString(R.string.title_resources),
                         getString(R.string.title_OrganizeEvent),
                         getString(R.string.title_SetupOfficeHours),
-                        getString(R.string.title_signout),
+                        getString(R.string.title_privacySettings),
 
 
                 }));

@@ -19,7 +19,6 @@ import java.util.Locale;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -41,13 +40,11 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.TextView;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.maps.GoogleMap;
@@ -102,7 +99,7 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 	private Fragment mFriendsFragment;
 	private Fragment mOrganizeEventFragment;
 	private Fragment mSetUpOfficeHoursFragment;
-	private Fragment mSignoutFragment;
+	private Fragment mPrivacyFragment;
 	private Fragment mResourceFragment;
 
 	private GoogleMap map;
@@ -206,6 +203,7 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
         alert = new CreateAlert(this);
         db = new DatabaseHandler(this);
         User usero = db.getUser();
+        db.Close();
     	pref = this.getSharedPreferences("User",MODE_PRIVATE);
         @SuppressWarnings("unused")
 		String temp = get_reg_id();
@@ -274,12 +272,11 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 					showFragment(mMapFragment);
 					mTitle = getString(R.string.title_map);
 					break;
-
 				case 1:
 					showFragment(mFriendsFragment);
+					mFriendsFragment.onResume();
 					mTitle = getString(R.string.title_friends);
 					break;
-					
 				case 2:
 					showFragment(mResourceFragment);
 					mTitle = getString(R.string.title_resources);
@@ -295,6 +292,11 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 					//addItemOnSpinner2();
 					mTitle = getString(R.string.title_SetupOfficeHours);
 					break;
+				case 5:
+					showFragment(mPrivacyFragment);
+					mPrivacyFragment.onResume();
+					mTitle = getString(R.string.title_privacySettings);
+					break;
 			}
 		}
 	
@@ -307,6 +309,7 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 			case 2:
 				mTitle = getString(R.string.title_friends);
 				break;
+
 			case 3:
 				mTitle = getString(R.string.title_resources);
 				break;
@@ -317,7 +320,7 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 				mTitle = getString(R.string.title_SetupOfficeHours);
 				break;
 			case 6:
-				mTitle = getString(R.string.title_signout);
+				mTitle = getString(R.string.title_privacySettings);
 				break;
 			}
 		}	
@@ -643,9 +646,6 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
             	alert.create_alert("Error","Signout Failed. Try again later");
             }
             return true;
-        } else if (id == R.id.meeting) {
-        	//menu_button(null);
-        	return true;
         } else if (id == R.id.menu_start){
         	  start_process();
 	        	return true;
@@ -663,16 +663,7 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
         	  return super.onOptionsItemSelected(item);
           }
     }
-//<<<<<<< HEAD
-            /*
-        } else if (id == R.id.friend) {
-        	Intent i = new Intent(getApplicationContext(), FriendActivity.class);
-        	startActivity(i);
-        } 
-        return super.onOptionsItemSelected(item);
-    }
-    */
-    
+
     
     public static class OrganizeEventFragment extends Fragment {
     	public static final String TAG = "organizeEvent";    
@@ -716,84 +707,14 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 		public View onCreateView(LayoutInflater inflater, ViewGroup container,
 				Bundle savedInstanceState) {
 			super.onCreateView(inflater, container, savedInstanceState);
-			View rootView = inflater.inflate(R.layout.setup_officehours, container,
-					false);
+			View rootView = inflater.inflate(R.layout.setup_officehours, container, false);
 			
 			return rootView;
 		}
     }
     
     
-/*    *//**
-	 * A placeholder fragment containing a simple view.
-	 *//*
-	public static class FriendsFragment extends Fragment {
-		public static final String TAG = "friends";
-		*//**
-		 * The fragment argument representing the section number for this
-		 * fragment.
-		 *//*
-		private static final String ARG_SECTION_NUMBER = "section_number";
 
-		*//**
-		 * Returns a new instance of this fragment for the given section number.
-		 *//*
-		
-		public static FriendsFragment newInstance(String friendName) {
-			FriendsFragment fragment = new FriendsFragment();
-			Bundle args = new Bundle();
-			args.putString(ARG_SECTION_NUMBER, friendName);
-			fragment.setArguments(args);
-			return fragment;
-		}
-
-		public FriendsFragment() {
-		}
-
-		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container,
-				Bundle savedInstanceState) {
-			View rootView = inflater.inflate(R.layout.fragment_main, container,
-					false);
-
-			TextView textView = (TextView) rootView
-					.findViewById(R.id.section_label);
-			textView.setText(getArguments().getString(
-					ARG_SECTION_NUMBER));
-			return rootView;
-		}
-
-		@Override
-		public void onAttach(Activity activity) {
-			super.onAttach(activity);
-			((MainActivity) activity).onSectionAttached(getArguments().getInt(
-					ARG_SECTION_NUMBER));
-		}
-	}*/
-/*=======
-            return true;
-        } else if (id == R.id.meeting) {
-        	menu_button(null);
-        	return true;
-        } else if (id == R.id.menu_start){
-        	  start_process();
-	        	return true;
-        }
-          else if (id == R.id.menu_stop){
-        	   stop_process();
-	            return true;
-        }
-          else if (id == R.id.action_settings){
-        	  Intent i = new Intent(getApplicationContext(), PrefsActivity.class);
-              startActivityForResult(i, 0); 
-	        	return true;
-        }
-          else{
-        	  return super.onOptionsItemSelected(item);
-          }
-    }
->>>>>>> 37dc59c5831ccdc5fd068c9fc66cde7525eb6f9e
-*/	
 	/**
 	 * A placeholder fragment containing a simple view.
 	 */
@@ -895,7 +816,7 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
         }
         ft.hide(mResourceFragment);
 
-        mOrganizeEventFragment = (OrganizeEventFragment) getSupportFragmentManager().findFragmentByTag(FriendsFragment.TAG);
+        mOrganizeEventFragment = (OrganizeEventFragment) getSupportFragmentManager().findFragmentByTag(OrganizeEventFragment.TAG);
         if (mOrganizeEventFragment == null)
         {
         	mOrganizeEventFragment = OrganizeEventFragment.newInstance();
@@ -911,8 +832,17 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
         	ft.add(R.id.container, mSetUpOfficeHoursFragment, SetUpOfficeHoursFragment.TAG);
         }
         ft.hide(mSetUpOfficeHoursFragment);
+        
+        mPrivacyFragment = (PrivacyFragment) getSupportFragmentManager().findFragmentByTag(PrivacyFragment.TAG);
+        if (mPrivacyFragment == null)
+        {
+        	mPrivacyFragment = PrivacyFragment.newInstance(this);
+        	ft.add(R.id.container, mPrivacyFragment, PrivacyFragment.TAG);
+        }
+        ft.hide(mPrivacyFragment);
  
         ft.commit();
+
     }
 	
 	 private void initilizeMap() {

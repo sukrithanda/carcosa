@@ -24,6 +24,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		super(context, DB, null, VERSION);
 		this.onCreate(getWritableDatabase());
 	}
+	
+	public void Close(){
+		close();
+	}
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
@@ -77,22 +81,26 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		} catch (Exception e) {
 			Log.i("Sidd",e.getMessage());
 		}
+		db.close();
 	}
 	
 	public void deleteLocations(){
 		Log.i("Sidd","deleting locations");
 		SQLiteDatabase db = this.getWritableDatabase();
 		db.execSQL("DROP TABLE IF EXISTS locations");
+		db.close();
 	}
 	
 	public void deleteUser(){
 		SQLiteDatabase db = this.getWritableDatabase();
 		db.execSQL("DROP TABLE IF EXISTS user");
+		db.close();
 	}
 	
 	public void deleteFriends(){
 		SQLiteDatabase db = this.getWritableDatabase();
 		db.execSQL("DROP TABLE IF EXISTS friends");
+		db.close();
 	}
 	
 	
@@ -133,8 +141,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			String token = cursor.getString(5);
 			String password = cursor.getString(6);
 			user = new User(user_id, first_name, last_name, email, token, reg_id, password);
+			db.close();
 			return user;
 		}
+		db.close();
 		return null;
 	}
 	
@@ -153,6 +163,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				fl.add(friend);
 			} while (cursor.moveToNext());
 		}
+		db.close();
 		return fl;
 	}
 	
@@ -204,6 +215,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				}
 			} while (cursor.moveToNext());
 		}
+		db.close();
 		return null;
 	}
 	

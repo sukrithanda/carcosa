@@ -29,6 +29,9 @@ import com.uoft.campusplannerapp.FriendClass;
 import com.uoft.campusplannerapp.DatabaseHandler;
 
 public class HTTPConsole {
+	private final String GET_PERMISSION = "http://104.236.85.199:8080/user/getPermission";
+	private final String HIDE_LOCATION = "http://104.236.85.199:8080/user/hideLocation";
+	private final String SHOW_LOCATION = "http://104.236.85.199:8080/user/showLocation";
 	private final String LOGIN_PAGE = "http://104.236.85.199:8080/user/login";
 	private final String SIGNUP_PAGE = "http://104.236.85.199:8080/user/signup";
 	private final String GET_FRIEND = "http://104.236.85.199:8080/friend/getFriends";
@@ -67,13 +70,14 @@ public class HTTPConsole {
 		
 		DatabaseHandler db = new DatabaseHandler(ctx);
 		db.addLocation(loc);
-		
+		db.Close();
 		
 	}
 
 	private void InitializeLoc(){
 		DatabaseHandler db = new DatabaseHandler(ctx);
 		db.deleteLocations();
+		db.Close();
 	}
 	public String HelloWorld(){
 		return SendGetRequest(HELLO_WORLD);
@@ -96,6 +100,7 @@ public class HTTPConsole {
 				User usero = new User(i_user_id,first_name,last_name,user,token,reg_id, password);
 				DatabaseHandler db = new DatabaseHandler(ctx);
 				db.addUser(usero);
+				db.Close();
 				return true;
 			} catch (JSONException e) {
 				e.printStackTrace();
@@ -138,6 +143,7 @@ public class HTTPConsole {
 			    }
 			    DatabaseHandler db = new DatabaseHandler(ctx);
 				db.addFriendList(my_friends);
+				db.Close();
 				return my_friends;
 			} catch (JSONException e) {
 				e.printStackTrace();
@@ -159,6 +165,9 @@ public class HTTPConsole {
 		String URL = LOCATE_FRIEND + "?userEmail=" + user_email + "&friendEmail=" + friend_email;
 		InitializeLoc();
 		String result = SendGetRequest(URL);
+		if (result == null) {
+			return "Failed";
+		}
 		if (result.equals("Invalid Request")){
 			return null;
 		} else {
@@ -231,9 +240,11 @@ public class HTTPConsole {
 		String URL = SIGNOUT + "?email=" + user.getEmail() + "&password=" + user.getPassword();
 		String ans = SendGetRequest(URL);
 		if (ans.equals("Invalid Request")){
+			db.Close();
 			return false;
 		} else {
 			db.deleteUser();
+			db.Close();
 			return true;
 		}
 		
@@ -291,6 +302,46 @@ public class HTTPConsole {
 			rsc.add(tmp);
 		}
 		return rsc;
+	}
+	
+	public boolean HideLocation() {
+		DatabaseHandler db = new DatabaseHandler(ctx);
+		User user = db.getUser();
+		db.Close();
+		String URL = HIDE_LOCATION + "?email=" + user.getEmail() + "&password=" + user.getPassword();
+		String ans = SendGetRequest(URL);
+		if (ans.equals("Invalid Request")){
+			return false;
+		} else {
+			return true;
+		}
+	}
+	
+	public boolean ShowLocation() {
+		DatabaseHandler db = new DatabaseHandler(ctx);
+		User user = db.getUser();
+		db.Close();
+		String URL = SHOW_LOCATION + "?email=" + user.getEmail() + "&password=" + user.getPassword();
+		String ans = SendGetRequest(URL);
+		if (ans.equals("Invalid Request")){
+			return false;
+		} else {
+			return true;
+		}
+	}
+	
+	/* Returns "Invalid Request" if there was some error
+	 *         "Hide" if location is hidden
+	 *         "Show" if location is shown
+	 */
+	public String GetPermission() {
+		DatabaseHandler db = new DatabaseHandler(ctx);
+		User user = db.getUser();
+		db.Close();
+		String URL = GET_PERMISSION + "?email=" + user.getEmail() + "&password=" + user.getPassword();
+		String ans = SendGetRequest(URL);
+		String anss[] = ans.split("\n");
+		return anss[0];
 	}
 	
 	@SuppressWarnings("unused")

@@ -11,13 +11,11 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -39,6 +37,7 @@ public class FriendsFragment extends Fragment {
 	public static final String TAG = "friends";
 	LayoutInflater inftr; 
 	ViewGroup ctr;
+	View rv = null;
 	
 	public static FriendsFragment newInstance(Context ctx) {
 		FriendsFragment fragment = new FriendsFragment();
@@ -51,9 +50,9 @@ public class FriendsFragment extends Fragment {
 			Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.friend_layout, container,
 				false);
+		rv = rootView;
 	    //super.onCreate(savedInstanceState);
 	    http_console = new HTTPConsole(ctx);
-	    db = new DatabaseHandler(ctx);
 	    alert = new CreateAlert(ctx);
 	    get_friends(rootView);
 	    Button button = (Button) rootView.findViewById(R.id.addfriendbtn);
@@ -69,18 +68,18 @@ public class FriendsFragment extends Fragment {
 	}
 	
 	private void get_friends(View rootView){
+	    db = new DatabaseHandler(ctx);
 		User u = db.getUser();
+		db.Close();
 		if (u == null) { 
 			return;
 		}
 		user = u.getEmail();
 	    my_friends = http_console.GetFriend(user);
 	    if (my_friends != null){
-		    LinearLayout sv = (LinearLayout)rootView.findViewById(R.id.friendlistlinear);
 		    TextView lText = new TextView(ctx);
 	        lText.setId(0); 
-		    ListView lv = new ListView(ctx);
-		    lv.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.MATCH_PARENT));
+		    ListView lv = (ListView) rv.findViewById(R.id.friendlistview);
 		    int num_friends = my_friends.size();
 		    String names[] = new String[num_friends];
 		    int i = 0; 
@@ -98,33 +97,34 @@ public class FriendsFragment extends Fragment {
 	              createMessageOrLocate(f_ctx,view);
 	          }
 	        });
-		    sv.addView(lv);
-		    
 	    }
 	}
 	
 	private void createMessageOrLocate(Context ctx, View v){
-		AlertDialog.Builder alert = new AlertDialog.Builder(ctx);
+		AlertDialog.Builder custon_alert = new AlertDialog.Builder(ctx);
 		TextView txt = (TextView) v;
 		String name = txt.getText().toString();
 		String names[] = name.split(Pattern.quote(" "));
 		String email = "none";
+		String fn = "none";
 		int i = 0; 
 		for (i = 0; i < my_friends.size(); i++){
 			FriendClass friend = my_friends.get(i);
 			if (friend.getFirst_name().equals(names[0]) && friend.getLast_name().equals(names[1])){
 				email = friend.getEmail();
+				fn = friend.getFirst_name();
 				break;
 			}
 		}
+		final String f_first_name = fn;
 		final String f_email = email;
-		alert.setTitle(name);
-		alert.setMessage("");
+		custon_alert.setTitle(name);
+		custon_alert.setMessage("");
 
 		// Set an EditText view to get user input 
 		final EditText input = new EditText(ctx);
-		alert.setView(input);
-		alert.setPositiveButton("Message", new DialogInterface.OnClickListener() {
+		custon_alert.setView(input);
+		custon_alert.setPositiveButton("Message", new DialogInterface.OnClickListener() {
 		public void onClick(DialogInterface dialog, int whichButton) {
 			try {
 				String msg = input.getText().toString();
@@ -137,16 +137,24 @@ public class FriendsFragment extends Fragment {
 		  }
 		});
 
-		alert.setNegativeButton("Locate", new DialogInterface.OnClickListener() {
+		custon_alert.setNegativeButton("Locate", new DialogInterface.OnClickListener() {
 		  public void onClick(DialogInterface dialog, int whichButton) {
-				http_console.LocateFriend(user, f_email);
-				@SuppressWarnings("unused")
-				View rootView = inftr.inflate(R.layout.fragment_map, ctr,
-						false);
+				String result = http_console.LocateFriend(user, f_email);
+				if (result.equals("Failed")){
+					alert.create_alert("Error", f_first_name + " doesnt wish to share location right now");
+				}
+				//View rootView = inftr.inflate(R.layout.fragment_map, ctr, false);
 		  }
 		});
 
-		alert.show();
+		custon_alert.show();
 		
 	}
+	
+	@Override
+    public void onResume() {
+		if (rv != null)
+        	get_friends(rv);
+		super.onResume();
+    }
 }
