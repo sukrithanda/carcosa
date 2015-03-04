@@ -44,6 +44,7 @@
     <string name="title_SetupOfficeHours">Set up Office Hours</string>
     <string name="title_signout">Signout</string>
     <string name="title_resources">Resources</string>
+    <string name="title_privacySettings">Privacy Settings</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="action_example">Example action</string>   
@@ -58,6 +59,8 @@
     <string name="menu_stop">Stop</string>
     <string name="resources">Resource Type</string>
     <string name="find">Find</string>
+    <string name="privacy_settings">Privacy Settings</string>
+    <string name="locationSharing">Location Sharing</string>
     <string-array name="resourceType">
         <item>Labs</item>
         <item>Tutorial Rooms</item>
