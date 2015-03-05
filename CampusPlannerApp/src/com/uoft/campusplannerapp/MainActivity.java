@@ -848,7 +848,38 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 	  		  
 	  		   map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 	  		   
-	  		  groundOverlay=map.addGroundOverlay(new GroundOverlayOptions().image(floor1).transparency(0.01f).anchor(0.5f, 0.5f)
+	  		 int floorint = (int)geolocation_sim[2];
+	  		 BitmapDescriptor floor;
+	  		switch (floorint) {
+			case 1:
+				floor = floor1;
+				break;
+			case 2:
+				floor = floor2;				
+				break;
+			case 3:
+				floor = floor3;
+				break;
+			case 4:
+				floor = floor4;
+				break;
+			case 5:
+				floor = floor5;
+				break;
+			case 6:
+				floor = floor6;
+				break;
+			case 7:
+				floor = floor7;
+				break;
+			case 8:
+				floor = floor8;
+				break;
+			default:
+				floor = floor1;
+				break;
+	  		}  
+	  		  groundOverlay=map.addGroundOverlay(new GroundOverlayOptions().image(floor).transparency(0.01f).anchor(0.5f, 0.5f)
 	  		        .position(new LatLng(43.659652988335878, -79.397276867154886), 100f, 121f).bearing(-17.89f));
 
 	  		
@@ -1196,6 +1227,7 @@ public class WiFiScanReceiver extends BroadcastReceiver {
 				ble_rss_sim,ble_mac_sim,ble_coordinates_sim,ble_tx_powers_sim,ble_status_sim,params_sim,location_sim,geolocation_sim,accuracy_sim,speed_sim,steps_sim);
 
 		SetMyLocation(geolocation_sim[0],geolocation_sim[1],(int)geolocation_sim[2],accuracy_sim[0],bearing);
+		
 		
 		if(start)
 			wifiManager.startScan();
