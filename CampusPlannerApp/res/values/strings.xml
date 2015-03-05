@@ -29,6 +29,8 @@
     <string name="LocationHint">Add Location</string>
     <string name="SubmitText">Submit</string>
     <string name="ClearText">Clear</string>
+    <string name="Yes">Yes</string>
+    <string name="No">No</string>
     
     <string-array name="eventType_array">
         <item>Office Hours</item>
@@ -45,6 +47,7 @@
     <string name="title_signout">Signout</string>
     <string name="title_resources">Resources</string>
     <string name="title_privacySettings">Privacy Settings</string>
+    <string name="title_event_invite">Event Invite</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="action_example">Example action</string>   

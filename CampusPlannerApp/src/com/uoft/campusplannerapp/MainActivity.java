@@ -91,6 +91,7 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 
     CreateAlert alert;
     DatabaseHandler db;
+    User u;
     
     private Spinner spinner2;
     private List<FriendClass> my_friends;
@@ -198,11 +199,12 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        db = new DatabaseHandler(this);
         http_console = new HTTPConsole(this);
 
         alert = new CreateAlert(this);
-        db = new DatabaseHandler(this);
         User usero = db.getUser();
+        u = usero;
         db.Close();
     	pref = this.getSharedPreferences("User",MODE_PRIVATE);
         @SuppressWarnings("unused")
