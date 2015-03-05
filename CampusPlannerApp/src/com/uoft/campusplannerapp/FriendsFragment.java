@@ -144,8 +144,8 @@ public class FriendsFragment extends Fragment {
 
 		custon_alert.setNegativeButton("Locate", new DialogInterface.OnClickListener() {
 		  public void onClick(DialogInterface dialog, int whichButton) {
-				String result = http_console.LocateFriend(user, f_email);
-				if (result.equals("Failed")){
+				Location result = http_console.LocateFriend(user, f_email);
+				if (result == null){
 					alert.create_alert("Error", f_first_name + " doesnt wish to share location right now");
 					x.showFragment(mMapFragment);
 
