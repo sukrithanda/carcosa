@@ -19,6 +19,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.SupportMapFragment;
 import com.uoft.campusplannerapp.HTTPConsole;
 import com.uoft.campusplannerapp.CreateAlert;
 import com.uoft.campusplannerapp.FriendClass;
@@ -38,10 +39,14 @@ public class FriendsFragment extends Fragment {
 	LayoutInflater inftr; 
 	ViewGroup ctr;
 	View rv = null;
+	SupportMapFragment mMapFragment;
+	MainActivity x;
 	
-	public static FriendsFragment newInstance(Context ctx) {
+	public static FriendsFragment newInstance(Context ctx, MainActivity x, SupportMapFragment mMapFragment) {
 		FriendsFragment fragment = new FriendsFragment();
 		fragment.ctx = ctx;
+		fragment.mMapFragment = mMapFragment;
+		fragment.x = x;
 		return fragment;
 	}
 	
@@ -142,6 +147,19 @@ public class FriendsFragment extends Fragment {
 				String result = http_console.LocateFriend(user, f_email);
 				if (result.equals("Failed")){
 					alert.create_alert("Error", f_first_name + " doesnt wish to share location right now");
+					x.showFragment(mMapFragment);
+
+				}
+				else{
+					
+					x.showFragment(mMapFragment);
+					//mTitle = getString(R.string.title_map);
+					//break;
+					// create new map fragment
+					// Map should show friends location. If current user is on the same floor also show the user location
+					
+					
+					
 				}
 				//View rootView = inftr.inflate(R.layout.fragment_map, ctr, false);
 		  }

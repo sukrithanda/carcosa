@@ -92,24 +92,24 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
     CreateAlert alert;
     DatabaseHandler db;
     
-    private Spinner spinner2;
-    private List<FriendClass> my_friends;
-    private Fragment mVisible;
-	private SupportMapFragment mMapFragment;
-	private Fragment mFriendsFragment;
-	private Fragment mOrganizeEventFragment;
-	private Fragment mSetUpOfficeHoursFragment;
-	private Fragment mPrivacyFragment;
-	private Fragment mResourceFragment;
+    public Spinner spinner2;
+    public List<FriendClass> my_friends;
+    public Fragment mVisible;
+	public SupportMapFragment mMapFragment;
+	public Fragment mFriendsFragment;
+	public Fragment mOrganizeEventFragment;
+	public Fragment mSetUpOfficeHoursFragment;
+	public Fragment mPrivacyFragment;
+	public Fragment mResourceFragment;
 
-	private GoogleMap map;
+	public GoogleMap map;
 	
 	//LOCALIZER CODE - START
 	
 	   // Google Map
    // private GoogleMap googleMap;
-    private CurrentLocationProvider mylocation;
-    private GroundOverlay groundOverlay;
+    public CurrentLocationProvider mylocation;
+    public GroundOverlay groundOverlay;
     float bearing;
     
 	BitmapDescriptor floor1;
@@ -120,14 +120,14 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 	BitmapDescriptor floor6;
 	BitmapDescriptor floor7;
 	BitmapDescriptor floor8;
-	private int load_floor=1;
+	public int load_floor=1;
 		
 	LocalizationCore localizationcore;
 	
-    private static final int MAX_WIFI_APs = 200;
-	private int counter_wifi=0;
-    private int[] wifi_rss_buff= new int[MAX_WIFI_APs];
-    private String[] wifi_mac_buff= new String[MAX_WIFI_APs];
+    public static final int MAX_WIFI_APs = 200;
+	public int counter_wifi=0;
+    public int[] wifi_rss_buff= new int[MAX_WIFI_APs];
+    public String[] wifi_mac_buff= new String[MAX_WIFI_APs];
     
     
 	// Wifi scanner part
@@ -135,24 +135,24 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 	WiFiScanReceiver receiver;
 	WifiManager wifiManager = null;
 
-	private float[] gyro_sim = new float[3];
-	private float[] accel_sim = new float[3];
-	private float[] magnet_sim = new float[3];
-	private float[] gravity_sim = new float[3];
-	private float[] linearaccel_sim = new float[3];
-	private float[] rotationvector_sim = new float[3];
-	private float[] gamerotation_sim = new float[3];
-	private float[] orientation_sim = new float[3];
-	private float[] rotationmatrix_sim = new float[9];
-	private float pressure_sim,gps_status_sim,wifi_status_sim,ble_status_sim;
-	private float[] gps_sim = new float[6];
-	private float[] wifi_rss_sim = new float[200];
-	private byte[]	wifi_mac_sim = new byte[3400];
-	private float[] ble_rss_sim = new float[100];
-	private byte[]	ble_mac_sim = new byte[1700];
-	private float[] ble_coordinates_sim = new float[300];
-	private float[] ble_tx_powers_sim = new float[100];
-	private float[] params_sim = new float[10];
+	public float[] gyro_sim = new float[3];
+	public float[] accel_sim = new float[3];
+	public float[] magnet_sim = new float[3];
+	public float[] gravity_sim = new float[3];
+	public float[] linearaccel_sim = new float[3];
+	public float[] rotationvector_sim = new float[3];
+	public float[] gamerotation_sim = new float[3];
+	public float[] orientation_sim = new float[3];
+	public float[] rotationmatrix_sim = new float[9];
+	public float pressure_sim,gps_status_sim,wifi_status_sim,ble_status_sim;
+	public float[] gps_sim = new float[6];
+	public float[] wifi_rss_sim = new float[200];
+	public byte[]	wifi_mac_sim = new byte[3400];
+	public float[] ble_rss_sim = new float[100];
+	public byte[]	ble_mac_sim = new byte[1700];
+	public float[] ble_coordinates_sim = new float[300];
+	public float[] ble_tx_powers_sim = new float[100];
+	public float[] params_sim = new float[10];
 	
 	int[] location_sim=new int[3];
 	float[] geolocation_sim=new float[3];
@@ -162,7 +162,7 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 	
 	
 	boolean autostart_enable=true;
-    private boolean start=false;
+    public boolean start=false;
     
     // LOCALIZATION CODE - END
 	
@@ -170,19 +170,22 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 	 * Fragment managing the behaviors, interactions and presentation of the
 	 * navigation drawer.
 	 */
-	private NavigationDrawerFragment mNavigationDrawerFragment;
+	public NavigationDrawerFragment mNavigationDrawerFragment;
 
 	/**
 	 * Used to store the last screen title. For use in
 	 * {@link #restoreActionBar()}.
 	 */
-	private CharSequence mTitle;
+	public CharSequence mTitle;
     
-	private Calendar dateTime = Calendar.getInstance();
-	private SimpleDateFormat dateFormatter = new SimpleDateFormat("MMMM dd yyyy");
-	private SimpleDateFormat timeFormatter = new SimpleDateFormat("hh:mm a");
+	public Calendar dateTime = Calendar.getInstance();
+	public SimpleDateFormat dateFormatter = new SimpleDateFormat("MMMM dd yyyy");
+	public SimpleDateFormat timeFormatter = new SimpleDateFormat("hh:mm a");
 	
-    private static void create_alert(Context ctx, String msg) {
+	
+
+	
+    public static void create_alert(Context ctx, String msg) {
     	AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
     	builder.setMessage(msg)
     	       .setCancelable(false)
@@ -207,6 +210,8 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
     	pref = this.getSharedPreferences("User",MODE_PRIVATE);
         @SuppressWarnings("unused")
 		String temp = get_reg_id();
+    	
+     
   
     	if (usero == null) {
             setContentView(R.layout.activity_main);
@@ -221,8 +226,8 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
     		mNavigationDrawerFragment.setUp(R.id.navigation_drawer,m);
 
     		setUpFragments();
-    		mVisible = mMapFragment;
-    		mTitle = getString(R.string.title_map);
+			showFragment(mMapFragment);
+    		//mTitle = getString(R.string.title_map);
     		
     		//LOCALIZATION CODE - START
     		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -252,6 +257,11 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
     		
     		if(autostart_enable)
     			start_process();
+    		
+    		//THREADS to receive and send locations
+
+            new ClientReciever().start();
+        	new ClientSender().start();
     	}
     	
     }
@@ -499,14 +509,14 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 		return true;
 	}
 
-	private boolean ValidateEmail(String s_utmail) {
+	public boolean ValidateEmail(String s_utmail) {
 		if (s_utmail.contains("utoronto.ca")  || s_utmail.contains("toronto.edu"))
 			return true;
 		else 
 			return false;
 	}
 
-	private boolean ValidatePassword(String s_password) {
+	public boolean ValidatePassword(String s_password) {
 		if (!s_password.matches(".*\\d+.*")){
 			return false;
 		}
@@ -555,7 +565,7 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 //		}	
 	}
 
-    private String getApplicationVersion() {
+    public String getApplicationVersion() {
     	try {
             PackageInfo packageInfo = getApplicationContext().getPackageManager()
                     .getPackageInfo(getApplicationContext().getPackageName(), 0);
@@ -567,7 +577,7 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
   
     }
     
-    private String get_reg_id() {
+    public String get_reg_id() {
         String oldVersionId = pref.getString("version", null);
     	User user = db.getUser();
     	if (user == null || oldVersionId == null){
@@ -587,7 +597,7 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
         
     }
     
-    private void register_gcm() {
+    public void register_gcm() {
     	new AsyncTask<Void, Void, String>() {
             @Override
             protected String doInBackground(Void... params) {
@@ -715,54 +725,23 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
     
     
 
-	/**
-	 * A placeholder fragment containing a simple view.
-	 */
-	public static  class MFragment extends SupportMapFragment {
-		public static final String TAG = "map";
-		/**
-		 * The fragment argument representing the section number for this
-		 * fragment.
-		 */
-
-		/**
-		 * Returns a new instance of this fragment for the given section number.
-		 */
-
-		public MFragment() {
-			super();
-		}
-
-		@Override
-		
-		public View onCreateView(LayoutInflater inflater, ViewGroup container,
-				Bundle savedInstanceState) {
-			super.onCreateView(inflater, container, savedInstanceState);
-			View rootView = inflater.inflate(R.layout.fragment_map, container,
-					false);
-			
-			return rootView;
-		}
-
-		@Override
-		public void onAttach(Activity activity) {
-			super.onAttach(activity);
-		}
-	}
 	
-	private void showFragment(Fragment fragmentIn) {
-        if (fragmentIn == null) return;
+	
+	public void showFragment(Fragment fragmentIn) {
+        if ( fragmentIn == null /*|| fragmentIn == mVisible*/) return;
 
         final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
 
-        if (mVisible != null) ft.hide(mVisible);
+        if (mVisible != null) {
+        	ft.hide(mVisible);
+        }
 
         ft.show(fragmentIn).commit();
         mVisible = fragmentIn;
     }
 
-	private void setUpFragments() {
+	public void setUpFragments() {
         final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 
         // If the activity is killed while in BG, it's possible that the
@@ -800,11 +779,11 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
         	//initilizeMap(map);
            ft.replace(R.id.container, mMapFragment, MFragment.TAG);
         }
-        ft.show(mMapFragment);
+        ft.hide(mMapFragment);
 
         mFriendsFragment = (FriendsFragment) getSupportFragmentManager().findFragmentByTag(FriendsFragment.TAG);
         if (mFriendsFragment == null) {
-            mFriendsFragment = FriendsFragment.newInstance(this);
+            mFriendsFragment = FriendsFragment.newInstance(this, MainActivity.this, mMapFragment);
             ft.add(R.id.container, mFriendsFragment, FriendsFragment.TAG);
         }
         ft.hide(mFriendsFragment);
@@ -845,7 +824,7 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 
     }
 	
-	 private void initilizeMap() {
+	 public void initilizeMap() {
 	      //  if (googleMap == null) {
 	        //    googleMap = ((MapFragment) getFragmentManager().findFragmentById(
 	       //             R.id.map)).getMap();
@@ -858,7 +837,7 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
          }
 	 
 	  		  map.setMyLocationEnabled(true);
-	  		  map.setIndoorEnabled(true);
+	  		  map.setIndoorEnabled(false);
 	  		 
 	  		  
 	  		  map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
@@ -1080,7 +1059,7 @@ public void Load_RadioMap(){
 	}
 }
 
-private void loadPref(){
+public void loadPref(){
 	  SharedPreferences mySharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 	  
 	  /* Algorithms */
@@ -1272,18 +1251,6 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
  
  loadPref();
 }
-
-//@Override
-//public boolean onPrepareOptionsMenu (Menu menu) {
-//	if (start){
-//        menu.getItem(0).setEnabled(false);
-//        menu.getItem(1).setEnabled(true);
-//    }else{
-//    	menu.getItem(0).setEnabled(true);
-//        menu.getItem(1).setEnabled(false);
-//    }
-//    return true;
-//}
 
   
 }
