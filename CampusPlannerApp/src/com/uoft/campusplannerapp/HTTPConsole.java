@@ -45,6 +45,11 @@ public class HTTPConsole {
 	private final String HELLO_WORLD = "http://104.236.85.199:8080/hello-world";
 	private final String SEND_LOCATION = "http://104.236.85.199:8080/location/putLocation";
 	private final String SIGNOUT = "http://104.236.85.199:8080/user/logout";
+	private final String CREATE_EVENT = "http://104.236.85.199:8080/event/create";
+	private final String GET_EVENTS = "http://104.236.85.199:8080/event/getEvents";
+	private final String SET_RESPONSE = "http://104.236.85.199:8080/event/setResponse";
+	private final String DELETE_EVENT = "http://104.236.85.199:8080/event/deleteEvent";
+	private final String GET_INVITEES = "http://104.236.85.199:8080/event/getInvitees";
 
 	private Context ctx;
 	
@@ -123,33 +128,8 @@ public class HTTPConsole {
 	
 	public List<FriendClass> GetFriend(String email){
 		String URL = GET_FRIEND + "?userEmail=" + email;
-		List<FriendClass> my_friends = new ArrayList<FriendClass>();
 		String friends = SendGetRequest(URL);
-		if (friends.equals("Invalid Request")){
-			return null;
-		} else {
-	    	String jsonString = "{\"friends\":" + friends.split(Pattern.quote("\n"))[0] + "}";
-			Log.i("Sidd", jsonString);
-			try {
-				JSONObject jsnobject = new JSONObject(jsonString);
-				JSONArray jsonArray = jsnobject.getJSONArray("friends");
-			    for (int i = 0; i < jsonArray.length(); i++) {
-			        JSONObject explrObject = jsonArray.getJSONObject(i);
-			        FriendClass temp = new FriendClass();
-			        temp.setFirst_name(explrObject.getString("firstName"));
-			        temp.setLast_name(explrObject.getString("lastName"));
-			        temp.setEmail(explrObject.getString("email"));
-			        my_friends.add(temp);
-			    }
-			    DatabaseHandler db = new DatabaseHandler(ctx);
-				db.addFriendList(my_friends);
-				db.Close();
-				return my_friends;
-			} catch (JSONException e) {
-				e.printStackTrace();
-				return null;
-			}
-		}
+		return getFriendFromString(friends); 
 	}
 	
 	public boolean AddFriend(String user_email, String friend_email) {
@@ -329,7 +309,7 @@ public class HTTPConsole {
 			return true;
 		}
 	}
-	
+	 
 	/* Returns "Invalid Request" if there was some error
 	 *         "Hide" if location is hidden
 	 *         "Show" if location is shown
@@ -343,6 +323,122 @@ public class HTTPConsole {
 		String anss[] = ans.split("\n");
 		return anss[0];
 	}
+	
+	/* EVENT REQUESTS START*/
+	// time must be string in format hh.mm
+	public boolean CreateEventRequest(List<FriendClass> friends, String from_time, String to_time, 
+			String location, String name ){
+		DatabaseHandler db = new DatabaseHandler(ctx);
+		User user = db.getUser();
+		db.Close();
+		String email = user.getEmail();
+		String friendsStr = "";
+		int i = 0; 
+		for (i = 0; i < friends.size(); i++) {
+			if (i != 0){
+				friendsStr += ";";
+			}
+			friendsStr += friends.get(i);
+		}
+		String URL = CREATE_EVENT + "?friends=" + friendsStr + "&email=" + email + "&from_time=" + from_time +
+				"&to_time=" + to_time + "&location=" + location + "&name=" + name.replaceAll(" ", "%20");
+		String ans = SendGetRequest(URL);
+		if (ans.equals("Invalid Request")){
+			return false;
+		} else {
+			return true;
+		}
+	}
+	
+	public List<EventClass> GetEvents(){
+		DatabaseHandler db = new DatabaseHandler(ctx);
+		User user = db.getUser();
+		db.Close();
+		String URL = GET_EVENTS + "?email=" + user.getEmail();
+		String ans = SendGetRequest(URL);
+		List<EventClass> events = new ArrayList<EventClass>();
+		
+		if (ans.equals("Invalid Request")){
+			return null;
+		} else {
+	    	String jsonString = "{\"events\":" + ans.split(Pattern.quote("\n"))[0] + "}";
+			Log.i("Sidd", jsonString);
+			try {
+				JSONObject jsnobject = new JSONObject(jsonString);
+				JSONArray jsonArray = jsnobject.getJSONArray("events");
+			    for (int i = 0; i < jsonArray.length(); i++) {
+			        JSONObject explrObject = jsonArray.getJSONObject(i);
+			        EventClass temp = new EventClass();
+			        
+			        String creator = explrObject.getString("creator");
+			        if (creator.equals("true")) {
+			        	temp.setCreator(true);
+			        } else {
+			        	temp.setCreator(false);
+			        }
+			        
+			        String response = explrObject.getString("response");
+			        if (response.equals("true")) {
+			        	temp.setResponse(true);
+			        } else {
+			        	temp.setResponse(false);
+			        }
+			        
+			        temp.setFrom_time(Float.parseFloat(explrObject.getString("from_time")));
+			        temp.setTo_time(Float.parseFloat(explrObject.getString("To_time")));
+
+			        temp.setId(Long.parseLong(explrObject.getString("event_id")));
+			        temp.setUser(Long.parseLong(explrObject.getString("user")));
+			        temp.setLocation(explrObject.getString("location"));
+			        temp.setName(explrObject.getString("name").replaceAll("%20"," "));
+			        
+			        events.add(temp);
+			    }
+				return events;
+			} catch (JSONException e) {
+				e.printStackTrace();
+				return null;
+			}
+		}
+		
+	}
+
+	public List<FriendClass> GetInvitees(long event_id) {
+		String URL = GET_INVITEES + "?event_id=" + event_id;
+		String friends = SendGetRequest(URL);
+		return getFriendFromString(friends);
+	}
+	
+	public boolean SetResponse(long event_id, boolean response) {
+		DatabaseHandler db = new DatabaseHandler(ctx);
+		User user = db.getUser();
+		db.Close();
+		String responseStr = "";
+		if (response) {
+			responseStr = "true";
+		} else {
+			responseStr = "false";
+		}
+		String URL = SET_RESPONSE + "?event_id=" + event_id + "&email=" + user.getEmail() + "&response=" + responseStr;
+		String ans = SendGetRequest(URL);
+		if (ans.equals("Invalid Request")){
+			return false;
+		} else {
+			return true;
+		}
+	}
+	
+	public boolean DeleteEvent(long event_id) {
+		String URL = DELETE_EVENT + "?event_id=" + event_id;
+		String ans = SendGetRequest(URL);
+		if (ans.equals("Invalid Request")){
+			return false;
+		} else {
+			return true;
+		}
+	}
+
+	/* EVENT REQUESTS END*/
 	
 	@SuppressWarnings("unused")
 	private Boolean SendPostRequest(String URL, final List<NameValuePair> nameValuePairs) {
@@ -465,5 +561,36 @@ public class HTTPConsole {
 	    }
 	    return sb.toString();
 	}
+
+	private List<FriendClass> getFriendFromString(String friends) {
+
+		List<FriendClass> my_friends = new ArrayList<FriendClass>();
+		if (friends.equals("Invalid Request")){
+			return null;
+		} else {
+	    	String jsonString = "{\"friends\":" + friends.split(Pattern.quote("\n"))[0] + "}";
+			Log.i("Sidd", jsonString);
+			try {
+				JSONObject jsnobject = new JSONObject(jsonString);
+				JSONArray jsonArray = jsnobject.getJSONArray("friends");
+			    for (int i = 0; i < jsonArray.length(); i++) {
+			        JSONObject explrObject = jsonArray.getJSONObject(i);
+			        FriendClass temp = new FriendClass();
+			        temp.setFirst_name(explrObject.getString("firstName"));
+			        temp.setLast_name(explrObject.getString("lastName"));
+			        temp.setEmail(explrObject.getString("email"));
+			        my_friends.add(temp);
+			    }
+			    DatabaseHandler db = new DatabaseHandler(ctx);
+				db.addFriendList(my_friends);
+				db.Close();
+				return my_friends;
+			} catch (JSONException e) {
+				e.printStackTrace();
+				return null;
+			}
+		}
+	}
+	
 
 }
