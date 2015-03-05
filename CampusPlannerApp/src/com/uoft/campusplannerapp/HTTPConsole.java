@@ -44,6 +44,7 @@ public class HTTPConsole {
 	private final String SEND_PRIVATE = "http://104.236.85.199:8080/send_private";
 	private final String HELLO_WORLD = "http://104.236.85.199:8080/hello-world";
 	private final String SEND_LOCATION = "http://104.236.85.199:8080/location/putLocation";
+	private final String ADD_LOCATION = "http://104.236.85.199:8080/location/addLocation";
 	private final String SIGNOUT = "http://104.236.85.199:8080/user/logout";
 	private final String CREATE_EVENT = "http://104.236.85.199:8080/event/create";
 	private final String GET_EVENTS = "http://104.236.85.199:8080/event/getEvents";
@@ -206,6 +207,22 @@ public class HTTPConsole {
 	
 	public boolean SendLocation(String email, String building, String floor, String x, String y) {
 		String URL = SEND_LOCATION + "?friendEmail=" + email + "&building=" + building + "&floor=" + floor + 
+				"&x=" + x+ "&y=" + y ;
+		if (SendGetRequest(URL).equals("Invalid Request")){
+			return false;
+		} else {
+			return true;
+		}
+	}
+	
+	
+	public boolean AddLocation(String building, String floor, String x, String y, String accuracy, 
+			String bearing) {
+
+		DatabaseHandler db = new DatabaseHandler(ctx);
+		User user = db.getUser();
+		db.Close();
+		String URL = ADD_LOCATION + "?email=" + user.getEmail() + "&floor=" + floor + "&building=" + building + 
 				"&x=" + x+ "&y=" + y ;
 		if (SendGetRequest(URL).equals("Invalid Request")){
 			return false;
