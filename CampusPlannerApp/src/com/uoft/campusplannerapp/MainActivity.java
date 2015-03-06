@@ -61,6 +61,8 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.uoft.campusplannerapp.CurrentLocationProvider;
 import com.uoft.campusplannerapp.LocalizationCore;
 import com.uoft.campusplannerapp.PrefsActivity;
@@ -110,6 +112,8 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 	   // Google Map
    // private GoogleMap googleMap;
     public CurrentLocationProvider mylocation;
+    public CurrentLocationProvider mylocation1;
+
     public GroundOverlay groundOverlay;
     float bearing;
     
@@ -233,11 +237,7 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
     		
     		//LOCALIZATION CODE - START
     		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-    		//if (map != null)
-    			//Load_Maps();
-    		//else{
-    		//	System.out.println("MAP IS NULL");
-    		//}
+    	
     		
     		localizationcore = new LocalizationCore();
     		
@@ -742,6 +742,19 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
         ft.show(fragmentIn).commit();
         mVisible = fragmentIn;
     }
+	
+	public void showFriend(int floor, float latitude, float longitude, final String name, final String email) {
+	 
+  	  LatLng pinLocation = new LatLng(latitude, longitude);
+
+	
+        	      Marker storeMarker = map.addMarker(new MarkerOptions()
+        	      .position(pinLocation)
+        	      .title(name)
+        	      .snippet(email));
+      
+           
+    }
 
 	public void setUpFragments() {
         final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -885,9 +898,9 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 	  		
 	  		  mylocation=new CurrentLocationProvider(this);
 	  		  map.setLocationSource(mylocation);
-
-	            
-	       // }
+	  		  
+	  		  
+	      
 	    }
 	
 	//LOCALIZATION CODE - FUNCTIONS START
@@ -1229,6 +1242,7 @@ public class WiFiScanReceiver extends BroadcastReceiver {
 		SetMyLocation(geolocation_sim[0],geolocation_sim[1],(int)geolocation_sim[2],accuracy_sim[0],bearing);
 		
 		
+		
 		if(start)
 			wifiManager.startScan();
 		
@@ -1272,7 +1286,6 @@ public void SetMyLocation(float latitude,float longitude,int floor,float accurac
 	load_floor=floor;
 
   mylocation.push_location(latitude, longitude, 0f, accuracy, bearing);
-	
 }
 
 @Override
