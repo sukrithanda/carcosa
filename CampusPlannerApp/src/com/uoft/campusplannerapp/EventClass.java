@@ -9,6 +9,8 @@ public class EventClass {
 	private float to_time; 
 	private String location;
 	private String name; 
+	private String from_date; 
+	private String to_date;
 	public String getLocation() {
 		return location;
 	}
@@ -56,5 +58,17 @@ public class EventClass {
 	}
 	public void setName(String name) {
 		this.name = name;
+	}
+	public String getFrom_date() {
+		return from_date;
+	}
+	public void setFrom_date(String from_date) {
+		this.from_date = from_date;
+	}
+	public String getTo_date() {
+		return to_date;
+	}
+	public void setTo_date(String to_date) {
+		this.to_date = to_date;
 	}
 }

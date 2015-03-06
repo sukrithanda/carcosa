@@ -339,7 +339,7 @@ public class HTTPConsole {
 	/* EVENT REQUESTS START*/
 	// time must be string in format hh.mm
 	public boolean CreateEventRequest(List<FriendClass> friends, String from_time, String to_time, 
-			String location, String name ){
+			String location, String name, String from_date, String to_date ){
 		DatabaseHandler db = new DatabaseHandler(ctx);
 		User user = db.getUser();
 		db.Close();
@@ -352,7 +352,8 @@ public class HTTPConsole {
 			}
 			friendsStr += friends.get(i);
 		}
-		String URL = CREATE_EVENT + "?friends=" + friendsStr + "&email=" + email + "&from_time=" + from_time +
+		String URL = CREATE_EVENT + "?friends=" + friendsStr + "&email=" + email +"&from_date=" + from_date +
+				"&to_date=" + to_date +  "&from_time=" + from_time +
 				"&to_time=" + to_time + "&location=" + location + "&name=" + name.replaceAll(" ", "%20");
 		String ans = SendGetRequest(URL);
 		if (ans.equals("Invalid Request")){
@@ -593,7 +594,9 @@ public class HTTPConsole {
 			        }
 			        
 			        temp.setFrom_time(Float.parseFloat(explrObject.getString("from_time")));
-			        temp.setTo_time(Float.parseFloat(explrObject.getString("To_time")));
+			        temp.setTo_time(Float.parseFloat(explrObject.getString("to_time")));
+			        temp.setFrom_date(explrObject.getString("from_date"));
+			        temp.setTo_date(explrObject.getString("to_date"));
 
 			        temp.setId(Long.parseLong(explrObject.getString("event_id")));
 			        temp.setUser(Long.parseLong(explrObject.getString("user")));

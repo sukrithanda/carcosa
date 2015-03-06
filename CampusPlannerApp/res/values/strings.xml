@@ -29,8 +29,14 @@
     <string name="LocationHint">Add Location</string>
     <string name="SubmitText">Submit</string>
     <string name="ClearText">Clear</string>
-    <string name="Yes">Yes</string>
-    <string name="No">No</string>
+    <string name="Yes">Accept</string>
+    <string name="No">Decline</string>
+    <string name="EventInvite">Event Invite</string>
+    <string name="Name">Name: </string>
+    <string name="When">When: </string>
+    <string name="Creator">Creator: </string>
+    <string name="Location">Location: </string>
+    <string name="Invitees">Invitees: </string>
     
     <string-array name="eventType_array">
         <item>Office Hours</item>

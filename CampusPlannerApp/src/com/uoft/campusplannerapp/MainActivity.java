@@ -445,7 +445,7 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 			edit.putString("user", s_username);
 			edit.commit();
 			create_alert(this, "LogIn Successful");
-	        setContentView(R.layout.map_main);
+			((Activity) this).setContentView(R.layout.map_main);
 	      
 	        mNavigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager()
 					.findFragmentById(R.id.navigation_drawer);
