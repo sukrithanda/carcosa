@@ -13,6 +13,7 @@ import java.security.PublicKey;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
@@ -106,6 +107,9 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 	public Fragment mResourceFragment;
 
 	public GoogleMap map;
+	
+    ArrayList<MarkerFloorPairs> markers = new ArrayList<MarkerFloorPairs>();
+
 	
 	//LOCALIZER CODE - START
 	
@@ -670,6 +674,20 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
               startActivityForResult(i, 0); 
 	        	return true;
         }
+          else if (id == R.id.menu_up){
+        	  int floor = load_floor;
+        	   if(floor < 8){
+        		   showFragment(mMapFragment, ++floor);
+        	   }
+	        	return true;
+        }
+          else if (id == R.id.menu_down){
+        	  int floor = load_floor;
+        	  if(floor > 1){
+       		   showFragment(mMapFragment, --floor);
+       	   	  }
+	        	return true;
+        }
           else{
         	  return super.onOptionsItemSelected(item);
           }
@@ -760,14 +778,23 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 	public void showFriend(int floor, float latitude, float longitude, final String name, final String email) {
 	 
   	  LatLng pinLocation = new LatLng(latitude, longitude);
-
-	
         	      Marker storeMarker = map.addMarker(new MarkerOptions()
         	      .position(pinLocation)
         	      .title(name)
-        	      .snippet(email));
-      
-           
+        	      .snippet(email));   
+        	      
+        	      MarkerFloorPairs j = new MarkerFloorPairs(storeMarker, floor, email);
+        	      /*if(markers.contains(j) == false){
+        	    	  System.out.println("ADDING MARKER");
+        	    	  markers.add(j);
+        	      }*/
+        	      Iterator<MarkerFloorPairs> iterator = markers.iterator();
+        			while (iterator.hasNext()) {
+        				if(iterator.next().getID().equals(email)){
+        					iterator.remove();
+        				}
+        			}
+        		  markers.add(j);
     }
 
 	public void setUpFragments() {
@@ -1269,31 +1296,38 @@ public void SetMyLocation(float latitude,float longitude,int floor,float accurac
 	// latitude and longitude
 	//Log.d("FLOOR",Integer.toString(floor)+Integer.toString(load_floor));
 	if (floor != load_floor){
-		
 	switch(floor){
 	case 1:
 		groundOverlay.setImage(floor1);
+		hidemarkers(floor);	
 		break;
 	case 2:
 		groundOverlay.setImage(floor2);
+		hidemarkers(floor);	
 		break;
 	case 3:
 		groundOverlay.setImage(floor3);
+		hidemarkers(floor);	
 		break;
 	case 4:
 		groundOverlay.setImage(floor4);
+		hidemarkers(floor);	
 		break;
 	case 5:
 		groundOverlay.setImage(floor5);
+		hidemarkers(floor);	
 		break;
 	case 6:
 		groundOverlay.setImage(floor6);
+		hidemarkers(floor);	
 		break;
 	case 7:
 		groundOverlay.setImage(floor7);
+		hidemarkers(floor);	
 		break;
 	case 8:
 		groundOverlay.setImage(floor8);
+		hidemarkers(floor);	
 		break;
 	default:
 		return;
@@ -1312,6 +1346,7 @@ public void changefloor(int floor){
 	//Log.d("FLOOR",Integer.toString(floor)+Integer.toString(load_floor));
 	if (floor != load_floor){
 		
+		hidemarkers(floor);
 		switch(floor){
 		case 1:
 			groundOverlay.setImage(floor1);
@@ -1344,6 +1379,17 @@ public void changefloor(int floor){
 	load_floor=floor;
 }
 
+public void hidemarkers(int floor){
+	for (int i = 0; i < markers.size(); i++) {
+		if (markers.get(i).getFloor() == floor){
+			markers.get(i).getMarker().setVisible(true);
+		}
+		else{
+			markers.get(i).getMarker().setVisible(false);
+		}
+	}
+	
+}
 @Override
 protected void onActivityResult(int requestCode, int resultCode, Intent data) {
  //super.onActivityResult(requestCode, resultCode, data);

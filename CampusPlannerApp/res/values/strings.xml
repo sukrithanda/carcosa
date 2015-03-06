@@ -64,6 +64,8 @@
     <string name="title_activity_time_pickr">TimePickrActivity</string>
     <string name="pick_date">Select a date</string>
     
+    <string name="menu_up">Floor Up</string>
+    <string name="menu_down">Floor Down</string>
     <string name="menu_start">Start</string>
     <string name="menu_stop">Stop</string>
     <string name="resources">Resource Type</string>
