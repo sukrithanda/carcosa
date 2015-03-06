@@ -20,12 +20,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.SupportMapFragment;
-import com.uoft.campusplannerapp.HTTPConsole;
-import com.uoft.campusplannerapp.CreateAlert;
-import com.uoft.campusplannerapp.FriendClass;
-import com.uoft.campusplannerapp.DatabaseHandler;
-import com.uoft.campusplannerapp.User;
-import com.uoft.campusplannerapp.R;
 
 public class FriendsFragment extends Fragment {
 	private HTTPConsole http_console;
@@ -154,8 +148,18 @@ public class FriendsFragment extends Fragment {
 					x.showFragment(mMapFragment, 3);*/
 				}
 				else{
+					/*mMapFragment.getMapAsync(new OnMapReadyCallback() {
+		                @Override
+		                public void onMapReady(GoogleMap googleMap) {
+		                    x.map = googleMap;
+		                }
+		            });*/
 					x.showFriend(result.getFloor(), result.getLatitude(), result.getLongitude(), f_first_name, f_email);
-					x.showFragment(mMapFragment, result.getFloor());
+					System.out.println("DEBUG - DONE SHOWING FRIEND");
+
+					//x.showFragment(mMapFragment, result.getFloor());
+					System.out.println("DEBUG - DONE SHOWING FRAGMENT");
+
 				}
 				//View rootView = inftr.inflate(R.layout.fragment_map, ctr, false);
 		  }

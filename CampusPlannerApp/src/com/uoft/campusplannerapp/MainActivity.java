@@ -96,6 +96,8 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
     DatabaseHandler db;
     User u;
     
+    ClientReciever listener;
+    
     public Spinner spinner2;
     public List<FriendClass> my_friends;
     public Fragment mVisible;
@@ -106,17 +108,15 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 	public Fragment mPrivacyFragment;
 	public Fragment mResourceFragment;
 
-	public GoogleMap map;
+	public static GoogleMap map;
 	
     ArrayList<MarkerFloorPairs> markers = new ArrayList<MarkerFloorPairs>();
 
+
 	
 	//LOCALIZER CODE - START
-	
-	   // Google Map
-   // private GoogleMap googleMap;
+
     public CurrentLocationProvider mylocation;
-    public CurrentLocationProvider mylocation1;
 
     public GroundOverlay groundOverlay;
     float bearing;
@@ -190,6 +190,8 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 	public Calendar dateTime = Calendar.getInstance();
 	public SimpleDateFormat dateFormatter = new SimpleDateFormat("MMMM dd yyyy");
 	public SimpleDateFormat timeFormatter = new SimpleDateFormat("hh:mm a");
+	//THREADS to receive and send locations
+
 	
 	
 
@@ -216,6 +218,8 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
         alert = new CreateAlert(this);
         User usero = db.getUser();
         u = usero;
+        List<FriendClass> friend_list = new ArrayList<FriendClass>();
+        friend_list = http_console.GetFriend(u.getEmail());
         db.Close();
     	pref = this.getSharedPreferences("User",MODE_PRIVATE);
         @SuppressWarnings("unused")
@@ -253,28 +257,28 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 
     		}
 
-    		// Register Broadcast Receiver
+    		// Register Broadcast .wReceiver
     		receiver=new WiFiScanReceiver();
     	
     		
     		params_sim[0]=1;
     		params_sim[1]=1;
     		loadPref();
-    		
+    	    listener = new ClientReciever(db, u, http_console, friend_list);
     		if(autostart_enable)
     			start_process();
-    		
-    		//THREADS to receive and send locations
-
-            new ClientReciever(db, u, http_console).start();
+    			listener.start();
     	}
     	
     }
     
 	@Override
     protected void onResume() {
+		
         super.onResume();
     }
+	
+	
 	
 	// Set different Fragments Here
 		@Override
@@ -677,6 +681,7 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
           else if (id == R.id.menu_up){
         	  int floor = load_floor;
         	   if(floor < 8){
+        		   stop_process();
         		   showFragment(mMapFragment, ++floor);
         	   }
 	        	return true;
@@ -684,6 +689,7 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
           else if (id == R.id.menu_down){
         	  int floor = load_floor;
         	  if(floor > 1){
+       		   stop_process();
        		   showFragment(mMapFragment, --floor);
        	   	  }
 	        	return true;
@@ -751,7 +757,10 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 
         final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
-
+        if (fragmentIn == mMapFragment && map!=null){
+        	map.setMyLocationEnabled(true);
+        	start_process();
+        }
         if (mVisible != null) {
         	ft.hide(mVisible);
         }
@@ -761,9 +770,13 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
     }
 	
 	public void showFragment(Fragment fragmentIn, int floor) {
+		System.out.println("DEBUG - SHOWING FRAGMENT WITH FLOOR");
+
         if ( fragmentIn == null /*|| fragmentIn == mVisible*/) return;
-        
+		System.out.println("DEBUG - CHANGING FLOOR: " + floor);
        changefloor(floor);
+		System.out.println("DEBUG - FLOOR CHANGED");
+
         final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
 
@@ -776,25 +789,38 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
     }
 	
 	public void showFriend(int floor, float latitude, float longitude, final String name, final String email) {
-	 
-  	  LatLng pinLocation = new LatLng(latitude, longitude);
+		System.out.println(" DEBUG - IN SHOW FRIEND");
+		stop_process();
+		System.out.println("DEBUG - PROCESS STOPPED");
+		System.out.println("DEBUG - DRAWING MAKER");
+
+		LatLng pinLocation = new LatLng(latitude, longitude);
         	      Marker storeMarker = map.addMarker(new MarkerOptions()
         	      .position(pinLocation)
         	      .title(name)
         	      .snippet(email));   
+        	      
         	      
         	      MarkerFloorPairs j = new MarkerFloorPairs(storeMarker, floor, email);
         	      /*if(markers.contains(j) == false){
         	    	  System.out.println("ADDING MARKER");
         	    	  markers.add(j);
         	      }*/
+        	      
         	      Iterator<MarkerFloorPairs> iterator = markers.iterator();
         			while (iterator.hasNext()) {
         				if(iterator.next().getID().equals(email)){
+        					System.out.println("DEBUG - PREVIOUS MARKER FOUND");
         					iterator.remove();
+        					System.out.println("DEBUG - REMOVED MARKER FOUND");
+
         				}
         			}
+					System.out.println("DEBUG - ADDING NE MARKER TO LIST");
         		  markers.add(j);
+        		  mMapFragment.isResumed();
+        		  showFragment(mMapFragment, floor);
+        		  
     }
 
 	public void setUpFragments() {
@@ -815,10 +841,7 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
                     initilizeMap();
                 }
             });
-                
-        	//map= mMapFragment.getMapAsync(new OnMapReadyCallback());
-        	//initilizeMap(map);
-            
+                       
             ft.add(R.id.container, mMapFragment, MFragment.TAG);
         }
         else{
@@ -827,12 +850,10 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
                   @Override
                   public void onMapReady(GoogleMap googleMap) {
                       map = googleMap;
-                      Load_Maps();
-                      initilizeMap();
+                      //Load_Maps();
+                      //initilizeMap();
                   }
               });
-        	//map= mMapFragment.getMapAsync(this);
-        	//initilizeMap(map);
            ft.replace(R.id.container, mMapFragment, MFragment.TAG);
         }
         ft.hide(mMapFragment);
@@ -898,7 +919,7 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 	  		  
 	  		  map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 	  		  CameraPosition cameraPosition = new CameraPosition.Builder().target(
-	  	                new LatLng(43.659652988335878, -79.397276867154886)).zoom(20).build();
+	  	                new LatLng(43.659652988335878, -79.397276867154886)).zoom(19).build();
 	  		  
 	  		   map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 	  		   
@@ -933,15 +954,14 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 				floor = floor1;
 				break;
 	  		}  
+	  		
 	  		  groundOverlay=map.addGroundOverlay(new GroundOverlayOptions().image(floor).transparency(0.01f).anchor(0.5f, 0.5f)
 	  		        .position(new LatLng(43.659652988335878, -79.397276867154886), 100f, 121f).bearing(-17.89f));
 
 	  		
 	  		  mylocation=new CurrentLocationProvider(this);
 	  		  map.setLocationSource(mylocation);
-	  		  
-	  		  
-	      
+	  	
 	    }
 	
 	//LOCALIZATION CODE - FUNCTIONS START
@@ -1173,8 +1193,8 @@ public void start_process(){
 
 		registerReceiver(receiver, new IntentFilter(
 		WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
-		wifiManager.startScan();
-
+		boolean wifi = wifiManager.startScan();
+		System.out.println("DEBUG: GETTING WIFI SIGNALS:" + wifi);
 	counter=1;
 
 	
@@ -1200,15 +1220,22 @@ public void start_process(){
 	localizationcore.initialize();
 	start=true;
 	Load_RadioMap();
+	//receiver.onReceive(this, null);
+
+	if (map != null){
+		map.setMyLocationEnabled(true);
+	changefloor((int)geolocation_sim[2]);
+	}
 	}
 }
 
 public void stop_process(){
 	if (start){
-
+		System.out.println("DEBUG - STOPPING LOCATION TRACKING");
 		unregisterReceiver(receiver);
+		map.setMyLocationEnabled(false);
+		start=false;
 		
-	start=false;
 	}
 }
 
@@ -1343,7 +1370,7 @@ public void SetMyLocation(float latitude,float longitude,int floor,float accurac
 
 public void changefloor(int floor){
 	// latitude and longitude
-	//Log.d("FLOOR",Integer.toString(floor)+Integer.toString(load_floor));
+	Log.d("FLOOR",Integer.toString(floor)+Integer.toString(load_floor));
 	if (floor != load_floor){
 		
 		hidemarkers(floor);
@@ -1400,6 +1427,8 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
  
  loadPref();
 }
+
+
 
   
 }

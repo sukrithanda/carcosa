@@ -4,19 +4,19 @@ import java.util.Iterator;
 import java.util.List;
 
 public class ClientReciever extends Thread{
-	 List<FriendClass> friends;
      DatabaseHandler db;
      User u;
      HTTPConsole http_console;
+     List<FriendClass> friend_list;
      
-    public ClientReciever(DatabaseHandler db, User u, HTTPConsole http_console){
+    public ClientReciever(DatabaseHandler db, User u, HTTPConsole http_console,List<FriendClass> friend_list){
     	this.db = db;
     	this.u = u;
     	this.http_console = http_console;
-    	//friends = db.getFriends();
-    	//if (friends.isEmpty()){
-    		friends = http_console.GetFriend(u.getEmail());
-		//}
+    	this.friend_list = friend_list;
+    //	if (friends != null || friends.isEmpty()){
+    	//	friends = http_console.GetFriend(u.getEmail());
+	//	}
     }
 
     public void run(){
@@ -30,11 +30,13 @@ public class ClientReciever extends Thread{
         	while(timeToSleep > 0){
         		start=System.currentTimeMillis();
         		try{
-            	
+        			if (friend_list.isEmpty() || friend_list == null){
+        				break;
+        			}
         			//TODO: need to perform get call here to retrieve the updated locations
         			
         			System.out.println("Receiver");
-        			for (Iterator<FriendClass> iter = friends.iterator(); iter.hasNext(); ) {
+        			for (Iterator<FriendClass> iter = friend_list.iterator(); iter.hasNext(); ) {
         			    FriendClass element = iter.next();
         			    http_console.GetFriend(element.getEmail());
         			}

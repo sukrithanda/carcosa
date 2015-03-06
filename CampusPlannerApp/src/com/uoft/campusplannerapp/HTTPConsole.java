@@ -76,8 +76,10 @@ public class HTTPConsole {
 		// get id from friend and set it
 		DatabaseHandler db = new DatabaseHandler(ctx);
 		FriendClass fr = db.getFriendFromEmail(friend);
-		loc.setUser_id(fr.getUser_id());
-		db.addLocation(loc);
+		if(fr!=null){
+			loc.setUser_id(fr.getUser_id());
+			db.addLocation(loc);
+		}
 		db.Close();
 		
 	}
