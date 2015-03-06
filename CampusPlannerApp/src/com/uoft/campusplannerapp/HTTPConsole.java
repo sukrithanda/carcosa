@@ -70,11 +70,13 @@ public class HTTPConsole {
 		Location loc = new Location();
 		loc.setBldg(bldg);
 		loc.setFloor(Integer.parseInt(floor));
-		loc.setX(Integer.parseInt(x));
-		loc.setY(Integer.parseInt(y));
-		loc.setEmail(friend);
-		
+		loc.setLatitude(Float.parseFloat(x));
+		loc.setLongitude(Float.parseFloat(y));
+		//loc.setUser(friend);
+		// get id from friend and set it
 		DatabaseHandler db = new DatabaseHandler(ctx);
+		FriendClass fr = db.getFriendFromEmail(friend);
+		loc.setUser_id(fr.getUser_id());
 		db.addLocation(loc);
 		db.Close();
 		
@@ -142,18 +144,11 @@ public class HTTPConsole {
 		}
 	}
 	
-	public String LocateFriend(String user_email,String friend_email) {
+	public Location LocateFriend(String user_email,String friend_email) {
 		String URL = LOCATE_FRIEND + "?userEmail=" + user_email + "&friendEmail=" + friend_email;
 		InitializeLoc();
 		String result = SendGetRequest(URL);
-		if (result == null) {
-			return "Failed";
-		}
-		if (result.equals("Invalid Request")){
-			return null;
-		} else {
-			return result;
-		}
+		return GetLocationFromString(result);
 	}
 	
 	public boolean RemoveFriend(String user_email, String friend_email) {
@@ -373,57 +368,15 @@ public class HTTPConsole {
 		db.Close();
 		String URL = GET_EVENTS + "?email=" + user.getEmail();
 		String ans = SendGetRequest(URL);
-		List<EventClass> events = new ArrayList<EventClass>();
+		return GetEventsFromString(ans);
 		
-		if (ans.equals("Invalid Request")){
-			return null;
-		} else {
-	    	String jsonString = "{\"events\":" + ans.split(Pattern.quote("\n"))[0] + "}";
-			Log.i("Sidd", jsonString);
-			try {
-				JSONObject jsnobject = new JSONObject(jsonString);
-				JSONArray jsonArray = jsnobject.getJSONArray("events");
-			    for (int i = 0; i < jsonArray.length(); i++) {
-			        JSONObject explrObject = jsonArray.getJSONObject(i);
-			        EventClass temp = new EventClass();
-			        
-			        String creator = explrObject.getString("creator");
-			        if (creator.equals("true")) {
-			        	temp.setCreator(true);
-			        } else {
-			        	temp.setCreator(false);
-			        }
-			        
-			        String response = explrObject.getString("response");
-			        if (response.equals("true")) {
-			        	temp.setResponse(true);
-			        } else {
-			        	temp.setResponse(false);
-			        }
-			        
-			        temp.setFrom_time(Float.parseFloat(explrObject.getString("from_time")));
-			        temp.setTo_time(Float.parseFloat(explrObject.getString("To_time")));
-
-			        temp.setId(Long.parseLong(explrObject.getString("event_id")));
-			        temp.setUser(Long.parseLong(explrObject.getString("user")));
-			        temp.setLocation(explrObject.getString("location"));
-			        temp.setName(explrObject.getString("name").replaceAll("%20"," "));
-			        
-			        events.add(temp);
-			    }
-				return events;
-			} catch (JSONException e) {
-				e.printStackTrace();
-				return null;
-			}
-		}
 		
 	}
 
-	public List<FriendClass> GetInvitees(long event_id) {
+	public List<EventClass> GetInvitees(long event_id) {
 		String URL = GET_INVITEES + "?event_id=" + event_id;
 		String friends = SendGetRequest(URL);
-		return getFriendFromString(friends);
+		return GetEventsFromString(friends);
 	}
 	
 	public boolean SetResponse(long event_id, boolean response) {
@@ -596,6 +549,7 @@ public class HTTPConsole {
 			        temp.setFirst_name(explrObject.getString("firstName"));
 			        temp.setLast_name(explrObject.getString("lastName"));
 			        temp.setEmail(explrObject.getString("email"));
+			        temp.setUser_id(Long.parseLong(explrObject.getString("user_id")));
 			        my_friends.add(temp);
 			    }
 			    DatabaseHandler db = new DatabaseHandler(ctx);
@@ -607,6 +561,76 @@ public class HTTPConsole {
 				return null;
 			}
 		}
+	}
+	
+	private List<EventClass> GetEventsFromString(String ans) {
+		List<EventClass> events = new ArrayList<EventClass>();
+		
+		if (ans.equals("Invalid Request")){
+			return null;
+		} else {
+	    	String jsonString = "{\"events\":" + ans.split(Pattern.quote("\n"))[0] + "}";
+			Log.i("Sidd", jsonString);
+			try {
+				JSONObject jsnobject = new JSONObject(jsonString);
+				JSONArray jsonArray = jsnobject.getJSONArray("events");
+			    for (int i = 0; i < jsonArray.length(); i++) {
+			        JSONObject explrObject = jsonArray.getJSONObject(i);
+			        EventClass temp = new EventClass();
+			        
+			        String creator = explrObject.getString("creator");
+			        if (creator.equals("true")) {
+			        	temp.setCreator(true);
+			        } else {
+			        	temp.setCreator(false);
+			        }
+			        
+			        String response = explrObject.getString("response");
+			        if (response.equals("true")) {
+			        	temp.setResponse(true);
+			        } else {
+			        	temp.setResponse(false);
+			        }
+			        
+			        temp.setFrom_time(Float.parseFloat(explrObject.getString("from_time")));
+			        temp.setTo_time(Float.parseFloat(explrObject.getString("To_time")));
+
+			        temp.setId(Long.parseLong(explrObject.getString("event_id")));
+			        temp.setUser(Long.parseLong(explrObject.getString("user")));
+			        temp.setLocation(explrObject.getString("location"));
+			        temp.setName(explrObject.getString("name").replaceAll("%20"," "));
+			        
+			        events.add(temp);
+			    }
+				return events;
+			} catch (JSONException e) {
+				e.printStackTrace();
+				return null;
+			}
+		}
+	}
+	
+	private Location GetLocationFromString(String result) {
+		if (result == null) 
+			return null;
+		Location loc = new Location();
+		if (result.equals("Invalid Request")){
+			return null;
+		} else {
+			try {
+				JSONObject obj = new JSONObject(result);
+				loc.setUser_id(obj.getInt("user_id"));
+				loc.setLatitude(Float.parseFloat(obj.getString("x_coordinate")));
+				loc.setLongitude(Float.parseFloat(obj.getString("y_coordinate")));
+				loc.setBldg(obj.getString("building"));
+				loc.setFloor(Integer.parseInt(obj.getString("floor")));
+				return loc;
+			} catch (JSONException e) {
+				e.printStackTrace();
+				return null;
+			}
+		}
+		
 	}
 	
 

@@ -262,8 +262,7 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
     		
     		//THREADS to receive and send locations
 
-            new ClientReciever().start();
-        	new ClientSender().start();
+            new ClientReciever(db, u, http_console).start();
     	}
     	
     }
@@ -732,6 +731,21 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 	public void showFragment(Fragment fragmentIn) {
         if ( fragmentIn == null /*|| fragmentIn == mVisible*/) return;
 
+        final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
+
+        if (mVisible != null) {
+        	ft.hide(mVisible);
+        }
+
+        ft.show(fragmentIn).commit();
+        mVisible = fragmentIn;
+    }
+	
+	public void showFragment(Fragment fragmentIn, int floor) {
+        if ( fragmentIn == null /*|| fragmentIn == mVisible*/) return;
+        
+       changefloor(floor);
         final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
 
@@ -1241,6 +1255,8 @@ public class WiFiScanReceiver extends BroadcastReceiver {
 
 		SetMyLocation(geolocation_sim[0],geolocation_sim[1],(int)geolocation_sim[2],accuracy_sim[0],bearing);
 		
+		//send location to server
+		
 		
 		
 		if(start)
@@ -1286,6 +1302,46 @@ public void SetMyLocation(float latitude,float longitude,int floor,float accurac
 	load_floor=floor;
 
   mylocation.push_location(latitude, longitude, 0f, accuracy, bearing);
+  
+  http_console.AddLocation("BA", Integer.toString(floor), Float.toString(latitude), Float.toString(longitude), Float.toString(accuracy), Float.toString(bearing));
+}
+
+
+public void changefloor(int floor){
+	// latitude and longitude
+	//Log.d("FLOOR",Integer.toString(floor)+Integer.toString(load_floor));
+	if (floor != load_floor){
+		
+		switch(floor){
+		case 1:
+			groundOverlay.setImage(floor1);
+			break;
+		case 2:
+			groundOverlay.setImage(floor2);
+			break;
+		case 3:
+			groundOverlay.setImage(floor3);
+			break;
+		case 4:
+			groundOverlay.setImage(floor4);
+			break;
+		case 5:
+			groundOverlay.setImage(floor5);
+			break;
+		case 6:
+			groundOverlay.setImage(floor6);
+			break;
+		case 7:
+			groundOverlay.setImage(floor7);
+			break;
+		case 8:
+			groundOverlay.setImage(floor8);
+			break;
+		default:
+			return;
+		}
+	}
+	load_floor=floor;
 }
 
 @Override

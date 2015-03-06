@@ -9,9 +9,22 @@ public class Location {
 	private float longitude; 
 	private float bearing; 
 	private float accuracy;
-	private String email; 
+	private long user_id;
 	private boolean plot;
 	
+	public Location(String bldg, int floor, float latitude, float longitude, long user_id){
+		this.bldg = bldg;
+		this.floor = floor;
+		this.latitude = latitude;
+		this.longitude = longitude;
+		this.user_id = user_id;
+		plot = true;
+	}
+	
+	public Location() {
+		;// TODO Auto-generated constructor stub
+	}
+
 	public void GetLocation(){
 		bldg = "BA";
 		Random rand = new Random();
@@ -28,11 +41,11 @@ public class Location {
 		return floor; 
 	}
 	
-	public float getX(){
+	public float getLatitude(){
 		return latitude;
 	}
 	
-	public float getY(){
+	public float getLongitude(){
 		return longitude;
 	}
 	
@@ -44,20 +57,12 @@ public class Location {
 		this.floor = floor;
 	}
 	
-	public void setX(int x){
+	public void setLatitude(float x){
 		this.latitude = x;
 	}
 
-	public void setY(int y){
+	public void setLongitude(float y){
 		this.longitude = y;
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
 	}
 
 	public boolean isPlot() {
@@ -87,6 +92,14 @@ public class Location {
 
 	public void setAccuracy(float accuracy) {
 		this.accuracy = accuracy;
+	}
+
+	public long getUser_id() {
+		return user_id;
+	}
+
+	public void setUser_id(long user_id) {
+		this.user_id = user_id;
 	}
 
 

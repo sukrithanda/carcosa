@@ -43,10 +43,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				"( friend_id INTEGER PRIMARY KEY AUTOINCREMENT, " + 
 				"first_name TEXT, " + 
 				"last_name TEXT, " + 
-				"email TEXT )";
+				"email TEXT ," + 
+				"user_id BIGINTEGER )";
 		String locations = "CREATE TABLE IF NOT EXISTS locations" + 
 				"( location_id INTEGER PRIMARY KEY AUTOINCREMENT, " + 
-				"email TEXT, " +
+				"user_id INTEGER, " +
 				"bldg TEXT, " + 
 				"floor INTEGER, " + 
 				"x INTEGER, " + 
@@ -160,11 +161,60 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				friend.setFirst_name(cursor.getString(1));
 				friend.setLast_name(cursor.getString(2));
 				friend.setEmail(cursor.getString(3));
+				friend.setUser_id(Long.parseLong(cursor.getString(4)));
 				fl.add(friend);
 			} while (cursor.moveToNext());
 		}
 		db.close();
 		return fl;
+	}
+	
+	public FriendClass getFriendFromId(long user_id){
+		Log.i("UPlan","Get one Friends");
+		SQLiteDatabase db = this.getWritableDatabase();
+		String query = "SELECT * FROM friends";
+		Cursor cursor = db.rawQuery(query, null);
+		if (cursor.moveToFirst()){
+			do {
+				if (Long.parseLong(cursor.getString(4)) == user_id) {
+					FriendClass friend = new FriendClass();
+					friend.setFirst_name(cursor.getString(1));
+					friend.setLast_name(cursor.getString(2));
+					friend.setEmail(cursor.getString(3));
+					friend.setUser_id(Long.parseLong(cursor.getString(4)));
+					db.close();
+					return friend;
+					
+				}
+			} while (cursor.moveToNext());
+		}
+		db.close();
+		return null;
+		
+	}
+	
+	public FriendClass getFriendFromEmail(String email){
+		Log.i("UPlan","Get one Friend");
+		SQLiteDatabase db = this.getWritableDatabase();
+		String query = "SELECT * FROM friends";
+		Cursor cursor = db.rawQuery(query, null);
+		if (cursor.moveToFirst()){
+			do {
+				if (cursor.getString(3) == email) {
+					FriendClass friend = new FriendClass();
+					friend.setFirst_name(cursor.getString(cursor.getColumnIndex("first_name")));
+					friend.setLast_name(cursor.getString(cursor.getColumnIndex("last_name")));
+					friend.setEmail(cursor.getString(cursor.getColumnIndex("email")));
+					friend.setUser_id(cursor.getLong(cursor.getColumnIndex("user_id")));
+					db.close();
+					return friend;
+					
+				}
+			} while (cursor.moveToNext());
+		}
+		db.close();
+		return null;
+		
 	}
 	
 	public boolean addFriendList(List<FriendClass> fl){
@@ -175,6 +225,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			values.put("first_name", f.getFirst_name());
 			values.put("last_name", f.getLast_name());
 			values.put("email",f.getEmail());
+			values.put("user_id",f.getUser_id());
 			db.insert("friends", null, values);
 		}
 		db.close();
@@ -187,6 +238,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put("first_name", friend.getFirst_name());
 		values.put("last_name", friend.getLast_name());
 		values.put("email",friend.getEmail());
+		values.put("user_id",friend.getUser_id());
 		db.insert("friends", null, values);
 		db.close();
 		return true;
@@ -202,11 +254,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			do {
 				Location loc = new Location();
 				try {
-					loc.setEmail(cursor.getString(1));
+					loc.setUser_id(Long.parseLong(cursor.getString(1)));
 					loc.setBldg(cursor.getString(2));
 					loc.setFloor(Integer.parseInt(cursor.getString(3)));
-					loc.setX(Integer.parseInt(cursor.getString(4)));
-					loc.setY(Integer.parseInt(cursor.getString(5)));
+					loc.setLatitude(Integer.parseInt(cursor.getString(4)));
+					loc.setLongitude(Integer.parseInt(cursor.getString(5)));
 					int plot = Integer.parseInt(cursor.getString(6));
 					loc.setPlot(plot==1?true:false);
 					locations.add(loc);
@@ -219,32 +271,62 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		return null;
 	}
 	
+	public Location getLocationFromId(long user_id){
+		Log.i("UPlan","Get All Friends");
+		SQLiteDatabase db = this.getWritableDatabase();
+		String query = "SELECT * FROM locations";
+		Cursor cursor = db.rawQuery(query, null);
+		if (cursor.moveToFirst()){
+			do {
+				try {
+					long t_user_id = cursor.getInt(cursor.getColumnIndex("user_id"));
+					if (t_user_id == user_id) {
+						Location loc = new Location();
+						loc.setUser_id(cursor.getInt(cursor.getColumnIndex("user_id")));
+						loc.setBldg(cursor.getString(cursor.getColumnIndex("bldg")));
+						loc.setFloor(cursor.getInt(cursor.getColumnIndex("floor")));
+						loc.setLatitude(cursor.getInt(cursor.getColumnIndex("x")));
+						loc.setLatitude(cursor.getInt(cursor.getColumnIndex("y")));
+						int plot = cursor.getInt(cursor.getColumnIndex("plot"));
+						loc.setPlot(plot==1?true:false);
+						db.close();
+						return loc;
+					}
+				} catch (Exception e){
+					e.printStackTrace();
+				}
+			} while (cursor.moveToNext());
+		}
+		db.close();
+		return null;
+	}
+	
 	public boolean addLocation(Location loc){
 		SQLiteDatabase db = this.getWritableDatabase();
 		ContentValues values = new ContentValues();
-		values.put("email", loc.getEmail());
+		values.put("user_id", loc.getUser_id());
 		values.put("bldg", loc.getBldg());
 		values.put("floor", "" + loc.getFloor());
-		values.put("x", "" + loc.getX());
-		values.put("y", "" + loc.getY());
+		values.put("x", "" + loc.getLatitude());
+		values.put("y", "" + loc.getLongitude());
 		values.put("plotted", "" + 0);
 		db.insert("locations", null, values);
 		db.close();
-		Log.i("Sidd", "Set Email, bldg, floor, x, y, 0"+ loc.getEmail() + loc.getBldg() + loc.getFloor() +  
-				loc.getX() + loc.getY());
+		Log.i("Sidd", "Set user_id, bldg, floor, x, y, 0"+ loc.getUser_id() + loc.getBldg() + loc.getFloor() +  
+				loc.getLatitude() + loc.getLongitude());
 		return true;
 	}
 	
 	public boolean updatePlotted(Location loc){
 		SQLiteDatabase db = this.getWritableDatabase();
 		ContentValues values = new ContentValues();
-		values.put("email", loc.getEmail());
+		values.put("user_id", loc.getUser_id());
 		values.put("bldg", loc.getBldg());
 		values.put("floor", "" + loc.getFloor());
-		values.put("x", "" + loc.getX());
-		values.put("y", "" + loc.getY());
+		values.put("x", "" + loc.getLatitude());
+		values.put("y", "" + loc.getLongitude());
 		values.put("plotted", "" + 1);
-		int i = db.update("locations", values, "email=?", new String[]{loc.getEmail()});
+		int i = db.update("locations", values, "user_id=?", new String[]{"" + loc.getUser_id()});
 		db.close();
 		return i==1?true:false;
 	}

@@ -1,15 +1,29 @@
 package com.uoft.campusplannerapp;
 
-public class ClientReciever extends Thread{
+import java.util.Iterator;
+import java.util.List;
 
-    public ClientReciever(){
-	;
+public class ClientReciever extends Thread{
+	 List<FriendClass> friends;
+     DatabaseHandler db;
+     User u;
+     HTTPConsole http_console;
+     
+    public ClientReciever(DatabaseHandler db, User u, HTTPConsole http_console){
+    	this.db = db;
+    	this.u = u;
+    	this.http_console = http_console;
+    	//friends = db.getFriends();
+    	//if (friends.isEmpty()){
+    		friends = http_console.GetFriend(u.getEmail());
+		//}
     }
 
     public void run(){
     	long timeToSleep = 10000;
         long start, end, slept;
         boolean interrupted = false;
+       
         
         while(true){
         	timeToSleep = 10000;
@@ -18,8 +32,12 @@ public class ClientReciever extends Thread{
         		try{
             	
         			//TODO: need to perform get call here to retrieve the updated locations
+        			
         			System.out.println("Receiver");
-
+        			for (Iterator<FriendClass> iter = friends.iterator(); iter.hasNext(); ) {
+        			    FriendClass element = iter.next();
+        			    http_console.GetFriend(element.getEmail());
+        			}
         			Thread.sleep(timeToSleep);
         			break;
         		}

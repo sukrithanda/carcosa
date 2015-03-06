@@ -144,28 +144,18 @@ public class FriendsFragment extends Fragment {
 
 		custon_alert.setNegativeButton("Locate", new DialogInterface.OnClickListener() {
 		  public void onClick(DialogInterface dialog, int whichButton) {
-				String result = http_console.LocateFriend(user, f_email);
-				if (result.equals("Failed")){
-					//alert.create_alert("Error", f_first_name + " doesnt wish to share location right now");
-					
-					float lat = (float) 43.659511;
+
+			  Location result = http_console.LocateFriend(user, f_email);
+				if (result == null || result.getFloor() == 0 || result.getLatitude() == 0 || result.getLatitude() == 0){
+					alert.create_alert("Error", f_first_name + " doesnt wish to share location right now or the location could not be found");
+					/*float lat = (float) 43.659511;
 					float log = (float) -79.397819;
-					
-					x.showFriend(1, lat, log, f_first_name, f_email);
-					x.showFragment(mMapFragment);
-
-
+					x.showFriend(3, lat, log, f_first_name, f_email);
+					x.showFragment(mMapFragment, 3);*/
 				}
 				else{
-					
-					x.showFragment(mMapFragment);
-					//mTitle = getString(R.string.title_map);
-					//break;
-					// create new map fragment
-					// Map should show friends location. If current user is on the same floor also show the user location
-					
-					
-					
+					x.showFriend(result.getFloor(), result.getLatitude(), result.getLongitude(), f_first_name, f_email);
+					x.showFragment(mMapFragment, result.getFloor());
 				}
 				//View rootView = inftr.inflate(R.layout.fragment_map, ctr, false);
 		  }
