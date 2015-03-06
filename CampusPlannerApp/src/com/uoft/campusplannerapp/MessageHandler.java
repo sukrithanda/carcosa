@@ -90,9 +90,13 @@ public class MessageHandler extends IntentService {
 			String mod_msg = event.replaceAll("%20", " ");
         	Log.i("Sidd", message + "^^^^^" + message + "^^^^^" + mod_msg);
         	Uri notisnd = Uri.parse("" + R.raw.fallbackring);
+        	int mNotificationId = 002;
+        	
         	
         	Intent resultIntent = new Intent(this, ResponseActivity.class);
         	resultIntent.putExtra("EventId", event_id);
+        	resultIntent.putExtra("Creator", creator);
+        	resultIntent.putExtra("notification", "" + mNotificationId);
         	// Because clicking the notification opens a new ("special") activity, there's
         	// no need to create an artificial back stack.
         	PendingIntent resultPendingIntent =
@@ -110,9 +114,6 @@ public class MessageHandler extends IntentService {
         		    .setSound(notisnd)
         		    .setContentIntent(resultPendingIntent)
         		    .setContentText(mod_msg);
-        	int mNotificationId = 001;
-        	
-        	// Attach Chat activity as On Click
             // Gets an instance of the NotificationManager service
     	     NotificationManager mNotifyMgr = 
     	             (NotificationManager) getSystemService(NOTIFICATION_SERVICE);

@@ -2,27 +2,175 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_weight="100"
     android:orientation="vertical" >
-    
+
     <TextView
-	        android:id="@+id/eventId"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:textAppearance="?android:attr/textAppearanceMedium" />
-    <Button 
-	        android:id="@+id/yesButton"
-    		android:layout_width="wrap_content" 
-    		android:layout_height="wrap_content"
-    		android:text="@string/Yes" 
-    		android:onClick="yesButton"
-    		style="?android:attr/borderlessButtonStyle" />
-    <Button 
-	        android:id="@+id/noButton"
-    		android:layout_width="wrap_content" 
-    		android:layout_height="wrap_content"
-    		android:text="@string/No" 
-    		android:onClick="noButton"
-    		style="?android:attr/borderlessButtonStyle" />
+        android:id="@+id/eventId"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="Helvetica"
+        android:text="@string/EventInvite"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textSize="28sp" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/eventNameTag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="Helvetica"
+            android:gravity="bottom"
+            android:text="@string/Name"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textSize="26sp" >
+        </TextView>
+
+        <TextView
+            android:id="@+id/eventName"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:fontFamily="Helvetica"
+            android:gravity="bottom"
+            android:paddingLeft="5dp"
+            android:text="@string/Name"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textSize="20sp" >
+        </TextView>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/Creator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="Helvetica"
+            android:gravity="bottom"
+            android:text="@string/Creator"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textSize="26sp" >
+        </TextView>
+
+        <TextView
+            android:id="@+id/creatorName"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:fontFamily="Helvetica"
+            android:gravity="bottom"
+            android:paddingLeft="5dp"
+            android:text="@string/Creator"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textSize="20sp" >
+        </TextView>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/Time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="Helvetica"
+            android:gravity="bottom"
+            android:text="@string/When"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textSize="26sp" >
+        </TextView>
+
+        <TextView
+            android:id="@+id/TimeAct"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:fontFamily="Helvetica"
+            android:gravity="bottom"
+            android:paddingLeft="5dp"
+            android:text="@string/When"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textSize="20sp" >
+        </TextView>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/Where"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="Helvetica"
+            android:gravity="bottom"
+            android:text="@string/Location"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textSize="26sp" >
+        </TextView>
+
+        <TextView
+            android:id="@+id/WhereAct"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:fontFamily="Helvetica"
+            android:gravity="bottom"
+            android:paddingLeft="5dp"
+            android:text="@string/Location"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textSize="20sp" >
+        </TextView>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/invitees"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="Helvetica"
+        android:text="@string/Invitees"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textSize="28sp" />
+
+    <ListView
+        android:id="@+id/inviteeScroll"
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:layout_weight="21.74" >
+
+    </ListView>
     
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_weight="2">
+        
+	    <Button
+	        android:id="@+id/noButton"
+	        style="?android:attr/borderlessButtonStyle"
+	        android:layout_width="0dip"
+	        android:layout_height="wrap_content"
+	        android:onClick="noButton"
+	        android:text="@string/No" 
+	        android:layout_weight="1"/>
+	
+	    <Button
+	        android:id="@+id/yesButton"
+	        style="?android:attr/borderlessButtonStyle"
+	        android:layout_width="0dip"
+	        android:layout_height="wrap_content"
+	        android:onClick="yesButton"
+	        android:text="@string/Yes" 
+	        android:layout_weight="1"/>
+        
+    </LinearLayout>
 
 </LinearLayout>
