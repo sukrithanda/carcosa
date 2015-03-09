@@ -13,6 +13,7 @@ import java.security.PublicKey;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
@@ -62,6 +63,8 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.uoft.campusplannerapp.CurrentLocationProvider;
 import com.uoft.campusplannerapp.LocalizationCore;
 import com.uoft.campusplannerapp.PrefsActivity;
@@ -92,25 +95,31 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 
     CreateAlert alert;
     DatabaseHandler db;
+    User u;
     
-    private Spinner spinner2;
-    private List<FriendClass> my_friends;
-    private Fragment mVisible;
-	private SupportMapFragment mMapFragment;
-	private Fragment mFriendsFragment;
-	private Fragment mOrganizeEventFragment;
-	private Fragment mSetUpOfficeHoursFragment;
-	private Fragment mPrivacyFragment;
-	private Fragment mResourceFragment;
+    ClientReciever listener;
+    
+    public Spinner spinner2;
+    public List<FriendClass> my_friends;
+    public Fragment mVisible;
+	public SupportMapFragment mMapFragment;
+	public Fragment mFriendsFragment;
+	public Fragment mOrganizeEventFragment;
+	public Fragment mSetUpOfficeHoursFragment;
+	public Fragment mPrivacyFragment;
+	public Fragment mResourceFragment;
 
-	private GoogleMap map;
+	public static GoogleMap map;
+	
+    ArrayList<MarkerFloorPairs> markers = new ArrayList<MarkerFloorPairs>();
+
+
 	
 	//LOCALIZER CODE - START
-	
-	   // Google Map
-   // private GoogleMap googleMap;
-    private CurrentLocationProvider mylocation;
-    private GroundOverlay groundOverlay;
+
+    public CurrentLocationProvider mylocation;
+
+    public GroundOverlay groundOverlay;
     float bearing;
     
 	BitmapDescriptor floor1;
@@ -121,14 +130,14 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 	BitmapDescriptor floor6;
 	BitmapDescriptor floor7;
 	BitmapDescriptor floor8;
-	private int load_floor=1;
+	public int load_floor=1;
 		
 	LocalizationCore localizationcore;
 	
-    private static final int MAX_WIFI_APs = 200;
-	private int counter_wifi=0;
-    private int[] wifi_rss_buff= new int[MAX_WIFI_APs];
-    private String[] wifi_mac_buff= new String[MAX_WIFI_APs];
+    public static final int MAX_WIFI_APs = 200;
+	public int counter_wifi=0;
+    public int[] wifi_rss_buff= new int[MAX_WIFI_APs];
+    public String[] wifi_mac_buff= new String[MAX_WIFI_APs];
     
     
 	// Wifi scanner part
@@ -136,24 +145,24 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 	WiFiScanReceiver receiver;
 	WifiManager wifiManager = null;
 
-	private float[] gyro_sim = new float[3];
-	private float[] accel_sim = new float[3];
-	private float[] magnet_sim = new float[3];
-	private float[] gravity_sim = new float[3];
-	private float[] linearaccel_sim = new float[3];
-	private float[] rotationvector_sim = new float[3];
-	private float[] gamerotation_sim = new float[3];
-	private float[] orientation_sim = new float[3];
-	private float[] rotationmatrix_sim = new float[9];
-	private float pressure_sim,gps_status_sim,wifi_status_sim,ble_status_sim;
-	private float[] gps_sim = new float[6];
-	private float[] wifi_rss_sim = new float[200];
-	private byte[]	wifi_mac_sim = new byte[3400];
-	private float[] ble_rss_sim = new float[100];
-	private byte[]	ble_mac_sim = new byte[1700];
-	private float[] ble_coordinates_sim = new float[300];
-	private float[] ble_tx_powers_sim = new float[100];
-	private float[] params_sim = new float[10];
+	public float[] gyro_sim = new float[3];
+	public float[] accel_sim = new float[3];
+	public float[] magnet_sim = new float[3];
+	public float[] gravity_sim = new float[3];
+	public float[] linearaccel_sim = new float[3];
+	public float[] rotationvector_sim = new float[3];
+	public float[] gamerotation_sim = new float[3];
+	public float[] orientation_sim = new float[3];
+	public float[] rotationmatrix_sim = new float[9];
+	public float pressure_sim,gps_status_sim,wifi_status_sim,ble_status_sim;
+	public float[] gps_sim = new float[6];
+	public float[] wifi_rss_sim = new float[200];
+	public byte[]	wifi_mac_sim = new byte[3400];
+	public float[] ble_rss_sim = new float[100];
+	public byte[]	ble_mac_sim = new byte[1700];
+	public float[] ble_coordinates_sim = new float[300];
+	public float[] ble_tx_powers_sim = new float[100];
+	public float[] params_sim = new float[10];
 	
 	int[] location_sim=new int[3];
 	float[] geolocation_sim=new float[3];
@@ -163,7 +172,7 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 	
 	
 	boolean autostart_enable=true;
-    private boolean start=false;
+    public boolean start=false;
     
     // LOCALIZATION CODE - END
 	
@@ -171,19 +180,24 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 	 * Fragment managing the behaviors, interactions and presentation of the
 	 * navigation drawer.
 	 */
-	private NavigationDrawerFragment mNavigationDrawerFragment;
+	public NavigationDrawerFragment mNavigationDrawerFragment;
 
 	/**
 	 * Used to store the last screen title. For use in
 	 * {@link #restoreActionBar()}.
 	 */
-	private CharSequence mTitle;
+	public CharSequence mTitle;
     
-	private Calendar dateTime = Calendar.getInstance();
-	private SimpleDateFormat dateFormatter = new SimpleDateFormat("MMMM dd yyyy");
-	private SimpleDateFormat timeFormatter = new SimpleDateFormat("hh:mm a");
+	public Calendar dateTime = Calendar.getInstance();
+	public SimpleDateFormat dateFormatter = new SimpleDateFormat("MMMM dd yyyy");
+	public SimpleDateFormat timeFormatter = new SimpleDateFormat("hh:mm a");
+	//THREADS to receive and send locations
+
 	
-    private static void create_alert(Context ctx, String msg) {
+	
+
+	
+    public static void create_alert(Context ctx, String msg) {
     	AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
     	builder.setMessage(msg)
     	       .setCancelable(false)
@@ -199,15 +213,20 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        db = new DatabaseHandler(this);
         http_console = new HTTPConsole(this);
 
         alert = new CreateAlert(this);
-        db = new DatabaseHandler(this);
         User usero = db.getUser();
+        u = usero;
+        List<FriendClass> friend_list = new ArrayList<FriendClass>();
+        friend_list = http_console.GetFriend(u.getEmail());
         db.Close();
     	pref = this.getSharedPreferences("User",MODE_PRIVATE);
         @SuppressWarnings("unused")
 		String temp = get_reg_id();
+    	
+     
   
     	if (usero == null) {
             setContentView(R.layout.activity_main);
@@ -222,16 +241,12 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
     		mNavigationDrawerFragment.setUp(R.id.navigation_drawer,m);
 
     		setUpFragments();
-    		mVisible = mMapFragment;
-    		mTitle = getString(R.string.title_map);
+			showFragment(mMapFragment);
+    		//mTitle = getString(R.string.title_map);
     		
     		//LOCALIZATION CODE - START
     		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-    		//if (map != null)
-    			//Load_Maps();
-    		//else{
-    		//	System.out.println("MAP IS NULL");
-    		//}
+    	
     		
     		localizationcore = new LocalizationCore();
     		
@@ -243,24 +258,28 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 
     		}
 
-    		// Register Broadcast Receiver
+    		// Register Broadcast .wReceiver
     		receiver=new WiFiScanReceiver();
     	
     		
     		params_sim[0]=1;
     		params_sim[1]=1;
     		loadPref();
-    		
+    	    listener = new ClientReciever(db, u, http_console, friend_list);
     		if(autostart_enable)
     			start_process();
+    			listener.start();
     	}
     	
     }
     
 	@Override
     protected void onResume() {
+		
         super.onResume();
     }
+	
+	
 	
 	// Set different Fragments Here
 		@Override
@@ -440,7 +459,7 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 			edit.putString("user", s_username);
 			edit.commit();
 			create_alert(this, "LogIn Successful");
-	        setContentView(R.layout.map_main);
+			((Activity) this).setContentView(R.layout.map_main);
 	      
 	        mNavigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager()
 					.findFragmentById(R.id.navigation_drawer);
@@ -505,14 +524,14 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 		return true;
 	}
 
-	private boolean ValidateEmail(String s_utmail) {
+	public boolean ValidateEmail(String s_utmail) {
 		if (s_utmail.contains("utoronto.ca")  || s_utmail.contains("toronto.edu"))
 			return true;
 		else 
 			return false;
 	}
 
-	private boolean ValidatePassword(String s_password) {
+	public boolean ValidatePassword(String s_password) {
 		if (!s_password.matches(".*\\d+.*")){
 			return false;
 		}
@@ -561,7 +580,7 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 //		}	
 	}
 
-    private String getApplicationVersion() {
+    public String getApplicationVersion() {
     	try {
             PackageInfo packageInfo = getApplicationContext().getPackageManager()
                     .getPackageInfo(getApplicationContext().getPackageName(), 0);
@@ -573,7 +592,7 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
   
     }
     
-    private String get_reg_id() {
+    public String get_reg_id() {
         String oldVersionId = pref.getString("version", null);
     	User user = db.getUser();
     	if (user == null || oldVersionId == null){
@@ -593,7 +612,7 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
         
     }
     
-    private void register_gcm() {
+    public void register_gcm() {
     	new AsyncTask<Void, Void, String>() {
             @Override
             protected String doInBackground(Void... params) {
@@ -663,6 +682,22 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
           else if (id == R.id.action_settings){
         	  Intent i = new Intent(getApplicationContext(), PrefsActivity.class);
               startActivityForResult(i, 0); 
+	        	return true;
+        }
+          else if (id == R.id.menu_up){
+        	  int floor = load_floor;
+        	   if(floor < 8){
+        		   stop_process();
+        		   showFragment(mMapFragment, ++floor);
+        	   }
+	        	return true;
+        }
+          else if (id == R.id.menu_down){
+        	  int floor = load_floor;
+        	  if(floor > 1){
+       		   stop_process();
+       		   showFragment(mMapFragment, --floor);
+       	   	  }
 	        	return true;
         }
           else{
@@ -754,54 +789,80 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
     
     
 
-	/**
-	 * A placeholder fragment containing a simple view.
-	 */
-	public static  class MFragment extends SupportMapFragment {
-		public static final String TAG = "map";
-		/**
-		 * The fragment argument representing the section number for this
-		 * fragment.
-		 */
-
-		/**
-		 * Returns a new instance of this fragment for the given section number.
-		 */
-
-		public MFragment() {
-			super();
-		}
-
-		@Override
-		
-		public View onCreateView(LayoutInflater inflater, ViewGroup container,
-				Bundle savedInstanceState) {
-			super.onCreateView(inflater, container, savedInstanceState);
-			View rootView = inflater.inflate(R.layout.fragment_map, container,
-					false);
-			
-			return rootView;
-		}
-
-		@Override
-		public void onAttach(Activity activity) {
-			super.onAttach(activity);
-		}
-	}
 	
-	private void showFragment(Fragment fragmentIn) {
-        if (fragmentIn == null) return;
+	
+	public void showFragment(Fragment fragmentIn) {
+        if ( fragmentIn == null /*|| fragmentIn == mVisible*/) return;
 
         final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
-
-        if (mVisible != null) ft.hide(mVisible);
+        if (fragmentIn == mMapFragment && map!=null){
+        	map.setMyLocationEnabled(true);
+        	start_process();
+        }
+        if (mVisible != null) {
+        	ft.hide(mVisible);
+        }
 
         ft.show(fragmentIn).commit();
         mVisible = fragmentIn;
     }
+	
+	public void showFragment(Fragment fragmentIn, int floor) {
+		System.out.println("DEBUG - SHOWING FRAGMENT WITH FLOOR");
 
-	private void setUpFragments() {
+        if ( fragmentIn == null /*|| fragmentIn == mVisible*/) return;
+		System.out.println("DEBUG - CHANGING FLOOR: " + floor);
+       changefloor(floor);
+		System.out.println("DEBUG - FLOOR CHANGED");
+
+        final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
+
+        if (mVisible != null) {
+        	ft.hide(mVisible);
+        }
+
+        ft.show(fragmentIn).commit();
+        mVisible = fragmentIn;
+    }
+	
+	public void showFriend(int floor, float latitude, float longitude, final String name, final String email) {
+		System.out.println(" DEBUG - IN SHOW FRIEND");
+		stop_process();
+		System.out.println("DEBUG - PROCESS STOPPED");
+		System.out.println("DEBUG - DRAWING MAKER");
+
+		LatLng pinLocation = new LatLng(latitude, longitude);
+        	      Marker storeMarker = map.addMarker(new MarkerOptions()
+        	      .position(pinLocation)
+        	      .title(name)
+        	      .snippet(email));   
+        	      
+        	      
+        	      MarkerFloorPairs j = new MarkerFloorPairs(storeMarker, floor, email);
+        	      /*if(markers.contains(j) == false){
+        	    	  System.out.println("ADDING MARKER");
+        	    	  markers.add(j);
+        	      }*/
+        	      
+        	      Iterator<MarkerFloorPairs> iterator = markers.iterator();
+        			while (iterator.hasNext()) {
+        				if(iterator.next().getID().equals(email)){
+        					System.out.println("DEBUG - PREVIOUS MARKER FOUND");
+        					iterator.remove();
+        					System.out.println("DEBUG - REMOVED MARKER FOUND");
+
+        				}
+        			}
+					System.out.println("DEBUG - ADDING NE MARKER TO LIST");
+        		  markers.add(j);
+        		  mMapFragment.isResumed();
+        		  showFragment(mMapFragment, floor);
+        		  
+    }
+
+	public void setUpFragments() {
         final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 
         // If the activity is killed while in BG, it's possible that the
@@ -819,10 +880,7 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
                     initilizeMap();
                 }
             });
-                
-        	//map= mMapFragment.getMapAsync(new OnMapReadyCallback());
-        	//initilizeMap(map);
-            
+                       
             ft.add(R.id.container, mMapFragment, MFragment.TAG);
         }
         else{
@@ -831,19 +889,17 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
                   @Override
                   public void onMapReady(GoogleMap googleMap) {
                       map = googleMap;
-                      Load_Maps();
-                      initilizeMap();
+                      //Load_Maps();
+                      //initilizeMap();
                   }
               });
-        	//map= mMapFragment.getMapAsync(this);
-        	//initilizeMap(map);
            ft.replace(R.id.container, mMapFragment, MFragment.TAG);
         }
-        ft.show(mMapFragment);
+        ft.hide(mMapFragment);
 
         mFriendsFragment = (FriendsFragment) getSupportFragmentManager().findFragmentByTag(FriendsFragment.TAG);
         if (mFriendsFragment == null) {
-            mFriendsFragment = FriendsFragment.newInstance(this);
+            mFriendsFragment = FriendsFragment.newInstance(this, MainActivity.this, mMapFragment);
             ft.add(R.id.container, mFriendsFragment, FriendsFragment.TAG);
         }
         ft.hide(mFriendsFragment);
@@ -884,7 +940,7 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 
     }
 	
-	 private void initilizeMap() {
+	 public void initilizeMap() {
 	      //  if (googleMap == null) {
 	        //    googleMap = ((MapFragment) getFragmentManager().findFragmentById(
 	       //             R.id.map)).getMap();
@@ -897,24 +953,54 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
          }
 	 
 	  		  map.setMyLocationEnabled(true);
-	  		  map.setIndoorEnabled(true);
+	  		  map.setIndoorEnabled(false);
 	  		 
 	  		  
 	  		  map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 	  		  CameraPosition cameraPosition = new CameraPosition.Builder().target(
-	  	                new LatLng(43.659652988335878, -79.397276867154886)).zoom(20).build();
+	  	                new LatLng(43.659652988335878, -79.397276867154886)).zoom(19).build();
 	  		  
 	  		   map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 	  		   
-	  		  groundOverlay=map.addGroundOverlay(new GroundOverlayOptions().image(floor1).transparency(0.01f).anchor(0.5f, 0.5f)
+	  		 int floorint = (int)geolocation_sim[2];
+	  		 BitmapDescriptor floor;
+	  		switch (floorint) {
+			case 1:
+				floor = floor1;
+				break;
+			case 2:
+				floor = floor2;				
+				break;
+			case 3:
+				floor = floor3;
+				break;
+			case 4:
+				floor = floor4;
+				break;
+			case 5:
+				floor = floor5;
+				break;
+			case 6:
+				floor = floor6;
+				break;
+			case 7:
+				floor = floor7;
+				break;
+			case 8:
+				floor = floor8;
+				break;
+			default:
+				floor = floor1;
+				break;
+	  		}  
+	  		
+	  		  groundOverlay=map.addGroundOverlay(new GroundOverlayOptions().image(floor).transparency(0.01f).anchor(0.5f, 0.5f)
 	  		        .position(new LatLng(43.659652988335878, -79.397276867154886), 100f, 121f).bearing(-17.89f));
 
 	  		
 	  		  mylocation=new CurrentLocationProvider(this);
 	  		  map.setLocationSource(mylocation);
-
-	            
-	       // }
+	  	
 	    }
 	
 	//LOCALIZATION CODE - FUNCTIONS START
@@ -1119,7 +1205,7 @@ public void Load_RadioMap(){
 	}
 }
 
-private void loadPref(){
+public void loadPref(){
 	  SharedPreferences mySharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 	  
 	  /* Algorithms */
@@ -1146,8 +1232,8 @@ public void start_process(){
 
 		registerReceiver(receiver, new IntentFilter(
 		WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
-		wifiManager.startScan();
-
+		boolean wifi = wifiManager.startScan();
+		System.out.println("DEBUG: GETTING WIFI SIGNALS:" + wifi);
 	counter=1;
 
 	
@@ -1173,15 +1259,22 @@ public void start_process(){
 	localizationcore.initialize();
 	start=true;
 	Load_RadioMap();
+	//receiver.onReceive(this, null);
+
+	if (map != null){
+		map.setMyLocationEnabled(true);
+	changefloor((int)geolocation_sim[2]);
+	}
 	}
 }
 
 public void stop_process(){
 	if (start){
-
+		System.out.println("DEBUG - STOPPING LOCATION TRACKING");
 		unregisterReceiver(receiver);
+		map.setMyLocationEnabled(false);
+		start=false;
 		
-	start=false;
 	}
 }
 
@@ -1255,6 +1348,10 @@ public class WiFiScanReceiver extends BroadcastReceiver {
 
 		SetMyLocation(geolocation_sim[0],geolocation_sim[1],(int)geolocation_sim[2],accuracy_sim[0],bearing);
 		
+		//send location to server
+		
+		
+		
 		if(start)
 			wifiManager.startScan();
 		
@@ -1265,31 +1362,38 @@ public void SetMyLocation(float latitude,float longitude,int floor,float accurac
 	// latitude and longitude
 	//Log.d("FLOOR",Integer.toString(floor)+Integer.toString(load_floor));
 	if (floor != load_floor){
-		
 	switch(floor){
 	case 1:
 		groundOverlay.setImage(floor1);
+		hidemarkers(floor);	
 		break;
 	case 2:
 		groundOverlay.setImage(floor2);
+		hidemarkers(floor);	
 		break;
 	case 3:
 		groundOverlay.setImage(floor3);
+		hidemarkers(floor);	
 		break;
 	case 4:
 		groundOverlay.setImage(floor4);
+		hidemarkers(floor);	
 		break;
 	case 5:
 		groundOverlay.setImage(floor5);
+		hidemarkers(floor);	
 		break;
 	case 6:
 		groundOverlay.setImage(floor6);
+		hidemarkers(floor);	
 		break;
 	case 7:
 		groundOverlay.setImage(floor7);
+		hidemarkers(floor);	
 		break;
 	case 8:
 		groundOverlay.setImage(floor8);
+		hidemarkers(floor);	
 		break;
 	default:
 		return;
@@ -1298,9 +1402,60 @@ public void SetMyLocation(float latitude,float longitude,int floor,float accurac
 	load_floor=floor;
 
   mylocation.push_location(latitude, longitude, 0f, accuracy, bearing);
-	
+  
+  http_console.AddLocation("BA", Integer.toString(floor), Float.toString(latitude), Float.toString(longitude), Float.toString(accuracy), Float.toString(bearing));
 }
 
+
+public void changefloor(int floor){
+	// latitude and longitude
+	Log.d("FLOOR",Integer.toString(floor)+Integer.toString(load_floor));
+	if (floor != load_floor){
+		
+		hidemarkers(floor);
+		switch(floor){
+		case 1:
+			groundOverlay.setImage(floor1);
+			break;
+		case 2:
+			groundOverlay.setImage(floor2);
+			break;
+		case 3:
+			groundOverlay.setImage(floor3);
+			break;
+		case 4:
+			groundOverlay.setImage(floor4);
+			break;
+		case 5:
+			groundOverlay.setImage(floor5);
+			break;
+		case 6:
+			groundOverlay.setImage(floor6);
+			break;
+		case 7:
+			groundOverlay.setImage(floor7);
+			break;
+		case 8:
+			groundOverlay.setImage(floor8);
+			break;
+		default:
+			return;
+		}
+	}
+	load_floor=floor;
+}
+
+public void hidemarkers(int floor){
+	for (int i = 0; i < markers.size(); i++) {
+		if (markers.get(i).getFloor() == floor){
+			markers.get(i).getMarker().setVisible(true);
+		}
+		else{
+			markers.get(i).getMarker().setVisible(false);
+		}
+	}
+	
+}
 @Override
 protected void onActivityResult(int requestCode, int resultCode, Intent data) {
  //super.onActivityResult(requestCode, resultCode, data);
@@ -1312,17 +1467,7 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
  loadPref();
 }
 
-//@Override
-//public boolean onPrepareOptionsMenu (Menu menu) {
-//	if (start){
-//        menu.getItem(0).setEnabled(false);
-//        menu.getItem(1).setEnabled(true);
-//    }else{
-//    	menu.getItem(0).setEnabled(true);
-//        menu.getItem(1).setEnabled(false);
-//    }
-//    return true;
-//}
+
 
   
 }

@@ -19,12 +19,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.uoft.campusplannerapp.HTTPConsole;
-import com.uoft.campusplannerapp.CreateAlert;
-import com.uoft.campusplannerapp.FriendClass;
-import com.uoft.campusplannerapp.DatabaseHandler;
-import com.uoft.campusplannerapp.User;
-import com.uoft.campusplannerapp.R;
+import com.google.android.gms.maps.SupportMapFragment;
 
 public class FriendsFragment extends Fragment {
 	private HTTPConsole http_console;
@@ -38,10 +33,14 @@ public class FriendsFragment extends Fragment {
 	LayoutInflater inftr; 
 	ViewGroup ctr;
 	View rv = null;
+	SupportMapFragment mMapFragment;
+	MainActivity x;
 	
-	public static FriendsFragment newInstance(Context ctx) {
+	public static FriendsFragment newInstance(Context ctx, MainActivity x, SupportMapFragment mMapFragment) {
 		FriendsFragment fragment = new FriendsFragment();
 		fragment.ctx = ctx;
+		fragment.mMapFragment = mMapFragment;
+		fragment.x = x;
 		return fragment;
 	}
 	
@@ -139,9 +138,28 @@ public class FriendsFragment extends Fragment {
 
 		custon_alert.setNegativeButton("Locate", new DialogInterface.OnClickListener() {
 		  public void onClick(DialogInterface dialog, int whichButton) {
-				String result = http_console.LocateFriend(user, f_email);
-				if (result.equals("Failed")){
-					alert.create_alert("Error", f_first_name + " doesnt wish to share location right now");
+
+			  Location result = http_console.LocateFriend(user, f_email);
+				if (result == null || result.getFloor() == 0 || result.getLatitude() == 0 || result.getLatitude() == 0){
+					alert.create_alert("Error", f_first_name + " doesnt wish to share location right now or the location could not be found");
+					/*float lat = (float) 43.659511;
+					float log = (float) -79.397819;
+					x.showFriend(3, lat, log, f_first_name, f_email);
+					x.showFragment(mMapFragment, 3);*/
+				}
+				else{
+					/*mMapFragment.getMapAsync(new OnMapReadyCallback() {
+		                @Override
+		                public void onMapReady(GoogleMap googleMap) {
+		                    x.map = googleMap;
+		                }
+		            });*/
+					x.showFriend(result.getFloor(), result.getLatitude(), result.getLongitude(), f_first_name, f_email);
+					System.out.println("DEBUG - DONE SHOWING FRIEND");
+
+					//x.showFragment(mMapFragment, result.getFloor());
+					System.out.println("DEBUG - DONE SHOWING FRAGMENT");
+
 				}
 				//View rootView = inftr.inflate(R.layout.fragment_map, ctr, false);
 		  }
