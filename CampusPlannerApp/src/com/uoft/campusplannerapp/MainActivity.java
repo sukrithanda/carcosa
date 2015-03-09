@@ -42,6 +42,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -357,6 +358,11 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 		Button timeButton = (Button) findViewById(R.id.timepickButton2);
 		timeButton.setText(time);
 	}
+	
+	public void addAutoCompleteText ()
+	{
+		
+	}
 		
 	public void showTimePickerDialog(View v) {
 	    DialogFragment newFragment = new TimePickerFragment();
@@ -666,15 +672,22 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 
     
     public static class OrganizeEventFragment extends Fragment {
-    	public static final String TAG = "organizeEvent";    
+    	public static final String TAG = "organizeEvent";   
+    	private HTTPConsole http_console;
+    	public Context ctx; 
+    	private AutoCompleteTextView actv;
+    	private List<FriendClass> my_friends;
+    	private DatabaseHandler db;
+    	private String user;
     	
     	// Constructor of organizeEvent
     	public OrganizeEventFragment() {
     		super();
     	}
     	
-		public static OrganizeEventFragment newInstance() {
+		public static OrganizeEventFragment newInstance(Context ctx) {
 			OrganizeEventFragment fragment = new OrganizeEventFragment();
+			fragment.ctx = ctx;
 			return fragment;
 		}
     	
@@ -683,6 +696,32 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 			super.onCreateView(inflater, container, savedInstanceState);
 			View rootView = inflater.inflate(R.layout.event_organizer, container,
 					false);
+			
+			Button addfriendbutton = (Button) rootView.findViewById(R.id.imageButton1);
+			
+			http_console = new HTTPConsole(ctx); 
+			actv = (AutoCompleteTextView) rootView.findViewById(R.id.editText2);
+			
+		    db = new DatabaseHandler(ctx);
+			User u = db.getUser();
+			db.Close();
+			if (u == null) { 
+				System.err.println("Error getting user");
+			}
+			user = u.getEmail();
+			my_friends = http_console.GetFriend(user);
+			int num_friends = my_friends.size();
+			
+		    String names[] = new String[num_friends];
+		    int i = 0; 
+		    for (i = 0; i < num_friends; i++){
+		    	FriendClass fr = my_friends.get(i);
+		    	names[i] = fr.getFirst_name() + " " + fr.getLast_name();
+		    }
+		    ArrayAdapter<String> adapter = new ArrayAdapter<String>(ctx,android.R.layout.simple_list_item_1,names);
+		    
+		    actv.setAdapter(adapter);
+		    
 			
 			return rootView;
 		}
@@ -819,7 +858,7 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
         mOrganizeEventFragment = (OrganizeEventFragment) getSupportFragmentManager().findFragmentByTag(OrganizeEventFragment.TAG);
         if (mOrganizeEventFragment == null)
         {
-        	mOrganizeEventFragment = OrganizeEventFragment.newInstance();
+        	mOrganizeEventFragment = OrganizeEventFragment.newInstance(this);
         	ft.add(R.id.container, mOrganizeEventFragment, OrganizeEventFragment.TAG);
         }
         ft.hide(mOrganizeEventFragment);
