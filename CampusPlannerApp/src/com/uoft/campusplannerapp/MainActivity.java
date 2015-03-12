@@ -46,6 +46,8 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
@@ -220,7 +222,9 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
         User usero = db.getUser();
         u = usero;
         List<FriendClass> friend_list = new ArrayList<FriendClass>();
-        friend_list = http_console.GetFriend(u.getEmail());
+        if (u != null) {
+        	friend_list = http_console.GetFriend(u.getEmail());
+        }
         db.Close();
     	pref = this.getSharedPreferences("User",MODE_PRIVATE);
         @SuppressWarnings("unused")
@@ -355,6 +359,7 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 	
 	public void updateDateButton(String date)
 	{
+		Log.d("Uplan", "Updating button datepickbutton1");
 		System.out.println("Date in updateDateButton is: "+date);
 		Button dateButton = (Button) findViewById(R.id.datepickButton);
 		dateButton.setText(date);
@@ -362,33 +367,36 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 	
 	public void updateTimeButton (String time)
 	{
+		Log.d("Uplan", "Updating button timepickbutton1");	
+		System.out.println("Date in updateDateButton is: "+time);
 		Button timeButton = (Button) findViewById(R.id.timepickButton);
 		timeButton.setText(time);
 	}
 	
 	public void updateDateButton2 (String date)
 	{
+		Log.d("Uplan", "Updating button datepickbutton2");
+		System.out.println("Date in updateDateButton2 is: "+date);
 		Button dateButton = (Button) findViewById(R.id.datepickButton2);
 		dateButton.setText(date);
 	}
 	
 	public void updateTimeButton2 (String time)
 	{
+		Log.d("Uplan", "Updating button timepickbutton2");
+		System.out.println("Date in updateDateButton2 is: "+time);
 		Button timeButton = (Button) findViewById(R.id.timepickButton2);
 		timeButton.setText(time);
 	}
-	
-	public void addAutoCompleteText ()
-	{
-		
-	}
 		
 	public void showTimePickerDialog(View v) {
+		Log.d("Uplan", "Show timepicker dialog");
 	    DialogFragment newFragment = new TimePickerFragment();
 	    newFragment.show(getSupportFragmentManager(), "timePicker");
 	}
     
 	public void showDatePickerDialog(View v) {
+		Log.d("Uplan", "Show datepicker dialog");
 	    DialogFragment newFragment = new DatePickerFragment();
 	    newFragment.show(getSupportFragmentManager(), "datePicker");
 	}
@@ -714,6 +722,8 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
     	private List<FriendClass> my_friends;
     	private DatabaseHandler db;
     	private String user;
+    	private Spinner spin;
+    	private Button addfriendbutton;
     	
     	// Constructor of organizeEvent
     	public OrganizeEventFragment() {
@@ -732,10 +742,12 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 			View rootView = inflater.inflate(R.layout.event_organizer, container,
 					false);
 			
-			Button addfriendbutton = (Button) rootView.findViewById(R.id.imageButton1);
+			//Button addfriendbutton = (Button) rootView.findViewById(R.id.imageButton1);
+			//addfriendbutton = (Button) rootView.findViewById(R.id.addfriendButton);
 			
 			http_console = new HTTPConsole(ctx); 
-			actv = (AutoCompleteTextView) rootView.findViewById(R.id.editText2);
+			//actv = (AutoCompleteTextView) rootView.findViewById(R.id.editText2);
+			spin = (Spinner) rootView.findViewById(R.id.friendList);
 			
 		    db = new DatabaseHandler(ctx);
 			User u = db.getUser();
@@ -754,9 +766,12 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 		    	names[i] = fr.getFirst_name() + " " + fr.getLast_name();
 		    }
 		    ArrayAdapter<String> adapter = new ArrayAdapter<String>(ctx,android.R.layout.simple_list_item_1,names);
-		    
-		    actv.setAdapter(adapter);
-		    
+			
+			
+		    //actv.setAdapter(adapter);
+		    spin.setAdapter(adapter);
+			// create button onclick listener
+	    
 			
 			return rootView;
 		}
@@ -766,7 +781,12 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 			super.onAttach(activity);
 		}
 		
+
+		
     }
+    
+    
+    
     
     public static class SetUpOfficeHoursFragment extends Fragment {
     	public static final String TAG = "Office Hours";
@@ -1219,7 +1239,7 @@ public void loadPref(){
 }
 
 public void start_process(){
-	if (!start){
+	if (!start && (map!=null)){
 
         try {
             // Loading map

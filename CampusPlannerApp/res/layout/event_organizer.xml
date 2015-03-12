@@ -120,30 +120,36 @@
 	        android:layout_width="wrap_content"
 	        android:layout_height="10dip"
 	        android:layout_below="@id/datepickButton2" /> 
-	        
+<!--	        
 	   <ImageButton
 	       android:id="@+id/imageButton1"
 	       android:layout_width="wrap_content"
 	       android:layout_height="wrap_content"
 		   android:layout_below="@id/padding5"
-		   android:onClick="addAutoCompleteText"
+		   android:onClick=""
 	       android:layout_marginRight="16dp"
 	       android:src="@drawable/ic_action_add_person" />
-	    
-	    <AutoCompleteTextView
-		    android:id="@+id/editText2"
-		    android:layout_width="match_parent"
-		    android:layout_height="49dp"
-		    android:layout_below="@id/imageButton1"
-		    android:hint="@string/FriendHint"
-		    android:ems="10" >
-		</AutoCompleteTextView>
-		
+	   
+	   <Button
+	       android:id="@+id/addfriendButton"
+	       android:layout_width="wrap_content"
+	       android:layout_height="wrap_content"
+	       android:layout_below="@id/padding5"
+	       android:onClick="OrganizeEventFragment.addSpinners"
+	       android:layout_alignRight="@+id/submitButton" />
+-->		
+		<Spinner 
+		    android:id="@+id/friendList"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"		    
+	        android:layout_below="@id/padding5"		    
+		    />
+
 	    <View 
 	        android:id="@+id/padding6"
 	        android:layout_width="wrap_content"
 	        android:layout_height="10dip"
-	        android:layout_below="@id/editText2" /> 
+	        android:layout_below="@id/friendList" /> 
 	        
 	    <EditText
 		    android:id="@+id/editText3"
