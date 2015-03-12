@@ -64,6 +64,7 @@ import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.uoft.campusplannerapp.CurrentLocationProvider;
 import com.uoft.campusplannerapp.LocalizationCore;
 import com.uoft.campusplannerapp.PrefsActivity;
@@ -75,6 +76,7 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.content.BroadcastReceiver;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.view.WindowManager;
 import android.widget.Toast;
 
@@ -802,10 +804,7 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
         	      
         	      
         	      MarkerFloorPairs j = new MarkerFloorPairs(storeMarker, floor, email);
-        	      /*if(markers.contains(j) == false){
-        	    	  System.out.println("ADDING MARKER");
-        	    	  markers.add(j);
-        	      }*/
+   
         	      
         	      Iterator<MarkerFloorPairs> iterator = markers.iterator();
         			while (iterator.hasNext()) {
@@ -822,6 +821,25 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
         		  showFragment(mMapFragment, floor);
         		  
     }
+	
+	public void showpath(int floor, float latitude, float longitude) {
+		
+		LatLng pinLocation = new LatLng(latitude, longitude);
+	      Marker storeMarker = map.addMarker(new MarkerOptions()
+	      .position(pinLocation)
+	      .title("test")
+	      .snippet("resources"));   
+		
+		
+		map
+		.addPolyline((new PolylineOptions())
+				.add(new LatLng(latitude, longitude), new LatLng(geolocation_sim[0],geolocation_sim[1])).width(5).color(Color.BLUE)
+				.geodesic(true));
+		showFragment(mMapFragment);
+
+        		  
+    }
+
 
 	public void setUpFragments() {
         final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -867,7 +885,7 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
         
         mResourceFragment = (ResourceFragment) getSupportFragmentManager().findFragmentByTag(ResourceFragment.TAG);
         if (mResourceFragment == null) {
-        	mResourceFragment = ResourceFragment.newInstance(this);
+        	mResourceFragment = ResourceFragment.newInstance(this, MainActivity.this);
             ft.add(R.id.container, mResourceFragment, ResourceFragment.TAG);
         }
         ft.hide(mResourceFragment);
@@ -1325,36 +1343,36 @@ public void SetMyLocation(float latitude,float longitude,int floor,float accurac
 	if (floor != load_floor){
 	switch(floor){
 	case 1:
-		groundOverlay.setImage(floor1);
 		hidemarkers(floor);	
+		groundOverlay.setImage(floor1);
 		break;
 	case 2:
-		groundOverlay.setImage(floor2);
 		hidemarkers(floor);	
+		groundOverlay.setImage(floor2);
 		break;
 	case 3:
-		groundOverlay.setImage(floor3);
 		hidemarkers(floor);	
+		groundOverlay.setImage(floor3);
 		break;
 	case 4:
-		groundOverlay.setImage(floor4);
 		hidemarkers(floor);	
+		groundOverlay.setImage(floor4);
 		break;
 	case 5:
-		groundOverlay.setImage(floor5);
 		hidemarkers(floor);	
+		groundOverlay.setImage(floor5);
 		break;
 	case 6:
-		groundOverlay.setImage(floor6);
 		hidemarkers(floor);	
+		groundOverlay.setImage(floor6);
 		break;
 	case 7:
-		groundOverlay.setImage(floor7);
 		hidemarkers(floor);	
+		groundOverlay.setImage(floor7);
 		break;
 	case 8:
-		groundOverlay.setImage(floor8);
 		hidemarkers(floor);	
+		groundOverlay.setImage(floor8);
 		break;
 	default:
 		return;

@@ -148,17 +148,11 @@ public class FriendsFragment extends Fragment {
 					x.showFragment(mMapFragment, 3);*/
 				}
 				else{
-					/*mMapFragment.getMapAsync(new OnMapReadyCallback() {
-		                @Override
-		                public void onMapReady(GoogleMap googleMap) {
-		                    x.map = googleMap;
-		                }
-		            });*/
+				
 					x.showFriend(result.getFloor(), result.getLatitude(), result.getLongitude(), f_first_name, f_email);
 					System.out.println("DEBUG - DONE SHOWING FRIEND");
 
-					//x.showFragment(mMapFragment, result.getFloor());
-					System.out.println("DEBUG - DONE SHOWING FRAGMENT");
+				System.out.println("DEBUG - DONE SHOWING FRAGMENT");
 
 				}
 				//View rootView = inftr.inflate(R.layout.fragment_map, ctr, false);
