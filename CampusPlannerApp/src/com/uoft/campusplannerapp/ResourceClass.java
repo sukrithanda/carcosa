@@ -23,5 +23,4 @@ public class ResourceClass {
 		this.loc = loc;
 	} 
 	
-
 }

@@ -51,6 +51,8 @@ public class HTTPConsole {
 	private final String SET_RESPONSE = "http://104.236.85.199:8080/event/setResponse";
 	private final String DELETE_EVENT = "http://104.236.85.199:8080/event/deleteEvent";
 	private final String GET_INVITEES = "http://104.236.85.199:8080/event/getInvitees";
+	private final String GET_RESOURCES = "http://104.236.85.199:9090/findResources";
+	private final String GET_PATH = "http://104.236.85.199:9090/path";
 
 	private Context ctx;
 	
@@ -246,56 +248,27 @@ public class HTTPConsole {
 	
 
 	public List<ResourceClass> getResources(String type) {
-		List<ResourceClass> rsc = new ArrayList<ResourceClass>();
-		ResourceClass tmp ;
-		if (type.equals("Labs")) {
-			tmp = new ResourceClass();
-			tmp.setResource("BA2025");
-			rsc.add(tmp);
-			tmp = new ResourceClass();
-			tmp.setResource("BA3025");
-			rsc.add(tmp);
-			tmp = new ResourceClass();
-			tmp.setResource("BA4025");
-			rsc.add(tmp);
-			tmp = new ResourceClass();
-			tmp.setResource("BA5025");
-			rsc.add(tmp);
-		} else if (type.equals("Tutorial Rooms")) {
-			tmp = new ResourceClass();
-			tmp.setResource("BA2125");
-			rsc.add(tmp);
-			tmp = new ResourceClass();
-			tmp.setResource("BA2135");
-			rsc.add(tmp);
-			tmp = new ResourceClass();
-			tmp.setResource("BA2145");
-			rsc.add(tmp);
-			tmp = new ResourceClass();
-			tmp.setResource("BA21555");
-			rsc.add(tmp);
-			
-		} else if (type.equals("Libraries")){
-			tmp = new ResourceClass();
-			tmp.setResource("BA1015");
-			rsc.add(tmp);
-			tmp = new ResourceClass();
-			tmp.setResource("BA3175");
-			rsc.add(tmp);
-		} else if (type.equals("Washrooms")) {
-			tmp = new ResourceClass();
-			tmp.setResource("BA2225");
-			rsc.add(tmp);
-			tmp = new ResourceClass();
-			tmp.setResource("BA8885");
-			rsc.add(tmp);
-			
-		} else if (type.equals("Cafeteria")) {
-			tmp = new ResourceClass();
-			tmp.setResource("BA1115");
-			rsc.add(tmp);
-		}
-		return rsc;
+		DatabaseHandler db = new DatabaseHandler(ctx);
+		User user = db.getUser();
+		Location loc = db.getLocationFromId(user.getUserId());
+		//double lat = 43.659779,  longi = -79.397339;
+		//System.out.println("get location for " + user.getUserId() +  " with lat = " + lat + " " +  longi);
+		String URL = GET_RESOURCES + "/" + type + "/" + loc.getLatitude() + "/"+ loc.getLongitude() + "/" 
+				+ loc.getFloor();
+		System.out.println(URL);
+		String ans = SendGetRequest(URL);
+		return GetResourcesFromString(ans);
+	}
+	
+	public List<ResourceClass> getPath(String destination) {
+		DatabaseHandler db = new DatabaseHandler(ctx);
+		User user = db.getUser();
+		Location loc = db.getLocationFromId(user.getUserId());
+		String URL = GET_PATH + "/" +  loc.getLatitude() + "/"+ loc.getLongitude() + "/" + loc.getFloor() 
+				+ "/" + destination;
+		System.out.println(URL);
+		String ans = SendGetRequest(URL);
+		return GetResourcesFromString(ans);
 	}
 	
 	public boolean HideLocation() {
@@ -340,20 +313,20 @@ public class HTTPConsole {
 	
 	/* EVENT REQUESTS START*/
 	// time must be string in format hh.mm
-	public boolean CreateEventRequest(List<FriendClass> friends, String from_time, String to_time, 
+	public boolean CreateEventRequest(/*List<FriendClass> friends*/String friendsStr, String from_time, String to_time, 
 			String location, String name, String from_date, String to_date ){
 		DatabaseHandler db = new DatabaseHandler(ctx);
 		User user = db.getUser();
 		db.Close();
 		String email = user.getEmail();
-		String friendsStr = "";
+		/*String friendsStr = "";
 		int i = 0; 
 		for (i = 0; i < friends.size(); i++) {
 			if (i != 0){
 				friendsStr += ";";
 			}
 			friendsStr += friends.get(i);
-		}
+		}*/
 		String URL = CREATE_EVENT + "?friends=" + friendsStr + "&email=" + email +"&from_date=" + from_date +
 				"&to_date=" + to_date +  "&from_time=" + from_time +
 				"&to_time=" + to_time + "&location=" + location + "&name=" + name.replaceAll(" ", "%20");
@@ -637,6 +610,50 @@ public class HTTPConsole {
 		}
 		
 	}
+	
+
+	
+	private List<ResourceClass> GetResourcesFromString(String ans) {
+		List<ResourceClass> resources = new ArrayList<ResourceClass>();
+		
+		if (ans.equals("Invalid Request")){
+			return null;
+		} else {
+			if (ans.substring(ans.length() - 1).equals(",")) {
+				ans = ans.substring(0, ans.length() - 1);
+			}
+			String withoutResource = ans.replaceAll("Resource", "");
+	    	String jsonString = "{\"resources\":[" + withoutResource.split(Pattern.quote("\n"))[0] + "]}";
+			Log.i("Sidd", jsonString);
+			try {
+				JSONObject jsnobject = new JSONObject(jsonString);
+				JSONArray jsonArray = jsnobject.getJSONArray("resources");
+			    for (int i = 0; i < jsonArray.length(); i++) {
+			        JSONObject explrObject = jsonArray.getJSONObject(i);
+			        ResourceClass temp = new ResourceClass();
+			        Location loctemp = new Location();
+			        loctemp.setFloor(Integer.parseInt(explrObject.getString("floor")));
+			        loctemp.setLatitude(Float.parseFloat(explrObject.getString("entrance_lat")));
+			        loctemp.setLongitude(Float.parseFloat(explrObject.getString("entrance_long")));
+			        loctemp.setBldg(explrObject.getString("building"));
+			        loctemp.setBearing(0);
+			        loctemp.setAccuracy(0);
+			        loctemp.setUser_id(-1);
+			        loctemp.setPlot(false);
+			        
+			        temp.setLoc(loctemp);
+			        temp.setResource(explrObject.getString("id"));
+			        temp.setType(explrObject.getString("type"));
+			        resources.add(temp);
+			    }
+				return resources;
+			} catch (JSONException e) {
+				e.printStackTrace();
+				return null;
+			}
+		}
+	}
+
 	
 
 }

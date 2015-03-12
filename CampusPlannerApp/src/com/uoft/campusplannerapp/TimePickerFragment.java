@@ -48,7 +48,7 @@ public class TimePickerFragment extends DialogFragment implements TimePickerDial
     	
     	StringBuilder sb = new StringBuilder();
     	sb.append(shour);
-    	sb.append(":");
+    	sb.append(".");
     	sb.append(sminute);
     	
     	String time = sb.toString();

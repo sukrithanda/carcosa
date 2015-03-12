@@ -72,11 +72,18 @@
     <string name="find">Find</string>
     <string name="privacy_settings">Privacy Settings</string>
     <string name="locationSharing">Location Sharing</string>
+    <string name="locationType">Location Type</string>
+    <string name="locationList">Location List</string>
     <string-array name="resourceType">
-        <item>Labs</item>
-        <item>Tutorial Rooms</item>
-        <item>Libraries</item>
-        <item>Washrooms</item>
+        <item>Lab</item>
+        <item>TutorialRoom</item>
+        <item>Library</item>
+        <item>WashroomMale</item>
+        <item>WashroomFemale</item>
+        <item>Washroom</item>
+        <item>GradLab</item>
+        <item>StudyArea</item>
+        <item>MeetingRoom</item>
         <item>Cafeteria</item>
     </string-array>
 </resources>
