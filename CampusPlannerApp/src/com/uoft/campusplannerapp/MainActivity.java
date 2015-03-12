@@ -42,11 +42,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.maps.GoogleMap;
@@ -173,7 +178,6 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 	
 	boolean autostart_enable=true;
     public boolean start=false;
-    
     // LOCALIZATION CODE - END
 	
 	/**
@@ -220,7 +224,8 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
         User usero = db.getUser();
         u = usero;
         List<FriendClass> friend_list = new ArrayList<FriendClass>();
-        friend_list = http_console.GetFriend(u.getEmail());
+        if (u != null)
+        	friend_list = http_console.GetFriend(u.getEmail());
         db.Close();
     	pref = this.getSharedPreferences("User",MODE_PRIVATE);
         @SuppressWarnings("unused")
@@ -353,36 +358,49 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 		}
 		
 	
+	
+	
 	public void updateDateButton(String date)
 	{
 		System.out.println("Date in updateDateButton is: "+date);
 		Button dateButton = (Button) findViewById(R.id.datepickButton);
 		dateButton.setText(date);
+		SharedPreferences pref = getSharedPreferences("Event", MODE_PRIVATE);
+		Editor edit = pref.edit();
+		edit.putString("from_date", date);
+		edit.commit();
 	}
 	
 	public void updateTimeButton (String time)
 	{
 		Button timeButton = (Button) findViewById(R.id.timepickButton);
 		timeButton.setText(time);
+		SharedPreferences pref = getSharedPreferences("Event", MODE_PRIVATE);
+		Editor edit = pref.edit();
+		edit.putString("from_time", time);
+		edit.commit();
 	}
 	
 	public void updateDateButton2 (String date)
 	{
 		Button dateButton = (Button) findViewById(R.id.datepickButton2);
 		dateButton.setText(date);
+		SharedPreferences pref = getSharedPreferences("Event", MODE_PRIVATE);
+		Editor edit = pref.edit();
+		edit.putString("to_date", date);
+		edit.commit();
 	}
 	
 	public void updateTimeButton2 (String time)
 	{
 		Button timeButton = (Button) findViewById(R.id.timepickButton2);
 		timeButton.setText(time);
+		SharedPreferences pref = getSharedPreferences("Event", MODE_PRIVATE);
+		Editor edit = pref.edit();
+		edit.putString("to_time", time);
+		edit.commit();
 	}
-	
-	public void addAutoCompleteText ()
-	{
-		
-	}
-		
+    /*
 	public void showTimePickerDialog(View v) {
 	    DialogFragment newFragment = new TimePickerFragment();
 	    newFragment.show(getSupportFragmentManager(), "timePicker");
@@ -403,7 +421,7 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 	    newFragment.show(getSupportFragmentManager(), "datePicker");
 	}
 	
-    
+    */
     public void addItemOnSpinner2() {
     	User usero = db.getUser();
     	if (usero == null) {
@@ -704,7 +722,7 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
         	  return super.onOptionsItemSelected(item);
           }
     }
-
+/*
     
     public static class OrganizeEventFragment extends Fragment {
     	public static final String TAG = "organizeEvent";   
@@ -714,6 +732,10 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
     	private List<FriendClass> my_friends;
     	private DatabaseHandler db;
     	private String user;
+        
+        List<String> pickedFriends = new ArrayList<String>();
+        String room = null;
+        
     	
     	// Constructor of organizeEvent
     	public OrganizeEventFragment() {
@@ -732,7 +754,7 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 			View rootView = inflater.inflate(R.layout.event_organizer, container,
 					false);
 			
-			Button addfriendbutton = (Button) rootView.findViewById(R.id.imageButton1);
+			//Button addfriendbutton = (Button) rootView.findViewById(R.id.imageButton1);
 			
 			http_console = new HTTPConsole(ctx); 
 			actv = (AutoCompleteTextView) rootView.findViewById(R.id.editText2);
@@ -756,8 +778,120 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 		    ArrayAdapter<String> adapter = new ArrayAdapter<String>(ctx,android.R.layout.simple_list_item_1,names);
 		    
 		    actv.setAdapter(adapter);
+		    final View frv = rootView;
 		    
-			
+		    Spinner locType = (Spinner) rootView.findViewById(R.id.spinner3);
+		    locType.setOnItemSelectedListener(new OnItemSelectedListener() {
+		        @Override
+		        public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+		            String type = parentView.getItemAtPosition(position).toString();
+		            List<ResourceClass> rsc = http_console.getResources(type);
+		            int size = 0;
+		            if (rsc != null) {
+		            	size = rsc.size();
+		            }
+		            String rooms[] = new String[size];
+		            int j = 0; 
+		            for (j = 0; j < size; j++) {
+		            	rooms[j] = rsc.get(j).getResource();
+		            }
+		            Spinner locList = (Spinner) frv.findViewById(R.id.spinner4);
+		            ArrayAdapter<String> adapter = new ArrayAdapter<String>(ctx,android.R.layout.simple_list_item_1,rooms);
+		            locList.setAdapter(adapter);
+		        }
+
+		        @Override
+		        public void onNothingSelected(AdapterView<?> parentView) {
+		            // your code here
+		        }
+
+		    });
+		    
+		    final Context fctx = ctx; 
+		    Spinner locList = (Spinner) rootView.findViewById(R.id.spinner4);
+		    locList.setOnItemSelectedListener(new OnItemSelectedListener() {
+		        @Override
+		        public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+		            String room = parentView.getItemAtPosition(position).toString();
+		            SharedPreferences pref = fctx.getSharedPreferences("Event",MODE_PRIVATE);
+		            Editor edit = pref.edit();
+		            edit.putString("room", room);
+		            edit.commit();
+		            
+		        }
+
+		        @Override
+		        public void onNothingSelected(AdapterView<?> parentView) {
+		            // your code here
+		        }
+
+		    });
+		    
+		    Button btn = (Button) rootView.findViewById(R.id.submitButton);
+		    CreateAlert alerts = new CreateAlert(ctx);
+		    final CreateAlert alert = alerts;
+		    final View frvbtn = rootView;
+		    btn.setOnClickListener(new View.OnClickListener()
+			{
+	             @Override
+	             public void onClick(View v)
+	             {
+	            	 try {
+	 					String from_date = ((Button) frvbtn.findViewById(R.id.datepickButton)).getText().toString();
+	 					String to_date = ((Button) frvbtn.findViewById(R.id.datepickButton2)).getText().toString();
+	 					String from_time = ((Button) frvbtn.findViewById(R.id.timepickButton)).getText().toString();
+	 					String to_time = ((Button) frvbtn.findViewById(R.id.timepickButton2)).getText().toString();
+	 					String event_name = ((EditText) frvbtn.findViewById(R.id.editText1)).getText().toString();
+	 					String friendsStr = "";
+	 					for(int i = 0; i < pickedFriends.size(); i++) {
+	 						if (i != 0) {
+	 							friendsStr += ";";
+	 						}
+	 						FriendClass fr = db.getFriendFromName(pickedFriends.get(i));
+	 						if (fr != null)
+	 							friendsStr+= fr.getEmail();
+	 					}
+	 					Spinner spinner4 = (Spinner) frvbtn.findViewById(R.id.spinner4); 
+	 					if (spinner4 == null) {
+	 						alert.create_alert("Error", "Cant find sponner");
+	 					}
+	 					if (spinner4.getSelectedItem() == null) {
+
+	 						alert.create_alert("Error", "nothing selected");
+	 			            SharedPreferences pref = fctx.getSharedPreferences("Event",MODE_PRIVATE);
+	 			            room = pref.getString("room", "Can't Find room");
+	 					}
+	 					else {
+	 						room = spinner4.getSelectedItem().toString();
+	 					}
+	 					System.out.println(from_date);
+	 					System.out.println(to_date);
+	 					System.out.println(from_time);
+	 					System.out.println(to_time);
+	 					System.out.println(event_name);
+	 					System.out.println(friendsStr);
+	 					System.out.println(room);
+	 					//return http_console.CreateEventRequest(friendsStr, from_time, to_time, room, event_name, from_date, to_date);
+	 				} catch (Exception e) {
+	 					e.printStackTrace();
+	 					alert.create_alert("Error", "You need to input all fields");
+	 				}
+	             } 
+			}); 
+		    
+			ImageButton autoBtn = (ImageButton) frv.findViewById(R.id.imageButton1);
+			autoBtn.setOnClickListener(new View.OnClickListener()
+			{
+	             @Override
+	             public void onClick(View v)
+	             {
+	            	AutoCompleteTextView actv = (AutoCompleteTextView) frv.findViewById(R.id.editText2);
+	 				pickedFriends.add(actv.getText().toString());
+	 				System.out.println("Add" + actv.getText().toString() + " mlkdasmd");
+	 				return ;
+	             } 
+			}); 
+		    
 			return rootView;
 		}
 		
@@ -767,7 +901,7 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 		}
 		
     }
-    
+*/
     public static class SetUpOfficeHoursFragment extends Fragment {
     	public static final String TAG = "Office Hours";
     	
@@ -899,6 +1033,7 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 
         mFriendsFragment = (FriendsFragment) getSupportFragmentManager().findFragmentByTag(FriendsFragment.TAG);
         if (mFriendsFragment == null) {
+        	System.out.println("GetFragments");
             mFriendsFragment = FriendsFragment.newInstance(this, MainActivity.this, mMapFragment);
             ft.add(R.id.container, mFriendsFragment, FriendsFragment.TAG);
         }
@@ -1269,7 +1404,7 @@ public void start_process(){
 }
 
 public void stop_process(){
-	if (start){
+	if (start && (map != null)){
 		System.out.println("DEBUG - STOPPING LOCATION TRACKING");
 		unregisterReceiver(receiver);
 		map.setMyLocationEnabled(false);
@@ -1402,7 +1537,20 @@ public void SetMyLocation(float latitude,float longitude,int floor,float accurac
 	load_floor=floor;
 
   mylocation.push_location(latitude, longitude, 0f, accuracy, bearing);
-  
+
+  User cu = db.getUser();
+  if (cu != null) {   
+	  Location loc = new Location();
+	  loc.setBldg("Ba");
+	  loc.setFloor(floor);
+	  loc.setLatitude(latitude);
+	  loc.setLongitude(longitude);
+	  loc.setPlot(false);
+	  loc.setAccuracy(accuracy);
+	  loc.setBearing(bearing);
+	  loc.setUser_id(cu.getUserId());
+	  db.addLocation(loc);
+  }
   http_console.AddLocation("BA", Integer.toString(floor), Float.toString(latitude), Float.toString(longitude), Float.toString(accuracy), Float.toString(bearing));
 }
 

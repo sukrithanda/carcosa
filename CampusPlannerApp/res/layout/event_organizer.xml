@@ -3,26 +3,26 @@
   	android:layout_width="fill_parent"
   	android:layout_height="fill_parent">
 
-	<RelativeLayout     
-		android:layout_width="match_parent"
-    	android:layout_height="match_parent"
-    	android:paddingLeft="16dp"
-    	android:paddingRight="16dp" >
-    	
-	    <EditText
-		    android:id="@+id/editText1"
-		    android:layout_width="match_parent"
-		    android:layout_height="49dp"
-		    android:hint="@string/EventHint"
-		    android:ems="10" >
-		</EditText>
+	<RelativeLayout
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent"
+	    android:paddingLeft="16dp"
+	    android:paddingRight="16dp" >
 
-	    <View 
+	    <EditText
+	        android:id="@+id/editText1"
+	        android:layout_width="match_parent"
+	        android:layout_height="49dp"
+	        android:ems="10"
+	        android:hint="@string/EventHint" >
+	    </EditText>
+
+	    <View
 	        android:id="@+id/padding1"
 	        android:layout_width="wrap_content"
 	        android:layout_height="10dip"
 	        android:layout_below="@id/editText1" />
-	    		
+
 	    <TextView
 	        android:id="@+id/textView1"
 	        android:layout_width="wrap_content"
@@ -30,13 +30,13 @@
 	        android:layout_below="@id/padding1"
 	        android:text="@string/eventType"
 	        android:textAppearance="?android:attr/textAppearanceMedium" />
-	    
-	    <View 
+
+	    <View
 	        android:id="@+id/padding2"
 	        android:layout_width="wrap_content"
 	        android:layout_height="10dip"
 	        android:layout_below="@id/textView1" />
-	    
+
 	    <Spinner
 	        android:id="@+id/spinner1"
 	        android:layout_width="match_parent"
@@ -44,13 +44,13 @@
 	        android:layout_below="@id/padding2"
 	        android:entries="@array/eventType_array"
 	        android:prompt="@string/event_prompt" />
-	    
-		<View 
+
+	    <View
 	        android:id="@+id/padding3"
 	        android:layout_width="wrap_content"
 	        android:layout_height="10dip"
-	        android:layout_below="@id/spinner1" />    
-	    
+	        android:layout_below="@id/spinner1" />
+
 	    <TextView
 	        android:id="@+id/textView2"
 	        android:layout_width="wrap_content"
@@ -58,126 +58,141 @@
 	        android:layout_below="@id/padding3"
 	        android:text="@string/from"
 	        android:textAppearance="?android:attr/textAppearanceMedium" />
-	    
-	    <Button 
+
+	    <Button
 	        android:id="@+id/datepickButton"
-    		android:layout_width="0dp" 
-    		android:layout_height="wrap_content"
-    		android:layout_below="@id/textView2"
-    		android:layout_toLeftOf="@+id/timepickButton"
-    		android:layout_alignParentLeft="true"
-    		android:text="@string/pick_date" 
-    		android:onClick="showDatePickerDialog"
-    		style="?android:attr/borderlessButtonStyle" />
-	    
-	    <Button 
+	        style="?android:attr/borderlessButtonStyle"
+	        android:layout_width="0dp"
+	        android:layout_height="wrap_content"
+	        android:layout_alignParentLeft="true"
+	        android:layout_below="@id/textView2"
+	        android:layout_toLeftOf="@+id/timepickButton"
+	        android:onClick="showDatePickerDialog"
+	        android:text="@string/pick_date" />
+
+	    <Button
 	        android:id="@id/timepickButton"
-    		android:layout_width="96dp" 
-    		android:layout_height="wrap_content"
-    		android:layout_below="@id/textView2"
-    		android:layout_alignParentRight="true"
-    		android:text="@string/pick_time" 
-    		android:onClick="showTimePickerDialog"
-    		style="?android:attr/borderlessButtonStyle"  />
-	    
-	    <View 
+	        style="?android:attr/borderlessButtonStyle"
+	        android:layout_width="96dp"
+	        android:layout_height="wrap_content"
+	        android:layout_alignParentRight="true"
+	        android:layout_below="@id/textView2"
+	        android:onClick="showTimePickerDialog"
+	        android:text="@string/pick_time" />
+
+	    <View
 	        android:id="@+id/padding4"
 	        android:layout_width="wrap_content"
 	        android:layout_height="10dip"
-	        android:layout_below="@id/datepickButton" />   
-	        
-	   <TextView
+	        android:layout_below="@id/datepickButton" />
+
+	    <TextView
 	        android:id="@+id/textView3"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:layout_below="@id/padding4"
 	        android:text="@string/to"
 	        android:textAppearance="?android:attr/textAppearanceMedium" />
-	   
-	   <Button 
+
+	    <Button
 	        android:id="@+id/datepickButton2"
-    		android:layout_width="0dp" 
-    		android:layout_height="wrap_content"
-    		android:layout_below="@id/textView3"
-    		android:layout_toLeftOf="@+id/timepickButton2"
-    		android:layout_alignParentLeft="true"
-    		android:text="@string/pick_date" 
-    		android:onClick="showDatePickerDialog2"
-    		style="?android:attr/borderlessButtonStyle" />
-	    
-	    <Button 
+	        style="?android:attr/borderlessButtonStyle"
+	        android:layout_width="0dp"
+	        android:layout_height="wrap_content"
+	        android:layout_alignParentLeft="true"
+	        android:layout_below="@id/textView3"
+	        android:layout_toLeftOf="@+id/timepickButton2"
+	        android:onClick="showDatePickerDialog2"
+	        android:text="@string/pick_date" />
+
+	    <Button
 	        android:id="@id/timepickButton2"
-    		android:layout_width="96dp" 
-    		android:layout_height="wrap_content"
-    		android:layout_below="@id/textView3"
-    		android:layout_alignParentRight="true"
-    		android:text="@string/pick_time" 
-    		android:onClick="showTimePickerDialog2"
-    		style="?android:attr/borderlessButtonStyle"  />
-	    
-	    <View 
+	        style="?android:attr/borderlessButtonStyle"
+	        android:layout_width="96dp"
+	        android:layout_height="wrap_content"
+	        android:layout_alignParentRight="true"
+	        android:layout_below="@id/textView3"
+	        android:onClick="showTimePickerDialog2"
+	        android:text="@string/pick_time" />
+
+	    <View
 	        android:id="@+id/padding5"
 	        android:layout_width="wrap_content"
 	        android:layout_height="10dip"
-	        android:layout_below="@id/datepickButton2" /> 
-	        
-	   <ImageButton
-	       android:id="@+id/imageButton1"
-	       android:layout_width="wrap_content"
-	       android:layout_height="wrap_content"
-		   android:layout_below="@id/padding5"
-		   android:onClick="addAutoCompleteText"
-	       android:layout_marginRight="16dp"
-	       android:src="@drawable/ic_action_add_person" />
-	    
+	        android:layout_below="@id/datepickButton2" />
+
+	    <ImageButton
+	        android:id="@+id/imageButton1"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_below="@id/padding5"
+	        android:layout_marginRight="16dp"
+	        android:onClick="addAutoCompleteText"
+	        android:src="@drawable/ic_action_add_person" />
+
 	    <AutoCompleteTextView
-		    android:id="@+id/editText2"
-		    android:layout_width="match_parent"
-		    android:layout_height="49dp"
-		    android:layout_below="@id/imageButton1"
-		    android:hint="@string/FriendHint"
-		    android:ems="10" >
-		</AutoCompleteTextView>
-		
-	    <View 
+	        android:id="@+id/editText2"
+	        android:layout_width="match_parent"
+	        android:layout_height="49dp"
+	        android:layout_below="@id/imageButton1"
+	        android:ems="10"
+	        android:hint="@string/FriendHint" >
+	    </AutoCompleteTextView>
+
+	    <View
 	        android:id="@+id/padding6"
 	        android:layout_width="wrap_content"
 	        android:layout_height="10dip"
-	        android:layout_below="@id/editText2" /> 
-	        
-	    <EditText
-		    android:id="@+id/editText3"
-		    android:layout_width="match_parent"
-		    android:layout_height="49dp"
-		    android:layout_below="@id/padding6"
-		    android:hint="@string/LocationHint"
-		    android:ems="10" >
-		</EditText>
-		
-	   <View 
+	        android:layout_below="@id/editText2" />
+	    
+	    <Spinner
+	        android:id="@+id/spinner3"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_below="@id/padding6"
+	        android:layout_toRightOf="@+id/textView3" 
+	        android:entries="@array/resourceType"
+	        android:prompt="@string/locationType" />
+
+	    <View
 	        android:id="@+id/padding7"
+	        android:layout_width="match_parent"
+	        android:layout_height="10dip"
+	        android:layout_below="@id/spinner3" />
+	    
+	    <Spinner
+	        android:id="@+id/spinner4"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_below="@id/padding7"
+	        android:prompt="@string/locationList" 
+	        android:layout_toRightOf="@+id/textView3" />
+
+	    <View
+	        android:id="@+id/padding8"
 	        android:layout_width="wrap_content"
 	        android:layout_height="10dip"
-	        android:layout_below="@id/editText3" />  
-	    
-	   <Button 
-	        android:id="@+id/submitButton"
-    		android:layout_width="0dp" 
-    		android:layout_height="wrap_content"
-    		android:layout_below="@id/padding7"
-    		android:layout_toLeftOf="@+id/clearButton"
-    		android:layout_alignParentLeft="true"
-    		android:text="@string/SubmitText"  />	    
-    	
-	   <Button 
-	        android:id="@id/clearButton"
-    		android:layout_width="160dp" 
-    		android:layout_height="wrap_content"
-    		android:layout_below="@id/padding7"
-    		android:layout_alignParentRight="true"
-    		android:text="@string/ClearText" />
+	        android:layout_below="@id/spinner4" />
 
+	    <Button
+	        android:id="@+id/submitButton"
+	        android:layout_width="0dp"
+	        android:layout_height="wrap_content"
+	        android:layout_alignParentLeft="true"
+	        android:layout_below="@id/padding8"
+	        android:layout_toLeftOf="@+id/clearButton"
+	        android:onClick="submitTheEvent"
+	        android:text="@string/SubmitText" />
+
+	    <Button
+	        android:id="@id/clearButton"
+	        android:layout_width="160dp"
+	        android:layout_height="wrap_content"
+	        android:layout_alignParentRight="true"
+	        android:layout_below="@id/padding8"
+	        android:text="@string/ClearText" />
 
 	    
 	</RelativeLayout>
+
 </ScrollView>

@@ -171,6 +171,7 @@ public class FriendsFragment extends Fragment {
 	
 	@Override
     public void onResume() {
+		System.out.println("Onresume Friends");
 		if (rv != null)
         	get_friends(rv);
 		super.onResume();
