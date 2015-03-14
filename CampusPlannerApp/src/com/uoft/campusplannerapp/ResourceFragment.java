@@ -8,11 +8,13 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.AdapterView.OnItemClickListener;
 
 public class ResourceFragment extends Fragment{
 	Context ctx;
@@ -45,7 +47,9 @@ public class ResourceFragment extends Fragment{
     	        String text = spinner.getSelectedItem().toString();
          		List<ResourceClass> rsc = http_console.getResources(text);
          		ListView lv = (ListView) frv.findViewById(R.id.resourcelistview);
-         		int num_resources = rsc.size();
+         		int num_resources = 0; 
+         		if (rsc != null)
+         			num_resources = rsc.size();
      		    String names[] = new String[num_resources];
      		    int i = 0; 
      		    for (i = 0; i < num_resources; i++){
@@ -54,6 +58,29 @@ public class ResourceFragment extends Fragment{
      		    }
      		    ArrayAdapter<String> fr_adp = new ArrayAdapter<String>(ctx,android.R.layout.simple_list_item_1,lText.getId(),names);
      		    lv.setAdapter(fr_adp);
+     		    lv.setOnItemClickListener(new OnItemClickListener() {
+     	           public void onItemClick(AdapterView<?> parent, View view,
+     	               int position, long id) {
+     	               String room = parent.getItemAtPosition(position).toString();
+     	               List<ResourceClass> path = http_console.getPath(room);
+     	               String path_s = "";
+     	               int i = 0; 
+     	               int size = 0; 
+     	               if (path != null) {
+     	            	   size = path.size();
+     	               }
+     	               for (i = 0; i < size; i++) {
+     	            	   if (i!=0) {
+     	            		   path_s += "\n";
+     	            	   }
+     	            	   path_s += path.get(i).getResource();
+     	               }
+     	               if (path_s.equals("")){
+     	            	   return;
+     	               }
+     	               alert.create_alert("Route", path_s);
+     	           }
+     	         });
              } 
 		}); 
 	    return rootView;

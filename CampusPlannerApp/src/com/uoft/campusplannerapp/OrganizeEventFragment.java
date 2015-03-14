@@ -170,10 +170,10 @@ public class OrganizeEventFragment extends Fragment implements DateInterface{
              public void onClick(View v)
              {
             	 try {
- 					//String from_date = ((Button) frvbtn.findViewById(R.id.datepickButton)).getText().toString();
- 					//String to_date = ((Button) frvbtn.findViewById(R.id.datepickButton2)).getText().toString();
- 					//String from_time = ((Button) frvbtn.findViewById(R.id.timepickButton)).getText().toString();
- 					//String to_time = ((Button) frvbtn.findViewById(R.id.timepickButton2)).getText().toString();
+ 					String from_date = ((Button) frvbtn.findViewById(R.id.datepickButton)).getText().toString();
+ 					String to_date = ((Button) frvbtn.findViewById(R.id.datepickButton2)).getText().toString();
+ 					String from_time = ((Button) frvbtn.findViewById(R.id.timepickButton)).getText().toString();
+ 					String to_time = ((Button) frvbtn.findViewById(R.id.timepickButton2)).getText().toString();
  					String event_name = ((EditText) frvbtn.findViewById(R.id.editText1)).getText().toString();
  					String friendsStr = "";
  					for(int i = 0; i < pickedFriends.size(); i++) {
@@ -191,10 +191,10 @@ public class OrganizeEventFragment extends Fragment implements DateInterface{
  					room = spinner4.getSelectedItem().toString();
 
 			        SharedPreferences pref = ctx.getSharedPreferences("Event",ctx.MODE_PRIVATE);
-			        String from_date = pref.getString("from_date", "None");
-			        String to_date = pref.getString("to_date", "None");
-			        String from_time = pref.getString("from_time", "None");
-			        String to_time = pref.getString("to_time", "None");
+			       // String from_date = pref.getString("from_date", "None");
+			       // String to_date = pref.getString("to_date", "None");
+			       // String from_time = pref.getString("from_time", "None");
+			       // String to_time = pref.getString("to_time", "None");
  					System.out.println(from_date);
  					System.out.println(to_date);
  					System.out.println(from_time);
@@ -220,6 +220,10 @@ public class OrganizeEventFragment extends Fragment implements DateInterface{
 		pref.edit().remove("to_date").commit();
 		pref.edit().remove("from_time").commit();
 		pref.edit().remove("to_time").commit();
+		((Button) rv.findViewById(R.id.datepickButton)).setText("Select a date");
+		((Button) rv.findViewById(R.id.datepickButton2)).setText("Select a date");
+		((Button) rv.findViewById(R.id.timepickButton)).setText("Select a time");
+		((Button) rv.findViewById(R.id.timepickButton2)).setText("Select a time");
 		pickedFriends.clear();
 		((EditText) rv.findViewById(R.id.editText1)).setText("");
 		((AutoCompleteTextView) rv.findViewById(R.id.editText2)).setText("");
@@ -256,7 +260,7 @@ public class OrganizeEventFragment extends Fragment implements DateInterface{
             @Override
             public void onClick(View v)
             {
-            	DatePickerFragment newFragment = new DatePickerFragment();
+            	DatePickerFragment newFragment = DatePickerFragment.newInstance(OrganizeEventFragment.this);
         	    newFragment.show(getChildFragmentManager(), "datePicker");
             } 
 		}); 
@@ -270,7 +274,7 @@ public class OrganizeEventFragment extends Fragment implements DateInterface{
             @Override
             public void onClick(View v)
             {
-            	DatePickerFragment2 newFragment = new DatePickerFragment2();
+            	DatePickerFragment2 newFragment = DatePickerFragment2.newInstance(OrganizeEventFragment.this);
         	    newFragment.show(getChildFragmentManager(), "datePicker");
             } 
 		}); 
@@ -284,7 +288,7 @@ public class OrganizeEventFragment extends Fragment implements DateInterface{
             @Override
             public void onClick(View v)
             {
-            	TimePickerFragment newFragment = new TimePickerFragment();
+            	TimePickerFragment newFragment = TimePickerFragment.newInstance(OrganizeEventFragment.this);
         	    newFragment.show(getChildFragmentManager(), "timePicker");
             } 
 		}); 
@@ -298,8 +302,8 @@ public class OrganizeEventFragment extends Fragment implements DateInterface{
             @Override
             public void onClick(View v)
             {
-            	TimePickerFragment2 newFragment = new TimePickerFragment2();
-        	    newFragment.show(getChildFragmentManager(), "timePicker");
+            	TimePickerFragment2 newFragment = TimePickerFragment2.newInstance(OrganizeEventFragment.this);
+        	    newFragment.show(getChildFragmentManager(), "timePicker2");
             } 
 		}); 
 	}

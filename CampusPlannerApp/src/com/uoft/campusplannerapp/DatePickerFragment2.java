@@ -12,6 +12,13 @@ import android.widget.DatePicker;
 public class DatePickerFragment2 extends DialogFragment implements DatePickerDialog.OnDateSetListener {
 	
 	DateInterface i;
+	OrganizeEventFragment ctx;
+
+	public static DatePickerFragment2 newInstance(OrganizeEventFragment ctx) {
+		DatePickerFragment2 fragment = new DatePickerFragment2();
+		fragment.ctx = ctx;
+		return fragment;
+	}
 	
 	 @Override
 	    public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -54,7 +61,8 @@ public class DatePickerFragment2 extends DialogFragment implements DatePickerDia
 	    	
 	    	System.out.println(date);
 	    	
-	    	i.updateDateButton2(date);
+	    	//i.updateDateButton2(date);
+	    	ctx.updateDateButton2(date);
 	    	
 	    }
 	    
