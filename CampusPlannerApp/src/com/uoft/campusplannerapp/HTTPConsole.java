@@ -263,11 +263,17 @@ public class HTTPConsole {
 	public List<ResourceClass> getPath(String destination) {
 		DatabaseHandler db = new DatabaseHandler(ctx);
 		User user = db.getUser();
+		System.out.println("DEBUG - IN HTTPCONSOLE GET PATH");
+
 		Location loc = db.getLocationFromId(user.getUserId());
 		String URL = GET_PATH + "/" +  loc.getLatitude() + "/"+ loc.getLongitude() + "/" + loc.getFloor() 
 				+ "/" + destination;
 		System.out.println(URL);
+		System.out.println("DEBUG - SENDING GET REQUEST");
+
 		String ans = SendGetRequest(URL);
+		System.out.println("DEBUG - REQUEST RETURNED");
+
 		return GetResourcesFromString(ans);
 	}
 	

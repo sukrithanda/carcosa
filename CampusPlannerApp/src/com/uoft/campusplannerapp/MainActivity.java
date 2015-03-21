@@ -934,6 +934,7 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
         ft.setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
         if (fragmentIn == mMapFragment && map!=null){
         	map.setMyLocationEnabled(true);
+        	
         	start_process();
         }
         if (mVisible != null) {
@@ -995,20 +996,51 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
         		  
     }
 	
-	public void showpath(int floor, float latitude, float longitude) {
+	public void showpath(List<ResourceClass> m) {
 		
-		LatLng pinLocation = new LatLng(latitude, longitude);
-	      Marker storeMarker = map.addMarker(new MarkerOptions()
-	      .position(pinLocation)
-	      .title("test")
-	      .snippet("resources"));   
+		 int i;
+		 stop_process();
+	      int size = m.size();
+			System.out.println("DEBUG - IN SHOW PATH");
+		ArrayList<LatLng> points = new ArrayList<LatLng>();
+		
+		//grab all the points and draw a marker at the end
+		for (i = 0; i < size; i++) {
+      	  Location l = m.get(i).getLoc();
+      	  LatLng pinLocation = new LatLng(l.getLatitude(), l.getLongitude());
+      	  points.add(pinLocation);
+      	  if (i == size-1){
+  	    	 Marker storeMarker = map.addMarker(new MarkerOptions()
+  	      	.position(pinLocation)
+  	      	.title(l.getBldg())
+  	      	.snippet("End Destination"));  
+      	  }
+      
+      	  
+         }
+		//draw the lines in between the markers!
+		int p;
+		for (p = 0; p < points.size(); p++){
+			  if (p < points.size() - 2){  
+		  	     	 map.addPolyline((new PolylineOptions())
+						.add(points.get(p), points.get(p+1)).width(5).color(Color.BLUE)
+						.geodesic(true));
+		      	 }
+		}
+		System.out.println("DEBUG - DONE DRAWING MARKERS");
+
+	    
+  	    mMapFragment.isResumed();
+		showFragment(mMapFragment, 4);
+		System.out.println("DEBUG - MAP SHOULD OPEN");
+
 		
 		
-		map
+		/*map
 		.addPolyline((new PolylineOptions())
 				.add(new LatLng(latitude, longitude), new LatLng(geolocation_sim[0],geolocation_sim[1])).width(5).color(Color.BLUE)
 				.geodesic(true));
-		showFragment(mMapFragment);
+		showFragment(mMapFragment);*/
 
         		  
     }
@@ -1385,8 +1417,10 @@ public void start_process(){
 
 		registerReceiver(receiver, new IntentFilter(
 		WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
-		boolean wifi = wifiManager.startScan();
-		System.out.println("DEBUG: GETTING WIFI SIGNALS:" + wifi);
+		if (wifiManager != null){
+			boolean wifi = wifiManager.startScan();
+			System.out.println("DEBUG: GETTING WIFI SIGNALS:" + wifi);
+		}
 	counter=1;
 
 	

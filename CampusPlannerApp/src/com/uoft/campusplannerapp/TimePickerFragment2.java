@@ -13,6 +13,12 @@ import android.widget.TimePicker;
 public class TimePickerFragment2 extends DialogFragment implements TimePickerDialog.OnTimeSetListener {
 	
 	DateInterface i;
+	OrganizeEventFragment ctx;
+	public static TimePickerFragment2 newInstance(OrganizeEventFragment ctx) {
+		TimePickerFragment2 fragment = new TimePickerFragment2();
+		fragment.ctx = ctx;
+		return fragment;
+	}
 	
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -53,7 +59,8 @@ public class TimePickerFragment2 extends DialogFragment implements TimePickerDia
     	
     	String time = sb.toString();
     	
-    	i.updateTimeButton2(time);
+    	//i.updateTimeButton2(time);
+    	ctx.updateTimeButton2(time);
 	}
 	
 }
