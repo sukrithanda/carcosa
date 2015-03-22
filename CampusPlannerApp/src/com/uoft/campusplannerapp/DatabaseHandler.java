@@ -50,8 +50,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				"user_id INTEGER, " +
 				"bldg TEXT, " + 
 				"floor INTEGER, " + 
-				"x INTEGER, " + 
-				"y INTEGER, " + 
+				"x FLOAT, " + 
+				"y FLOAT, " + 
 				"plotted INTEGER)" ;
 		try {
 			db.execSQL(user);
@@ -200,7 +200,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		Cursor cursor = db.rawQuery(query, null);
 		if (cursor.moveToFirst()){
 			do {
-				if (cursor.getString(3) == email) {
+				if (cursor.getString(3).equals(email)) {
 					FriendClass friend = new FriendClass();
 					friend.setFirst_name(cursor.getString(cursor.getColumnIndex("first_name")));
 					friend.setLast_name(cursor.getString(cursor.getColumnIndex("last_name")));
@@ -216,7 +216,34 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		return null;
 		
 	}
-	
+	public FriendClass getFriendFromName(String Name){
+		Log.i("UPlan","Get one Friend");
+		SQLiteDatabase db = this.getWritableDatabase();
+		String query = "SELECT * FROM friends";
+		Cursor cursor = db.rawQuery(query, null);
+		if (cursor.moveToFirst()){
+			do {
+				String firstName = "";
+				String lastName = "";
+				firstName = cursor.getString(cursor.getColumnIndex("first_name"));
+				lastName = cursor.getString(cursor.getColumnIndex("last_name"));
+				String full_name = firstName + " " + lastName;
+				if (Name.equals(full_name)) {
+					FriendClass friend = new FriendClass();
+					friend.setFirst_name(cursor.getString(cursor.getColumnIndex("first_name")));
+					friend.setLast_name(cursor.getString(cursor.getColumnIndex("last_name")));
+					friend.setEmail(cursor.getString(cursor.getColumnIndex("email")));
+					friend.setUser_id(cursor.getLong(cursor.getColumnIndex("user_id")));
+					db.close();
+					return friend;
+					
+				}
+			} while (cursor.moveToNext());
+		}
+		db.close();
+		return null;
+		
+	}
 	public boolean addFriendList(List<FriendClass> fl){
 		Log.i("UPlan","Add list of friends");
 		SQLiteDatabase db = this.getWritableDatabase();
@@ -257,8 +284,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 					loc.setUser_id(Long.parseLong(cursor.getString(1)));
 					loc.setBldg(cursor.getString(2));
 					loc.setFloor(Integer.parseInt(cursor.getString(3)));
-					loc.setLatitude(Integer.parseInt(cursor.getString(4)));
-					loc.setLongitude(Integer.parseInt(cursor.getString(5)));
+					loc.setLatitude(Float.parseFloat(cursor.getString(4)));
+					loc.setLongitude(Float.parseFloat(cursor.getString(5)));
 					int plot = Integer.parseInt(cursor.getString(6));
 					loc.setPlot(plot==1?true:false);
 					locations.add(loc);
@@ -285,9 +312,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 						loc.setUser_id(cursor.getInt(cursor.getColumnIndex("user_id")));
 						loc.setBldg(cursor.getString(cursor.getColumnIndex("bldg")));
 						loc.setFloor(cursor.getInt(cursor.getColumnIndex("floor")));
-						loc.setLatitude(cursor.getInt(cursor.getColumnIndex("x")));
-						loc.setLatitude(cursor.getInt(cursor.getColumnIndex("y")));
-						int plot = cursor.getInt(cursor.getColumnIndex("plot"));
+						loc.setLatitude(cursor.getFloat(cursor.getColumnIndex("x")));
+						loc.setLongitude(cursor.getFloat(cursor.getColumnIndex("y")));
+						int plot = cursor.getInt(cursor.getColumnIndex("plotted"));
 						loc.setPlot(plot==1?true:false);
 						db.close();
 						return loc;
@@ -310,7 +337,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put("x", "" + loc.getLatitude());
 		values.put("y", "" + loc.getLongitude());
 		values.put("plotted", "" + 0);
-		db.insert("locations", null, values);
+		if (getLocationFromId(loc.getUser_id()) == null) {
+			db = this.getWritableDatabase();
+			db.insert("locations", null, values);
+		} else {
+			db = this.getWritableDatabase();
+			db.update("locations", values, "user_id=?", new String[]{"" + loc.getUser_id()});
+		}
 		db.close();
 		Log.i("Sidd", "Set user_id, bldg, floor, x, y, 0"+ loc.getUser_id() + loc.getBldg() + loc.getFloor() +  
 				loc.getLatitude() + loc.getLongitude());

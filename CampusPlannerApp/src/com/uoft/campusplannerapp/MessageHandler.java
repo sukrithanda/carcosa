@@ -56,7 +56,7 @@ public class MessageHandler extends IntentService {
         	Log.i("com.uoft.campusplannerapp", "Location requested by" + email);
         	Location loc = new Location();
         	loc.GetLocation();
-        	http.SendLocation(email, loc.getBldg(), "" + loc.getFloor(), "" + loc.getLatitude(), "" + loc.getLongitude());
+        	//http.SendLocation(email, loc.getBldg(), "" + loc.getFloor(), "" + loc.getLatitude(), "" + loc.getLongitude());
         } else if (title.equals("putLocation")) {
         	String message = extras.getString("message");
         	http.SetLoc(message);
