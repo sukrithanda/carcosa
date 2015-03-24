@@ -384,7 +384,10 @@ public class HTTPConsole {
 	}
 	
 	public boolean DeleteEvent(long event_id) {
-		String URL = DELETE_EVENT + "?event_id=" + event_id;
+		DatabaseHandler db = new DatabaseHandler(ctx);
+		User user = db.getUser();
+		db.Close();
+		String URL = DELETE_EVENT + "?event_id=" + event_id + "&user=" + user.getUserId();
 		String ans = SendGetRequest(URL);
 		if (ans.equals("Invalid Request")){
 			return false;

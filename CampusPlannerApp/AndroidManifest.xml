@@ -114,6 +114,11 @@ android:value="AIzaSyBgWGvoAkY_A9GsjTAhHXjOyg6yqRq7p3s"/>
             android:name="com.uoft.campusplannerapp.ResponseActivity"
             android:label="@string/title_event_invite" >
         </activity>
+        
+        <activity
+            android:name="com.uoft.campusplannerapp.NotifActivity"
+            android:label="@string/title_event_invite" >
+        </activity>
     </application>
 
 </manifest>

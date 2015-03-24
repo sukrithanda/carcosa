@@ -119,6 +119,44 @@ public class MessageHandler extends IntentService {
     	             (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
     	     // Builds the notification and issues it.
     	     mNotifyMgr.notify(mNotificationId, mBuilder.build());
+        } else if (title.equals("eventCancelled") || title.equals("userNotAttending")) {
+        	String message = extras.getString("message");
+        	String event = message.split(Pattern.quote(";"))[0];
+        	String creator = message.split(Pattern.quote(";"))[1];
+        	String event_id = message.split(Pattern.quote(";"))[2];
+			String mod_msg = event.replaceAll("%20", " ");
+        	Log.i("Sidd", message + "^^^^^" + message + "^^^^^" + mod_msg);
+        	Uri notisnd = Uri.parse("" + R.raw.fallbackring);
+        	int mNotificationId = 003;
+
+        	Intent resultIntent = new Intent(this, NotifActivity.class);
+        	resultIntent.putExtra("EventId", event_id);
+        	resultIntent.putExtra("Creator", creator);
+        	resultIntent.putExtra("Event", event);
+        	resultIntent.putExtra("Type", title);
+        	resultIntent.putExtra("notification", "" + mNotificationId);
+        	// Because clicking the notification opens a new ("special") activity, there's
+        	// no need to create an artificial back stack.
+        	PendingIntent resultPendingIntent =
+        	    PendingIntent.getActivity(
+        	    this,
+        	    0,
+        	    resultIntent,
+        	    PendingIntent.FLAG_UPDATE_CURRENT
+        	);
+        	
+        	NotificationCompat.Builder mBuilder =
+        		    new NotificationCompat.Builder(this)
+        		    .setSmallIcon(R.drawable.ic_launcher)
+        		    .setContentTitle("Event Update")
+        		    .setSound(notisnd)
+        		    .setContentIntent(resultPendingIntent)
+        		    .setContentText(mod_msg);
+            // Gets an instance of the NotificationManager service
+    	     NotificationManager mNotifyMgr = 
+    	             (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+    	     // Builds the notification and issues it.
+    	     mNotifyMgr.notify(mNotificationId, mBuilder.build());
         }
         
 
