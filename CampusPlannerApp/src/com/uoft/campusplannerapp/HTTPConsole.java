@@ -251,7 +251,8 @@ public class HTTPConsole {
 		DatabaseHandler db = new DatabaseHandler(ctx);
 		User user = db.getUser();
 		Location loc = db.getLocationFromId(user.getUserId());
-		//double lat = 43.659779,  longi = -79.397339;
+//		double lat = 43.659779,  longi = -79.397339;
+//		String URL = GET_RESOURCES + "/" + type + "/" + lat + "/"+ longi + "/" + 4;
 		//System.out.println("get location for " + user.getUserId() +  " with lat = " + lat + " " +  longi);
 		String URL = GET_RESOURCES + "/" + type + "/" + loc.getLatitude() + "/"+ loc.getLongitude() + "/" 
 				+ loc.getFloor();
@@ -266,6 +267,8 @@ public class HTTPConsole {
 		System.out.println("DEBUG - IN HTTPCONSOLE GET PATH");
 
 		Location loc = db.getLocationFromId(user.getUserId());
+//		double lat = 43.659779,  longi = -79.397339;
+//		String URL = GET_PATH + "/" + lat + "/"+ longi + "/" + 4 + "/"+ destination;
 		String URL = GET_PATH + "/" +  loc.getLatitude() + "/"+ loc.getLongitude() + "/" + loc.getFloor() 
 				+ "/" + destination;
 		System.out.println(URL);
@@ -445,7 +448,7 @@ public class HTTPConsole {
         		HttpClient client = new DefaultHttpClient();
         	    HttpGet request = new HttpGet(URL[0]);
         	    HttpResponse response;
-        	    String result = null;
+        	    String result = "Invalid Request";
         	    try {
         	        response = client.execute(request);
         	        Log.e("com.uoft.campusplannerapp", "Hi "+response.getStatusLine().toString());
@@ -471,6 +474,9 @@ public class HTTPConsole {
         	        e1.printStackTrace();
         	    } catch (IOException e1) {
         	        e1.printStackTrace();
+        	    } catch (Exception all) {
+        	    	all.printStackTrace();
+        	    	
         	    }
         	    return result;
 
@@ -525,6 +531,9 @@ public class HTTPConsole {
 			try {
 				JSONObject jsnobject = new JSONObject(jsonString);
 				JSONArray jsonArray = jsnobject.getJSONArray("friends");
+				if (null == jsonArray) {
+					return null;
+				}
 			    for (int i = 0; i < jsonArray.length(); i++) {
 			        JSONObject explrObject = jsonArray.getJSONObject(i);
 			        FriendClass temp = new FriendClass();

@@ -1,33 +1,10 @@
 package com.uoft.campusplannerapp;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
-
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
-
 import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -71,6 +48,9 @@ public class ResourceFragment extends Fragment{
     	        Spinner spinner = (Spinner)frv.findViewById(R.id.resourceSpinner);
     	        String text = spinner.getSelectedItem().toString();
          		List<ResourceClass> rsc = http_console.getResources(text);
+         		if (rsc == null) {
+         			alert.create_alert("Error", "No " + text + " found near you");
+         		}
          		ListView lv = (ListView) frv.findViewById(R.id.resourcelistview);
          		int num_resources = 0; 
          		if (rsc != null)
@@ -83,35 +63,24 @@ public class ResourceFragment extends Fragment{
      		    }
      		    ArrayAdapter<String> fr_adp = new ArrayAdapter<String>(ctx,android.R.layout.simple_list_item_1,lText.getId(),names);
      		    lv.setAdapter(fr_adp);
-
      		    lv.setOnItemClickListener(new OnItemClickListener() {
      	           public void onItemClick(AdapterView<?> parent, View view,
      	               int position, long id) {
      	               String room = parent.getItemAtPosition(position).toString();
-     	            //  new httpcall().execute(room);
-
-     	              List<ResourceClass> path = http_console.getPath(room);
-     	              //new httpcall().execute(room);
-     	               ArrayList<MarkerFloorPairs> route_markers = new ArrayList<MarkerFloorPairs>();
-     	             // try { Thread.sleep(5000); }
-     	             // catch (InterruptedException e) { e.printStackTrace(); }
-     	               String path_s = "";
-     	               int i = 0; 
-     	               int size = 0; 
-     	               if (path != null) {
-     	            	   size = path.size();
-
-     	               }
-     	               for (i = 0; i < size; i++) {
-     	            	   if (i!=0) {
-     	            		   path_s += "\n";
-     	            	   }
-     	            	
-     	            	   
-     	            	   path_s += path.get(i).getResource();
-     	        	   
-     	            	  
-     	               }
+     	               List<ResourceClass> path = http_console.getPath(room);
+     	               //ArrayList<MarkerFloorPairs> route_markers = new ArrayList<MarkerFloorPairs>();
+//     	               String path_s = "";
+//     	               int i = 0; 
+//     	               int size = 0; 
+//     	               if (path != null) {
+//     	            	   size = path.size();
+//     	               }
+//     	               for (i = 0; i < size; i++) {
+//     	            	   if (i!=0) {
+//     	            		   path_s += "\n";
+//     	            	   }
+//     	            	   path_s += path.get(i).getResource();
+//     	               }
 	     	         
 
      	              if (path !=null)
@@ -119,12 +88,8 @@ public class ResourceFragment extends Fragment{
 
      	           }
      	         });
-     		    
-     		    		
-
              } 
 		}); 
 	    return rootView;
-	
 	}
 }

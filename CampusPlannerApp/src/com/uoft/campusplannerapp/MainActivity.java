@@ -30,29 +30,22 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.ListView;
 import android.widget.Spinner;
-import android.widget.TextView;
-
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -99,6 +92,7 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
     KeyPair key;
     PublicKey publicKey;
     PrivateKey privateKey;
+    boolean session = true;
 
     CreateAlert alert;
     DatabaseHandler db;
@@ -117,6 +111,7 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 	public Fragment mResourceFragment;
 
 	public static GoogleMap map;
+	private boolean reload_needed = false;
 	
     ArrayList<MarkerFloorPairs> markers = new ArrayList<MarkerFloorPairs>();
 
@@ -215,14 +210,80 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
     	AlertDialog alert = builder.create();
     	alert.show();
     }
+    
+    private void setUpMapAfterLogin() {
+
+        User usero = db.getUser();
+        u = usero;
+        List<FriendClass> friend_list = new ArrayList<FriendClass>();
+        if (u != null)
+        	friend_list = http_console.GetFriend(u.getEmail());
+        db.Close(); 
+
+		mNavigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager()
+			.findFragmentById(R.id.navigation_drawer);
+		DrawerLayout m = (DrawerLayout)findViewById(R.id.drawer_layout);
+
+		// Set up the drawer.
+		mNavigationDrawerFragment.setUp(R.id.navigation_drawer,m);
+
+		setUpFragments();
+		showFragment(mMapFragment);
+		//mTitle = getString(R.string.title_map);
+		
+		//LOCALIZATION CODE - START
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+	
+		
+		localizationcore = new LocalizationCore();
+		
+		try {
+			wifiManager = (WifiManager) getBaseContext()
+					.getSystemService(Context.WIFI_SERVICE);
+			//wifiManager.setWifiEnabled(false);
+		} catch (Exception e) {
+
+		}
+
+		// Register Broadcast .wReceiver
+		receiver=new WiFiScanReceiver();
+	
+		
+		params_sim[0]=1;
+		params_sim[1]=1;
+		loadPref();
+	    listener = new ClientReciever(db, u, http_console, friend_list);
+		if(autostart_enable)
+			start_process();
+			listener.start();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         db = new DatabaseHandler(this);
         http_console = new HTTPConsole(this);
-
+        session = true;
         alert = new CreateAlert(this);
+
+        /* First of all verify if we can connect to server */ 
+        String server_sts = http_console.HelloWorld();
+        if (server_sts.equals("Invalid Request")) {
+        	AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    		builder.setTitle("Error")
+        		   .setMessage("Can't connect to server right now\n" +
+        		   		"Check your network connection and try again")
+        	       .setCancelable(false)
+        	       .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+        	           public void onClick(DialogInterface dialog, int id) {
+        	                finish();
+        	                System.exit(0);
+        	           }
+        	       });
+        	AlertDialog alert = builder.create();
+        	alert.show();
+        	return;
+        }
         User usero = db.getUser();
         u = usero;
         List<FriendClass> friend_list = new ArrayList<FriendClass>();
@@ -238,54 +299,16 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
     	if (usero == null) {
             setContentView(R.layout.activity_main);
     	} else {
-    		setContentView(R.layout.map_main);  
-
-    		mNavigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager()
-				.findFragmentById(R.id.navigation_drawer);
-    		DrawerLayout m = (DrawerLayout)findViewById(R.id.drawer_layout);
-    
-    		// Set up the drawer.
-    		mNavigationDrawerFragment.setUp(R.id.navigation_drawer,m);
-
-    		setUpFragments();
-			showFragment(mMapFragment);
-    		//mTitle = getString(R.string.title_map);
-    		
-    		//LOCALIZATION CODE - START
-    		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-    	
-    		
-    		localizationcore = new LocalizationCore();
-    		
-    		try {
-    			wifiManager = (WifiManager) getBaseContext()
-    					.getSystemService(Context.WIFI_SERVICE);
-    			//wifiManager.setWifiEnabled(false);
-    		} catch (Exception e) {
-
-    		}
-
-    		// Register Broadcast .wReceiver
-    		receiver=new WiFiScanReceiver();
-    	
-    		
-    		params_sim[0]=1;
-    		params_sim[1]=1;
-    		loadPref();
-    	    listener = new ClientReciever(db, u, http_console, friend_list);
-    		if(autostart_enable)
-    			start_process();
-    			listener.start();
+        	setContentView(R.layout.map_main); 
+    		setUpMapAfterLogin();
     	}
     	
     }
     
 	@Override
     protected void onResume() {
-		
         super.onResume();
     }
-	
 	
 	
 	// Set different Fragments Here
@@ -402,28 +425,7 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 		edit.putString("to_time", time);
 		edit.commit();
 	}
-    /*
-	public void showTimePickerDialog(View v) {
-	    DialogFragment newFragment = new TimePickerFragment();
-	    newFragment.show(getSupportFragmentManager(), "timePicker");
-	}
-    
-	public void showDatePickerDialog(View v) {
-	    DialogFragment newFragment = new DatePickerFragment();
-	    newFragment.show(getSupportFragmentManager(), "datePicker");
-	}
-	
-	public void showTimePickerDialog2(View v) {
-	    DialogFragment newFragment = new TimePickerFragment2();
-	    newFragment.show(getSupportFragmentManager(), "timePicker");
-	}
-    
-	public void showDatePickerDialog2(View v) {
-	    DialogFragment newFragment = new DatePickerFragment2();
-	    newFragment.show(getSupportFragmentManager(), "datePicker");
-	}
-	
-    */
+
     public void addItemOnSpinner2() {
     	User usero = db.getUser();
     	if (usero == null) {
@@ -478,9 +480,20 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 			Editor edit = pref.edit();
 			edit.putString("user", s_username);
 			edit.commit();
-			create_alert(this, "LogIn Successful");
+			create_alert(this, "LogIn Successful"); 
+			try {
 			((Activity) this).setContentView(R.layout.map_main);
-	      
+			} catch (Exception e) {
+				alert.create_alert("One", "First try failed");
+				try {
+					alert.create_alert("Two", "Second try failed");
+					this.setContentView(R.layout.map_main);
+				} catch (Exception f) {
+					
+				}
+			}
+			setUpMapAfterLogin();
+	        /*
 	        mNavigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager()
 					.findFragmentById(R.id.navigation_drawer);
 	    	DrawerLayout m = (DrawerLayout)findViewById(R.id.drawer_layout);
@@ -491,7 +504,7 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 			setUpFragments();
 			mVisible = mMapFragment;
 			mTitle = getString(R.string.title_map);
-	        
+	        */
 	       // setContentView(new MovingImage(this));
 
 		}
@@ -683,11 +696,18 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 		// as you specify a parent activity in AndroidManifest.xml.
     	int id = item.getItemId();
          if (id == R.id.signout) {
+        	listener.setRunning(false);
             boolean sts = http_console.Logout();
             if (sts == true){
+            	session = false;
             	db.deleteDatabses();
             	setContentView(R.layout.activity_main);
+            	finish();
+            	System.exit(0);	
             } else { 
+            	// restart client if signout failed
+            	listener.setRunning(true);
+            	listener.start();
             	alert.create_alert("Error","Signout Failed. Try again later");
             }
             return true;
@@ -724,186 +744,7 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
         	  return super.onOptionsItemSelected(item);
           }
     }
-/*
-    
-    public static class OrganizeEventFragment extends Fragment {
-    	public static final String TAG = "organizeEvent";   
-    	private HTTPConsole http_console;
-    	public Context ctx; 
-    	private AutoCompleteTextView actv;
-    	private List<FriendClass> my_friends;
-    	private DatabaseHandler db;
-    	private String user;
-        
-        List<String> pickedFriends = new ArrayList<String>();
-        String room = null;
-        
-    	
-    	// Constructor of organizeEvent
-    	public OrganizeEventFragment() {
-    		super();
-    	}
-    	
-		public static OrganizeEventFragment newInstance(Context ctx) {
-			OrganizeEventFragment fragment = new OrganizeEventFragment();
-			fragment.ctx = ctx;
-			return fragment;
-		}
-    	
-		public View onCreateView(LayoutInflater inflater, ViewGroup container,
-				Bundle savedInstanceState) {
-			super.onCreateView(inflater, container, savedInstanceState);
-			View rootView = inflater.inflate(R.layout.event_organizer, container,
-					false);
-			
-			//Button addfriendbutton = (Button) rootView.findViewById(R.id.imageButton1);
-			
-			http_console = new HTTPConsole(ctx); 
-			actv = (AutoCompleteTextView) rootView.findViewById(R.id.editText2);
-			
-		    db = new DatabaseHandler(ctx);
-			User u = db.getUser();
-			db.Close();
-			if (u == null) { 
-				System.err.println("Error getting user");
-			}
-			user = u.getEmail();
-			my_friends = http_console.GetFriend(user);
-			int num_friends = my_friends.size();
-			
-		    String names[] = new String[num_friends];
-		    int i = 0; 
-		    for (i = 0; i < num_friends; i++){
-		    	FriendClass fr = my_friends.get(i);
-		    	names[i] = fr.getFirst_name() + " " + fr.getLast_name();
-		    }
-		    ArrayAdapter<String> adapter = new ArrayAdapter<String>(ctx,android.R.layout.simple_list_item_1,names);
-		    
-		    actv.setAdapter(adapter);
-		    final View frv = rootView;
-		    
-		    Spinner locType = (Spinner) rootView.findViewById(R.id.spinner3);
-		    locType.setOnItemSelectedListener(new OnItemSelectedListener() {
-		        @Override
-		        public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-		            String type = parentView.getItemAtPosition(position).toString();
-		            List<ResourceClass> rsc = http_console.getResources(type);
-		            int size = 0;
-		            if (rsc != null) {
-		            	size = rsc.size();
-		            }
-		            String rooms[] = new String[size];
-		            int j = 0; 
-		            for (j = 0; j < size; j++) {
-		            	rooms[j] = rsc.get(j).getResource();
-		            }
-		            Spinner locList = (Spinner) frv.findViewById(R.id.spinner4);
-		            ArrayAdapter<String> adapter = new ArrayAdapter<String>(ctx,android.R.layout.simple_list_item_1,rooms);
-		            locList.setAdapter(adapter);
-		        }
 
-		        @Override
-		        public void onNothingSelected(AdapterView<?> parentView) {
-		            // your code here
-		        }
-
-		    });
-		    
-		    final Context fctx = ctx; 
-		    Spinner locList = (Spinner) rootView.findViewById(R.id.spinner4);
-		    locList.setOnItemSelectedListener(new OnItemSelectedListener() {
-		        @Override
-		        public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-		            String room = parentView.getItemAtPosition(position).toString();
-		            SharedPreferences pref = fctx.getSharedPreferences("Event",MODE_PRIVATE);
-		            Editor edit = pref.edit();
-		            edit.putString("room", room);
-		            edit.commit();
-		            
-		        }
-
-		        @Override
-		        public void onNothingSelected(AdapterView<?> parentView) {
-		            // your code here
-		        }
-
-		    });
-		    
-		    Button btn = (Button) rootView.findViewById(R.id.submitButton);
-		    CreateAlert alerts = new CreateAlert(ctx);
-		    final CreateAlert alert = alerts;
-		    final View frvbtn = rootView;
-		    btn.setOnClickListener(new View.OnClickListener()
-			{
-	             @Override
-	             public void onClick(View v)
-	             {
-	            	 try {
-	 					String from_date = ((Button) frvbtn.findViewById(R.id.datepickButton)).getText().toString();
-	 					String to_date = ((Button) frvbtn.findViewById(R.id.datepickButton2)).getText().toString();
-	 					String from_time = ((Button) frvbtn.findViewById(R.id.timepickButton)).getText().toString();
-	 					String to_time = ((Button) frvbtn.findViewById(R.id.timepickButton2)).getText().toString();
-	 					String event_name = ((EditText) frvbtn.findViewById(R.id.editText1)).getText().toString();
-	 					String friendsStr = "";
-	 					for(int i = 0; i < pickedFriends.size(); i++) {
-	 						if (i != 0) {
-	 							friendsStr += ";";
-	 						}
-	 						FriendClass fr = db.getFriendFromName(pickedFriends.get(i));
-	 						if (fr != null)
-	 							friendsStr+= fr.getEmail();
-	 					}
-	 					Spinner spinner4 = (Spinner) frvbtn.findViewById(R.id.spinner4); 
-	 					if (spinner4 == null) {
-	 						alert.create_alert("Error", "Cant find sponner");
-	 					}
-	 					if (spinner4.getSelectedItem() == null) {
-
-	 						alert.create_alert("Error", "nothing selected");
-	 			            SharedPreferences pref = fctx.getSharedPreferences("Event",MODE_PRIVATE);
-	 			            room = pref.getString("room", "Can't Find room");
-	 					}
-	 					else {
-	 						room = spinner4.getSelectedItem().toString();
-	 					}
-	 					System.out.println(from_date);
-	 					System.out.println(to_date);
-	 					System.out.println(from_time);
-	 					System.out.println(to_time);
-	 					System.out.println(event_name);
-	 					System.out.println(friendsStr);
-	 					System.out.println(room);
-	 					//return http_console.CreateEventRequest(friendsStr, from_time, to_time, room, event_name, from_date, to_date);
-	 				} catch (Exception e) {
-	 					e.printStackTrace();
-	 					alert.create_alert("Error", "You need to input all fields");
-	 				}
-	             } 
-			}); 
-		    
-			ImageButton autoBtn = (ImageButton) frv.findViewById(R.id.imageButton1);
-			autoBtn.setOnClickListener(new View.OnClickListener()
-			{
-	             @Override
-	             public void onClick(View v)
-	             {
-	            	AutoCompleteTextView actv = (AutoCompleteTextView) frv.findViewById(R.id.editText2);
-	 				pickedFriends.add(actv.getText().toString());
-	 				System.out.println("Add" + actv.getText().toString() + " mlkdasmd");
-	 				return ;
-	             } 
-			}); 
-		    
-			return rootView;
-		}
-		
-		@Override
-		public void onAttach(Activity activity) {
-			super.onAttach(activity);
-		}
-		
-    }
-*/
     public static class SetUpOfficeHoursFragment extends Fragment {
     	public static final String TAG = "Office Hours";
     	
@@ -934,7 +775,6 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
         ft.setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
         if (fragmentIn == mMapFragment && map!=null){
         	map.setMyLocationEnabled(true);
-        	
         	start_process();
         }
         if (mVisible != null) {
@@ -1417,10 +1257,11 @@ public void start_process(){
 
 		registerReceiver(receiver, new IntentFilter(
 		WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
-		if (wifiManager != null){
-			boolean wifi = wifiManager.startScan();
-			System.out.println("DEBUG: GETTING WIFI SIGNALS:" + wifi);
-		}
+		boolean wifi = false; 
+		if (wifiManager != null)
+			wifiManager = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
+		wifi = wifiManager.startScan();
+		System.out.println("DEBUG: GETTING WIFI SIGNALS:" + wifi);
 	counter=1;
 
 	
@@ -1442,7 +1283,8 @@ public void start_process(){
 		rotationmatrix_sim[ii]=-1000;
 	}
 	pressure_sim=1000;		
-	
+	if (localizationcore == null) 
+		localizationcore = new LocalizationCore();
 	localizationcore.initialize();
 	start=true;
 	Load_RadioMap();
@@ -1590,6 +1432,9 @@ public void SetMyLocation(float latitude,float longitude,int floor,float accurac
 
   mylocation.push_location(latitude, longitude, 0f, accuracy, bearing);
 
+  if (session == false) {
+	  return;
+  }
   User cu = db.getUser();
   if (cu != null) {   
 	  Location loc = new Location();
@@ -1665,6 +1510,14 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
   */
  
  loadPref();
+}
+
+@Override
+public boolean onKeyDown(int keyCode, KeyEvent event) {
+	if ((keyCode == KeyEvent.KEYCODE_BACK)) {
+		moveTaskToBack(true);
+	} 
+	return super.onKeyDown(keyCode, event);
 }
 
 

@@ -138,6 +138,8 @@ public class OrganizeEventFragment extends Fragment implements DateInterface{
              {
             	AutoCompleteTextView actv = (AutoCompleteTextView) frv.findViewById(R.id.editText2);
  				pickedFriends.add(actv.getText().toString());
+ 				actv.setText("");
+ 				actv.setHint("Invite Friends");
  				System.out.println("Add" + actv.getText().toString() + " mlkdasmd");
  				return ;
              } 

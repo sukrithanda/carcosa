@@ -11,9 +11,7 @@ public class ServerBroadcastReceiver extends WakefulBroadcastReceiver{
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		// TODO Auto-generated method stub
-		// Explicitly specify that GcmMessageHandler will handle the intent.
-        Log.i("Sidd","Atleast it comes here");
+        Log.i("Sidd","Create the message handler service");
         ComponentName comp = new ComponentName(context.getPackageName(),
                 MessageHandler.class.getName());
         // Start the service, keeping the device awake while it is launching.

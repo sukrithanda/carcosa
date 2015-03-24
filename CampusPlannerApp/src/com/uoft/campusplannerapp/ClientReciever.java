@@ -8,6 +8,7 @@ public class ClientReciever extends Thread{
      User u;
      HTTPConsole http_console;
      List<FriendClass> friend_list;
+     boolean running = true;
      
     public ClientReciever(DatabaseHandler db, User u, HTTPConsole http_console,List<FriendClass> friend_list){
     	this.db = db;
@@ -18,6 +19,11 @@ public class ClientReciever extends Thread{
     	//	friends = http_console.GetFriend(u.getEmail());
 	//	}
     }
+    
+    public void setRunning(boolean sts) {
+    	System.out.println("Set running " + sts);
+    	running = sts;
+    }
 
     public void run(){
     	long timeToSleep = 10000;
@@ -25,12 +31,13 @@ public class ClientReciever extends Thread{
         boolean interrupted = false;
        
         
-        while(true){
+        while(running){
+        	System.out.println("Running is " + running);
         	timeToSleep = 10000;
         	while(timeToSleep > 0){
         		start=System.currentTimeMillis();
         		try{
-        			if (friend_list.isEmpty() || friend_list == null){
+        			if (friend_list == null || friend_list.isEmpty()){
         				break;
         			}
         			//TODO: need to perform get call here to retrieve the updated locations
@@ -41,6 +48,7 @@ public class ClientReciever extends Thread{
         			    http_console.GetFriend(element.getEmail());
         			}
         			Thread.sleep(timeToSleep);
+        			timeToSleep = 0;
         			break;
         		}
         		catch(InterruptedException e){
