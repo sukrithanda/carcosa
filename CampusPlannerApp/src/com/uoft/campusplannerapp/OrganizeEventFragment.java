@@ -18,6 +18,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.AdapterView.OnItemSelectedListener;
 import com.uoft.campusplannerapp.DatePickerFragment;
@@ -79,6 +80,7 @@ public class OrganizeEventFragment extends Fragment implements DateInterface{
 	    actv.setAdapter(adapter);
 	    
 	    /*Setup On clicks */ 
+	    //setupListView(rootView);
 	    setupLocationTypeOnClick(rootView);
 	    setupAutoBtnOnClick(rootView);
 	    setupSubmitButtonOnClick(rootView);
@@ -88,6 +90,7 @@ public class OrganizeEventFragment extends Fragment implements DateInterface{
 	    setupTime1OnClick(rootView);
 	    setupTime2OnClick(rootView);
 	    setupClearBtnOnClick(rootView);
+
 
 		return rootView;
 	}
@@ -131,6 +134,7 @@ public class OrganizeEventFragment extends Fragment implements DateInterface{
 	private void setupAutoBtnOnClick(View rootView) {
 		final View frv = rootView;
 		ImageButton autoBtn = (ImageButton) frv.findViewById(R.id.imageButton1);
+
 		autoBtn.setOnClickListener(new View.OnClickListener()
 		{
              @Override
@@ -138,11 +142,27 @@ public class OrganizeEventFragment extends Fragment implements DateInterface{
              {
             	AutoCompleteTextView actv = (AutoCompleteTextView) frv.findViewById(R.id.editText2);
  				pickedFriends.add(actv.getText().toString());
+ 				//ListView lv = (ListView) v.findViewById(R.id.listView1);
+ 				//ArrayAdapter<String> Adpter = new ArrayAdapter<String>(ctx, android.R.layout.simple_list_item_1, pickedFriends);
+ 				//lv.setAdapter(Adpter);
+ 				updateListView(frv);
  				System.out.println("Add" + actv.getText().toString() + " mlkdasmd");
  				return ;
              } 
 		}); 
 	    
+	}
+	
+	private void updateListView(View rootView) {
+		System.out.println("Updated list view");
+		for (String s: pickedFriends)
+		{
+			System.out.println("Friends are: " + s);
+		}
+		ListView lv = (ListView) rootView.findViewById(R.id.friendListView1);
+		ArrayAdapter<String> Adpter = new ArrayAdapter<String>(ctx, android.R.layout.simple_list_item_1, pickedFriends);
+		lv.setAdapter(Adpter);
+		
 	}
 	
 	private void setupClearBtnOnClick(View rootView) {
@@ -303,6 +323,7 @@ public class OrganizeEventFragment extends Fragment implements DateInterface{
             } 
 		}); 
 	}
+	
 
 
 

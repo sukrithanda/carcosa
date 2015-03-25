@@ -113,6 +113,7 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 	public Fragment mSetUpOfficeHoursFragment;
 	public Fragment mPrivacyFragment;
 	public Fragment mResourceFragment;
+	public Fragment mDisplayEventsFragment;
 
 	public static GoogleMap map;
 	
@@ -322,6 +323,10 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 					mPrivacyFragment.onResume();
 					mTitle = getString(R.string.title_privacySettings);
 					break;
+				case 6:
+					showFragment(mDisplayEventsFragment);
+					mTitle = getString(R.string.title_displayEvents);
+					break;
 			}
 		}
 	
@@ -347,6 +352,8 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 			case 6:
 				mTitle = getString(R.string.title_privacySettings);
 				break;
+			case 7:
+				mTitle = getString(R.string.title_displayEvents);
 			}
 		}	
 		
@@ -1065,6 +1072,15 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
         	ft.add(R.id.container, mPrivacyFragment, PrivacyFragment.TAG);
         }
         ft.hide(mPrivacyFragment);
+        
+        mDisplayEventsFragment = (DisplayEventsFragment) getSupportFragmentManager().findFragmentByTag(DisplayEventsFragment.TAG);
+        if (mDisplayEventsFragment == null) 
+        {
+        	mDisplayEventsFragment = DisplayEventsFragment.newInstance(this);
+        	ft.add(R.id.container, mDisplayEventsFragment, DisplayEventsFragment.TAG);
+        }
+        ft.hide(mDisplayEventsFragment);
+        
  
         ft.commit();
 
