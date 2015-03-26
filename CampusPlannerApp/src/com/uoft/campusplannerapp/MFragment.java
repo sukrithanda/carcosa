@@ -30,6 +30,8 @@ public class MFragment extends SupportMapFragment {
 	
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
+		System.out.println("DEBUG: MFRAGMENT ONCREATE");
+
 		super.onCreateView(inflater, container, savedInstanceState);
 		View rootView = inflater.inflate(R.layout.fragment_map, container,
 				false);

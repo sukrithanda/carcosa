@@ -63,6 +63,7 @@ import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.uoft.campusplannerapp.CurrentLocationProvider;
 import com.uoft.campusplannerapp.LocalizationCore;
@@ -115,6 +116,8 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 	private boolean reload_needed = false;
 	
     ArrayList<MarkerFloorPairs> markers = new ArrayList<MarkerFloorPairs>();
+    ArrayList<PolyLineFloorPairs> pathlines = new ArrayList<PolyLineFloorPairs>();
+
 
 
 	
@@ -228,12 +231,11 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 		// Set up the drawer.
 		mNavigationDrawerFragment.setUp(R.id.navigation_drawer,m);
 
-		setUpFragments();
-		showFragment(mMapFragment);
+	
 		//mTitle = getString(R.string.title_map);
 		
 		//LOCALIZATION CODE - START
-		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+		//getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 	
 		
 		localizationcore = new LocalizationCore();
@@ -253,10 +255,17 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 		params_sim[0]=1;
 		params_sim[1]=1;
 		loadPref();
-	    listener = new ClientReciever(db, u, http_console, friend_list);
-		if(autostart_enable)
+	   // listener = new ClientReciever(db, u, http_console, friend_list);
+		if(autostart_enable){
 			start_process();
-			listener.start();
+		//	listener.start();
+			showFragment(mMapFragment);
+		}
+		else{
+			setUpFragments();
+			showFragment(mMapFragment);
+		}
+
     }
 
     @Override
@@ -850,45 +859,100 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 		 stop_process();
 	      int size = m.size();
 			System.out.println("DEBUG - IN SHOW PATH");
-		ArrayList<LatLng> points = new ArrayList<LatLng>();
+		ArrayList<Location> points = new ArrayList<Location>();
+		//ArrayList<Integer> fl = new ArrayList<Integer>();
+
 		
 		//grab all the points and draw a marker at the end
+		double oldlat = 43.659652988335878;
+		double newlat =  43.659658;
+				
+		float difflat = (float) (newlat - oldlat);
+		float difflong = (float)(-79.397276867154886 - -79.397435);
+		LatLng endLocation = null;
+		
 		for (i = 0; i < size; i++) {
       	  Location l = m.get(i).getLoc();
-      	  LatLng pinLocation = new LatLng(l.getLatitude(), l.getLongitude());
-      	  points.add(pinLocation);
-      	  if (i == size-1){
+      	  String g = m.get(i).getResource();
+		  LatLng pinLocation = new LatLng(l.getLatitude() + difflat, l.getLongitude() + difflong);
+
+      	  	if (m.get(i).getType().equals("Corridor") || m.get(i).getType().equals("Elevator") || m.get(i).getType().equals("Stairs")  ){
+      		  	points.add(l);
+      		  	//fl.add(m.get(i).getLoc().getFloor());
+      			if (m.get(i).getType().equals("Elevator") || m.get(i).getType().equals("Stairs")){
+      	  	    	 Marker storeMarker = map.addMarker(new MarkerOptions()
+      	  	      	.position(pinLocation)
+      	  	      	.title("Please go Down or Up")
+      	  	      	.snippet("Stair or Corridor"));  
+      	  	    	 MarkerFloorPairs x =  new MarkerFloorPairs(storeMarker, m.get(i).getLoc().getFloor() , "NO EMAIL");
+      	  	    	 markers.add(x);
+      	      	  }
+      	  	}
+      	  	if (i == size-1){
+    		 endLocation = new LatLng(l.getLatitude() + difflat, l.getLongitude() + difflong);
+
   	    	 Marker storeMarker = map.addMarker(new MarkerOptions()
-  	      	.position(pinLocation)
-  	      	.title(l.getBldg())
+  	      	.position(endLocation)
+  	      	.title(g)
   	      	.snippet("End Destination"));  
+  	    	 
+  	    	MarkerFloorPairs x =  new MarkerFloorPairs(storeMarker, m.get(i).getLoc().getFloor() , "NO EMAIL");
+	  	    	 markers.add(x);
       	  }
-      
       	  
          }
+		
+		 LatLng currentloc = new LatLng(geolocation_sim[0],geolocation_sim[1]);
+		 Marker storeMarker = map.addMarker(new MarkerOptions()
+	      	.position(currentloc)
+	      	.title("Starting Location")
+	      	.snippet("User is here")); 
+		 MarkerFloorPairs x =  new MarkerFloorPairs(storeMarker, m.get(0).getLoc().getFloor() , "NO EMAIL");
+	    	 markers.add(x);
+		 
+		
 		//draw the lines in between the markers!
 		int p;
-		for (p = 0; p < points.size(); p++){
-			  if (p < points.size() - 2){  
-		  	     	 map.addPolyline((new PolylineOptions())
-						.add(points.get(p), points.get(p+1)).width(5).color(Color.BLUE)
+		if (points.size() > 1){
+   		  LatLng o = new LatLng(points.get(0).getLatitude() + difflat, points.get(0).getLongitude() + difflong);
+
+	     	  Polyline line = map.addPolyline((new PolylineOptions())
+					.add(currentloc, o).width(7).color(Color.BLUE)
+					.geodesic(true));
+	     	  
+	     	 PolyLineFloorPairs b = new PolyLineFloorPairs(line,points.get(0).getFloor());
+	     	  pathlines.add(b);
+	     	  
+	     	  
+	     	  
+			for (p = 0; p < points.size() - 1; p++){
+				
+				if(points.get(p).getFloor() == points.get(p+1).getFloor()){
+		   		  LatLng plusone = new LatLng(points.get(p).getLatitude() + difflat, points.get(p).getLongitude() + difflong);
+		   		  LatLng o1 = new LatLng(points.get(p+1).getLatitude() + difflat, points.get(p+1).getLongitude() + difflong);
+
+		   		  line = map.addPolyline((new PolylineOptions())
+						.add(o1, plusone).width(7).color(Color.BLUE)
 						.geodesic(true));
-		      	 }
+				
+				 b = new PolyLineFloorPairs(line, points.get(p).getFloor() );
+		     	  pathlines.add(b);
+				}
+		      	 
+			}
+		}else{
+			 Polyline line = map.addPolyline((new PolylineOptions())
+						.add(currentloc, endLocation) .width(5).color(Color.BLUE)
+						.geodesic(true));
+			 PolyLineFloorPairs b = new PolyLineFloorPairs(line, load_floor );
+	     	  pathlines.add(b);
 		}
 		System.out.println("DEBUG - DONE DRAWING MARKERS");
 
 	    
   	    mMapFragment.isResumed();
-		showFragment(mMapFragment, 4);
+		showFragment(mMapFragment, m.get(0).getLoc().getFloor() );
 		System.out.println("DEBUG - MAP SHOULD OPEN");
-
-		
-		
-		/*map
-		.addPolyline((new PolylineOptions())
-				.add(new LatLng(latitude, longitude), new LatLng(geolocation_sim[0],geolocation_sim[1])).width(5).color(Color.BLUE)
-				.geodesic(true));
-		showFragment(mMapFragment);*/
 
         		  
     }
@@ -983,10 +1047,7 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
     }
 	
 	 public void initilizeMap() {
-	      //  if (googleMap == null) {
-	        //    googleMap = ((MapFragment) getFragmentManager().findFragmentById(
-	       //             R.id.map)).getMap();
-         // check if map is created successfully or not
+	      
 		 if (map == null) {
              Toast.makeText(getApplicationContext(),
                      "Sorry! unable to create maps", Toast.LENGTH_SHORT)
@@ -1036,10 +1097,10 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 				break;
 	  		}  
 	  		
-	  		  groundOverlay=map.addGroundOverlay(new GroundOverlayOptions().image(floor).transparency(0.01f).anchor(0.5f, 0.5f)
+	  		 groundOverlay=map.addGroundOverlay(new GroundOverlayOptions().image(floor).transparency(0.01f).anchor(0.5f, 0.5f)
 	  		        .position(new LatLng(43.659652988335878, -79.397276867154886), 100f, 121f).bearing(-17.89f));
 
-	  		
+	  	
 	  		  mylocation=new CurrentLocationProvider(this);
 	  		  map.setLocationSource(mylocation);
 	  	
@@ -1309,9 +1370,9 @@ public void start_process(){
 
 	if (map != null){
 		map.setMyLocationEnabled(true);
-	changefloor((int)geolocation_sim[2]);
+		changefloor((int)geolocation_sim[2]);
 	}
-	}
+}
 }
 
 public void stop_process(){
@@ -1514,6 +1575,15 @@ public void hidemarkers(int floor){
 		}
 		else{
 			markers.get(i).getMarker().setVisible(false);
+		}
+	}
+	
+	for (int j = 0; j < pathlines.size(); j++) {
+		if (pathlines.get(j).getFloor() == floor){
+			pathlines.get(j).getLine().setVisible(true);
+		}
+		else{
+			pathlines.get(j).getLine().setVisible(false);
 		}
 	}
 	

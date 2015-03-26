@@ -53,7 +53,7 @@ public class FriendsFragment extends Fragment {
 	    //super.onCreate(savedInstanceState);
 	    http_console = new HTTPConsole(ctx);
 	    alert = new CreateAlert(ctx);
-	    get_friends(rootView);
+	  //  get_friends(rootView);
 	    Button button = (Button) rootView.findViewById(R.id.addfriendbtn);
 		button.setOnClickListener(new View.OnClickListener()
 		{

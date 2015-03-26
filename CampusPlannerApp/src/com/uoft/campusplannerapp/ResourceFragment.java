@@ -32,6 +32,8 @@ public class ResourceFragment extends Fragment{
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
+		System.out.println("DEBUG: RESOURCE ONCREATE");
+
 		http_console = new HTTPConsole(ctx);
 	    alert = new CreateAlert(ctx);
 		View rootView = inflater.inflate(R.layout.resource_layout, container,
@@ -82,9 +84,12 @@ public class ResourceFragment extends Fragment{
 //     	            	   path_s += path.get(i).getResource();
 //     	               }
 	     	         
-
+     	              for (int i = 0; i < 8; i ++){
+     	              	  x.hidemarkers(i);
+     	              }
      	              if (path !=null)
     	            	  x.showpath(path);
+     	             
 
      	           }
      	         });

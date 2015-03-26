@@ -251,11 +251,11 @@ public class HTTPConsole {
 		DatabaseHandler db = new DatabaseHandler(ctx);
 		User user = db.getUser();
 		Location loc = db.getLocationFromId(user.getUserId());
-		double lat = 43.659779,  longi = -79.397339;
-		String URL = GET_RESOURCES + "/" + type + "/" + lat + "/"+ longi + "/" + 4;
+	//	double lat = 43.659779,  longi = -79.397339;
+	//	String URL = GET_RESOURCES + "/" + type + "/" + lat + "/"+ longi + "/" + 4;
 		//System.out.println("get location for " + user.getUserId() +  " with lat = " + lat + " " +  longi);
-		//String URL = GET_RESOURCES + "/" + type + "/" + loc.getLatitude() + "/"+ loc.getLongitude() + "/" 
-		//		+ loc.getFloor();
+		String URL = GET_RESOURCES + "/" + type + "/" + loc.getLatitude() + "/"+ loc.getLongitude() + "/" 
+				+ loc.getFloor();
 		System.out.println(URL);
 		String ans = SendGetRequest(URL);
 		return GetResourcesFromString(ans);
@@ -267,10 +267,10 @@ public class HTTPConsole {
 		System.out.println("DEBUG - IN HTTPCONSOLE GET PATH");
 
 		Location loc = db.getLocationFromId(user.getUserId());
-		double lat = 43.659779,  longi = -79.397339;
-		String URL = GET_PATH + "/" + lat + "/"+ longi + "/" + 4 + "/"+ destination;
-		//String URL = GET_PATH + "/" +  loc.getLatitude() + "/"+ loc.getLongitude() + "/" + loc.getFloor() 
-		//		+ "/" + destination;
+		//double lat = 43.659779,  longi = -79.397339;
+		//String URL = GET_PATH + "/" + lat + "/"+ longi + "/" + 4 + "/"+ destination;
+		String URL = GET_PATH + "/" +  loc.getLatitude() + "/"+ loc.getLongitude() + "/" + loc.getFloor() 
+				+ "/" + destination;
 		System.out.println(URL);
 		System.out.println("DEBUG - SENDING GET REQUEST");
 

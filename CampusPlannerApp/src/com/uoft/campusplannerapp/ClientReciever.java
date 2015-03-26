@@ -33,7 +33,7 @@ public class ClientReciever extends Thread{
         
         while(running){
         	System.out.println("Running is " + running);
-        	timeToSleep = 10000;
+        	timeToSleep = 20000;
         	while(timeToSleep > 0){
         		start=System.currentTimeMillis();
         		try{
