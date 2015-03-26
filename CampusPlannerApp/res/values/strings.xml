@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <string name="app_name">UPlan</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
@@ -19,7 +20,8 @@
     <string name="friend_list">Your Friends</string>
     <string name="add_friend">Add Friend</string>
     <string name="register_message">Register your Account</string>
-     <string name="event_prompt">Choose an event</string>
+    <string name="event_list">Your Events</string>
+    <string name="event_prompt">Choose an event</string>
     <string name="create_meeting">Create an event</string>
     <string name="eventType">Event Type</string>
     <string name="from">From</string>
@@ -37,15 +39,14 @@
     <string name="Creator">Creator: </string>
     <string name="Location">Location: </string>
     <string name="Invitees">Invitees: </string>
-    
+
     <string-array name="eventType_array">
         <item>Office Hours</item>
         <item>Group Study</item>
         <item>Computer Lab</item>
     </string-array>
-    
-    <string name="title_map">Map</string>
 
+    <string name="title_map">Map</string>
     <string name="title_chat">Chat</string>
     <string name="title_OrganizeEvent">Organize Event</string>
     <string name="title_friends">Friends</string>
@@ -54,16 +55,15 @@
     <string name="title_resources">Resources</string>
     <string name="title_privacySettings">Privacy Settings</string>
     <string name="title_event_invite">Event Invite</string>
+    <string name="title_displayEvents">All Events</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="action_example">Example action</string>   
-    
+    <string name="action_example">Example action</string>
     <string name="Test">TestEx</string>
     <string name="pick_time">Select Time</string>
     <string name="title_activity_time_pick">TimePickActivity</string>
     <string name="title_activity_time_pickr">TimePickrActivity</string>
     <string name="pick_date">Select a date</string>
-    
     <string name="menu_up">Floor Up</string>
     <string name="menu_down">Floor Down</string>
     <string name="menu_start">Start</string>
@@ -74,6 +74,7 @@
     <string name="locationSharing">Location Sharing</string>
     <string name="locationType">Location Type</string>
     <string name="locationList">Location List</string>
+
     <string-array name="resourceType">
         <item>Lab</item>
         <item>TutorialRoom</item>
@@ -86,4 +87,7 @@
         <item>MeetingRoom</item>
         <item>Cafeteria</item>
     </string-array>
+
+    <string name="title_activity_display_event">DisplayEventActivity</string>
+
 </resources>
