@@ -251,10 +251,11 @@ public class HTTPConsole {
 		DatabaseHandler db = new DatabaseHandler(ctx);
 		User user = db.getUser();
 		Location loc = db.getLocationFromId(user.getUserId());
-		//double lat = 43.659779,  longi = -79.397339;
+		double lat = 43.659779,  longi = -79.397339;
+		String URL = GET_RESOURCES + "/" + type + "/" + lat + "/"+ longi + "/" + 4;
 		//System.out.println("get location for " + user.getUserId() +  " with lat = " + lat + " " +  longi);
-		String URL = GET_RESOURCES + "/" + type + "/" + loc.getLatitude() + "/"+ loc.getLongitude() + "/" 
-				+ loc.getFloor();
+		//String URL = GET_RESOURCES + "/" + type + "/" + loc.getLatitude() + "/"+ loc.getLongitude() + "/" 
+		//		+ loc.getFloor();
 		System.out.println(URL);
 		String ans = SendGetRequest(URL);
 		return GetResourcesFromString(ans);
@@ -263,11 +264,19 @@ public class HTTPConsole {
 	public List<ResourceClass> getPath(String destination) {
 		DatabaseHandler db = new DatabaseHandler(ctx);
 		User user = db.getUser();
+		System.out.println("DEBUG - IN HTTPCONSOLE GET PATH");
+
 		Location loc = db.getLocationFromId(user.getUserId());
-		String URL = GET_PATH + "/" +  loc.getLatitude() + "/"+ loc.getLongitude() + "/" + loc.getFloor() 
-				+ "/" + destination;
+		double lat = 43.659779,  longi = -79.397339;
+		String URL = GET_PATH + "/" + lat + "/"+ longi + "/" + 4 + "/"+ destination;
+		//String URL = GET_PATH + "/" +  loc.getLatitude() + "/"+ loc.getLongitude() + "/" + loc.getFloor() 
+		//		+ "/" + destination;
 		System.out.println(URL);
+		System.out.println("DEBUG - SENDING GET REQUEST");
+
 		String ans = SendGetRequest(URL);
+		System.out.println("DEBUG - REQUEST RETURNED");
+
 		return GetResourcesFromString(ans);
 	}
 	
@@ -375,7 +384,10 @@ public class HTTPConsole {
 	}
 	
 	public boolean DeleteEvent(long event_id) {
-		String URL = DELETE_EVENT + "?event_id=" + event_id;
+		DatabaseHandler db = new DatabaseHandler(ctx);
+		User user = db.getUser();
+		db.Close();
+		String URL = DELETE_EVENT + "?event_id=" + event_id + "&user=" + user.getUserId();
 		String ans = SendGetRequest(URL);
 		if (ans.equals("Invalid Request")){
 			return false;
@@ -439,7 +451,7 @@ public class HTTPConsole {
         		HttpClient client = new DefaultHttpClient();
         	    HttpGet request = new HttpGet(URL[0]);
         	    HttpResponse response;
-        	    String result = null;
+        	    String result = "Invalid Request";
         	    try {
         	        response = client.execute(request);
         	        Log.e("com.uoft.campusplannerapp", "Hi "+response.getStatusLine().toString());
@@ -465,6 +477,9 @@ public class HTTPConsole {
         	        e1.printStackTrace();
         	    } catch (IOException e1) {
         	        e1.printStackTrace();
+        	    } catch (Exception all) {
+        	    	all.printStackTrace();
+        	    	
         	    }
         	    return result;
 
@@ -519,6 +534,9 @@ public class HTTPConsole {
 			try {
 				JSONObject jsnobject = new JSONObject(jsonString);
 				JSONArray jsonArray = jsnobject.getJSONArray("friends");
+				if (null == jsonArray) {
+					return null;
+				}
 			    for (int i = 0; i < jsonArray.length(); i++) {
 			        JSONObject explrObject = jsonArray.getJSONObject(i);
 			        FriendClass temp = new FriendClass();

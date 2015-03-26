@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/notifTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="Helvetica"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textSize="28sp" />
+    
+	<View
+        android:id="@+id/padding10"
+        android:layout_width="wrap_content"
+        android:layout_height="10dip" />
+    
+    <TextView
+        android:id="@+id/notifMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="Helvetica"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textSize="20sp" />
+
+    <View
+        android:id="@+id/padding11"
+        android:layout_width="wrap_content"
+        android:layout_height="10dip" />
+    	
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_weight="2">
+        
+	    <Button
+	        android:id="@+id/positiveButton"
+	        style="?android:attr/borderlessButtonStyle"
+	        android:layout_width="0dip"
+	        android:layout_height="wrap_content"
+	        android:onClick="posituveButton"
+	        android:text="@string/No" 
+	        android:layout_weight="1"/>
+	
+	    <Button
+	        android:id="@+id/negativeButton"
+	        style="?android:attr/borderlessButtonStyle"
+	        android:layout_width="0dip"
+	        android:layout_height="wrap_content"
+	        android:onClick="negativeButton"
+	        android:text="@string/Yes" 
+	        android:layout_weight="1"/>
+        
+    </LinearLayout>
+
+</LinearLayout>

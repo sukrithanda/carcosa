@@ -2,9 +2,12 @@ package com.uoft.campusplannerapp;
 
 import java.util.Calendar;
 
+import com.google.android.gms.maps.SupportMapFragment;
+
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.widget.DatePicker;
@@ -12,7 +15,12 @@ import android.widget.DatePicker;
 public class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
 	
 	DateInterface i;
-	
+	OrganizeEventFragment ctx;
+	public static DatePickerFragment newInstance(OrganizeEventFragment ctx) {
+		DatePickerFragment fragment = new DatePickerFragment();
+		fragment.ctx = ctx;
+		return fragment;
+	}
 	 @Override
 	    public Dialog onCreateDialog(Bundle savedInstanceState) {
 	        // Use the current date as the default date in the picker
@@ -54,8 +62,8 @@ public class DatePickerFragment extends DialogFragment implements DatePickerDial
 	    	
 	    	System.out.println(date);
 	    	
-	    	i.updateDateButton(date);
-	    	
+	    	//i.updateDateButton(date);
+	    	ctx.updateDateButton(date);
 	    }
 	    
 

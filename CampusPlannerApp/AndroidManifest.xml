@@ -108,17 +108,25 @@
             android:name=".TimePickrActivity"
             android:label="@string/title_activity_time_pickr" >
         </activity>
+        
+        <activity
+            android:name=".DisplayEventActivity"
+            android:label="@string/title_activity_display_event" >
+		</activity>
+        
         <activity
             android:name=".PrefsActivity"
             android:screenOrientation="portrait" >
         </activity>
-        <activity
-            android:name=".ResponseActivity"
+         <activity
+            android:name="com.uoft.campusplannerapp.ResponseActivity"
             android:label="@string/title_event_invite" >
         </activity>
+
+        
         <activity
-            android:name=".DisplayEventActivity"
-            android:label="@string/title_activity_display_event" >
+            android:name="com.uoft.campusplannerapp.NotifActivity"
+            android:label="@string/title_event_invite" >
         </activity>
     </application>
 
