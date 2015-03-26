@@ -579,12 +579,8 @@ public class HTTPConsole {
 			        	temp.setCreator(false);
 			        }
 			        
-			        String response = explrObject.getString("response");
-			        if (response.equals("true")) {
-			        	temp.setResponse(true);
-			        } else {
-			        	temp.setResponse(false);
-			        }
+			        long response = explrObject.getLong("response");
+			        temp.setResponse(response);
 			        
 			        temp.setFrom_time(Float.parseFloat(explrObject.getString("from_time")));
 			        temp.setTo_time(Float.parseFloat(explrObject.getString("to_time")));
