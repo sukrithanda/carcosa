@@ -4,7 +4,7 @@ public class EventClass {
 	private long id; 
 	private long user; 
 	private boolean creator; 
-	private boolean response; 
+	private long response; 
 	private float from_time; 
 	private float to_time; 
 	private String location;
@@ -23,10 +23,10 @@ public class EventClass {
 	public void setFrom_time(float from_time) {
 		this.from_time = from_time;
 	}
-	public boolean isResponse() {
+	public long isResponse() {
 		return response;
 	}
-	public void setResponse(boolean response) {
+	public void setResponse(long response) {
 		this.response = response;
 	}
 	public boolean isCreator() {
