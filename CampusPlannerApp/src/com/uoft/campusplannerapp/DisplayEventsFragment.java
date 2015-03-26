@@ -1,5 +1,6 @@
 package com.uoft.campusplannerapp;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import android.support.v4.app.Fragment;
@@ -29,6 +30,9 @@ public class DisplayEventsFragment extends Fragment {
 	private String user; 
 	private List<EventClass> my_events;
 	private List<FriendClass> my_friends;
+	private ListView lv;
+	private ArrayAdapter<String> ev_adp;
+	private List<String> events_array;
 	View rv;
 
 	
@@ -76,18 +80,22 @@ public class DisplayEventsFragment extends Fragment {
 		my_events = http_console.GetEvents();
 		int num_events = my_events.size();
 		
-		ListView lv = (ListView) rootView.findViewById(R.id.eventlistview);
+		lv = (ListView) rootView.findViewById(R.id.eventlistview);
+		
+		events_array = new ArrayList<String>();
 		
 		// Array of event descriptors
-		String events[] = new String[num_events];
+		//events = new String[num_events];
 		int i = 0;
 		for(i = 0; i < num_events; i++)
 		{
 			EventClass ev = my_events.get(i);
-			events[i] = ev.getName() + " in " + ev.getLocation() + " at " + ev.getFrom_time();
+			String s = ev.getName() + " in " + ev.getLocation() + " at " + ev.getFrom_time();
+			System.out.println("String output is: " + s);
+			events_array.add(s);
 		}
 			
-		ArrayAdapter<String> ev_adp = new ArrayAdapter<String>(ctx,android.R.layout.simple_list_item_1,events);
+		ev_adp = new ArrayAdapter<String>(ctx,android.R.layout.simple_list_item_1,events_array);
 		lv.setAdapter(ev_adp);
 		
 		// onItemClick only allows final contexts
@@ -174,7 +182,7 @@ public class DisplayEventsFragment extends Fragment {
 	{
 		AlertDialog.Builder eventDialog = new AlertDialog.Builder(ctx);
 		TextView tv = (TextView) v;
-		String event = tv.getText().toString();
+		final String event = tv.getText().toString();
 		
 		eventDialog.setTitle("Delete Event?");
 		eventDialog.setMessage("Delete event: " + event + "?");
@@ -184,8 +192,22 @@ public class DisplayEventsFragment extends Fragment {
 			{
 				// TO DO:
 				// Add code to remove event!
-				//dialog.cancel();
-				
+				for(EventClass levents: my_events)
+				{
+					String s = levents.getName() + " in " + levents.getLocation() + " at " + levents.getFrom_time();
+					if(s.equals(event))
+					{
+						System.out.println("events "+event);
+						//my_events.get(indexOf(levents));
+						events_array.remove(s);
+						// Get id of event select
+						long dlt_ID = levents.getId();
+						System.out.println("Event id i want to delete is" + dlt_ID);
+						boolean deleted = http_console.DeleteEvent(dlt_ID);
+						
+					}
+				}
+				ev_adp.notifyDataSetChanged();
 			}
 		});
 		eventDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener()
