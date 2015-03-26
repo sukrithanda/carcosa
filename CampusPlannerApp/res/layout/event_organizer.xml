@@ -139,11 +139,23 @@
 	        android:hint="@string/FriendHint" >
 	    </AutoCompleteTextView>
 
+	    <ScrollView
+	        android:id="@+id/scrollView2"
+	        android:layout_width="fill_parent"
+  			android:layout_height="fill_parent"
+  			android:layout_below="@id/editText2">
+			<ListView
+			    android:id="@+id/friendListView1"
+			    android:layout_width="wrap_content"
+			    android:layout_height="wrap_content" >
+			    
+			</ListView>
+	    </ScrollView>
 	    <View
 	        android:id="@+id/padding6"
 	        android:layout_width="wrap_content"
 	        android:layout_height="10dip"
-	        android:layout_below="@id/editText2" />
+	        android:layout_below="@id/scrollView2" />
 	    
 	    <Spinner
 	        android:id="@+id/spinner3"
