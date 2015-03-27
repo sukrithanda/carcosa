@@ -857,6 +857,9 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 		
 		 int i;
 		 stop_process();
+		 
+		 markers.clear();
+		 pathlines.clear();
 	      int size = m.size();
 			System.out.println("DEBUG - IN SHOW PATH");
 		ArrayList<Location> points = new ArrayList<Location>();
@@ -875,20 +878,22 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
       	  Location l = m.get(i).getLoc();
       	  String g = m.get(i).getResource();
 		  LatLng pinLocation = new LatLng(l.getLatitude() + difflat, l.getLongitude() + difflong);
-
       	  	if (m.get(i).getType().equals("Corridor") || m.get(i).getType().equals("Elevator") || m.get(i).getType().equals("Stairs")  ){
-      		  	points.add(l);
-      		  	//fl.add(m.get(i).getLoc().getFloor());
-      			if (m.get(i).getType().equals("Elevator") || m.get(i).getType().equals("Stairs")){
-      	  	    	 Marker storeMarker = map.addMarker(new MarkerOptions()
-      	  	      	.position(pinLocation)
-      	  	      	.title("Please go Down or Up")
-      	  	      	.snippet("Stair or Corridor"));  
-      	  	    	 MarkerFloorPairs x =  new MarkerFloorPairs(storeMarker, m.get(i).getLoc().getFloor() , "NO EMAIL");
-      	  	    	 markers.add(x);
-      	      	  }
+    		  	points.add(l);
+
+      		  		if ( m.get(i).getLoc().getFloor() != m.get(i+1).getLoc().getFloor() && (m.get(i).getType().equals("Elevator") || m.get(i).getType().equals("Stairs"))  ){
+      	  	    		 Marker storeMarker = map.addMarker(new MarkerOptions()
+      	  	      		.position(pinLocation)
+      	  	      		.title("Please go Down or Up")
+      	  	      		.snippet("Stair or Elevator"));  
+      	  	    		 MarkerFloorPairs x =  new MarkerFloorPairs(storeMarker, m.get(i).getLoc().getFloor() , "NO EMAIL");
+      	  	    		 markers.add(x);
+      		  		}
+
       	  	}
       	  	if (i == size-1){
+    		  	points.add(l);
+
     		 endLocation = new LatLng(l.getLatitude() + difflat, l.getLongitude() + difflong);
 
   	    	 Marker storeMarker = map.addMarker(new MarkerOptions()
@@ -917,7 +922,7 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
    		  LatLng o = new LatLng(points.get(0).getLatitude() + difflat, points.get(0).getLongitude() + difflong);
 
 	     	  Polyline line = map.addPolyline((new PolylineOptions())
-					.add(currentloc, o).width(7).color(Color.BLUE)
+					.add(currentloc, o).width(10).color(Color.BLUE)
 					.geodesic(true));
 	     	  
 	     	 PolyLineFloorPairs b = new PolyLineFloorPairs(line,points.get(0).getFloor());
@@ -932,7 +937,7 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 		   		  LatLng o1 = new LatLng(points.get(p+1).getLatitude() + difflat, points.get(p+1).getLongitude() + difflong);
 
 		   		  line = map.addPolyline((new PolylineOptions())
-						.add(o1, plusone).width(7).color(Color.BLUE)
+						.add(o1, plusone).width(10).color(Color.BLUE)
 						.geodesic(true));
 				
 				 b = new PolyLineFloorPairs(line, points.get(p).getFloor() );
@@ -941,16 +946,19 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 		      	 
 			}
 		}else{
+	   		  LatLng plusone = new LatLng(points.get(points.size() - 2).getLatitude() + difflat, points.get(points.size() - 2).getLongitude() + difflong);
+
 			 Polyline line = map.addPolyline((new PolylineOptions())
-						.add(currentloc, endLocation) .width(5).color(Color.BLUE)
+						.add(plusone, endLocation) .width(10).color(Color.BLUE)
 						.geodesic(true));
-			 PolyLineFloorPairs b = new PolyLineFloorPairs(line, load_floor );
+			 PolyLineFloorPairs b = new PolyLineFloorPairs(line, points.get(points.size() - 1).getFloor()  );
 	     	  pathlines.add(b);
 		}
 		System.out.println("DEBUG - DONE DRAWING MARKERS");
 
 	    
   	    mMapFragment.isResumed();
+		hidemarkers(m.get(0).getLoc().getFloor() );
 		showFragment(mMapFragment, m.get(0).getLoc().getFloor() );
 		System.out.println("DEBUG - MAP SHOULD OPEN");
 
@@ -1370,7 +1378,7 @@ public void start_process(){
 
 	if (map != null){
 		map.setMyLocationEnabled(true);
-		changefloor((int)geolocation_sim[2]);
+	changefloor((int)geolocation_sim[2]);
 	}
 }
 }
