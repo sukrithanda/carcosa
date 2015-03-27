@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
@@ -53,6 +54,28 @@ public class HTTPConsole {
 	private final String GET_INVITEES = "http://104.236.85.199:8080/event/getInvitees";
 	private final String GET_RESOURCES = "http://104.236.85.199:9090/findResources";
 	private final String GET_PATH = "http://104.236.85.199:9090/path";
+	
+	static HashMap<String,String> resourceHash = new HashMap<String,String>();
+	
+	static {
+		resourceHash.put("Undergraduate Lab", "Lab");
+		resourceHash.put("Graduate Lab", "GradLab");
+		resourceHash.put("Lecture Room", "LectureRoom");
+		resourceHash.put("Meeting Room", "MeetingRoom");
+		resourceHash.put("Library", "Library");
+		resourceHash.put("Male", "WashroomMale");
+		resourceHash.put("Female", "WashroomFemale");
+		resourceHash.put("Family", "Washroom");
+		resourceHash.put("Study Area", "StudyArea");
+		resourceHash.put("Tutorial Rooms", "TutorialRoom");
+		resourceHash.put("Graduate Students Study Area", "GradStudentRoom");
+		resourceHash.put("Elevator", "Elevator");
+		resourceHash.put("Stairs", "Stairs");
+		resourceHash.put("Cafeteria", "Cafeteria");
+		resourceHash.put("Office", "Office");
+		resourceHash.put("Prayer Room", "PrayerRoom");
+		resourceHash.put("Exit", "Exit");
+	}
 
 	private Context ctx;
 	
@@ -246,16 +269,15 @@ public class HTTPConsole {
 		
 	}
 	
-
-	public List<ResourceClass> getResources(String type) {
+	public List<ResourceClass> getResources(String looseType) {
+		String type = resourceHash.get(looseType);
 		DatabaseHandler db = new DatabaseHandler(ctx);
 		User user = db.getUser();
 		Location loc = db.getLocationFromId(user.getUserId());
-	//	double lat = 43.659779,  longi = -79.397339;
-	//	String URL = GET_RESOURCES + "/" + type + "/" + lat + "/"+ longi + "/" + 4;
-		//System.out.println("get location for " + user.getUserId() +  " with lat = " + lat + " " +  longi);
-		String URL = GET_RESOURCES + "/" + type + "/" + loc.getLatitude() + "/"+ loc.getLongitude() + "/" 
-				+ loc.getFloor();
+		double lat = 43.659779,  longi = -79.397339;
+		String URL = GET_RESOURCES + "/" + type + "/" + lat + "/"+ longi + "/" + 4;
+//		String URL = GET_RESOURCES + "/" + type + "/" + loc.getLatitude() + "/"+ loc.getLongitude() + "/" 
+//				+ loc.getFloor();
 		System.out.println(URL);
 		String ans = SendGetRequest(URL);
 		return GetResourcesFromString(ans);
@@ -267,10 +289,10 @@ public class HTTPConsole {
 		System.out.println("DEBUG - IN HTTPCONSOLE GET PATH");
 
 		Location loc = db.getLocationFromId(user.getUserId());
-		//double lat = 43.659779,  longi = -79.397339;
-		//String URL = GET_PATH + "/" + lat + "/"+ longi + "/" + 4 + "/"+ destination;
-		String URL = GET_PATH + "/" +  loc.getLatitude() + "/"+ loc.getLongitude() + "/" + loc.getFloor() 
-				+ "/" + destination;
+		double lat = 43.659779,  longi = -79.397339;
+		String URL = GET_PATH + "/" + lat + "/"+ longi + "/" + 4 + "/"+ destination;
+//		String URL = GET_PATH + "/" +  loc.getLatitude() + "/"+ loc.getLongitude() + "/" + loc.getFloor() 
+//				+ "/" + destination;
 		System.out.println(URL);
 		System.out.println("DEBUG - SENDING GET REQUEST");
 
@@ -658,6 +680,7 @@ public class HTTPConsole {
 			        temp.setLoc(loctemp);
 			        temp.setResource(explrObject.getString("id"));
 			        temp.setType(explrObject.getString("type"));
+			        temp.setDescription(explrObject.getString("description"));
 			        resources.add(temp);
 			    }
 				return resources;

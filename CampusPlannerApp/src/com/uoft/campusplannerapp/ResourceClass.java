@@ -4,6 +4,7 @@ public class ResourceClass {
 	private String resource; 
 	private String type; 
 	private Location loc;
+	private String description;
 	public String getResource() {
 		return resource;
 	}
@@ -21,6 +22,12 @@ public class ResourceClass {
 	}
 	public void setLoc(Location loc) {
 		this.loc = loc;
+	}
+	public String getDescription() {
+		return description;
+	}
+	public void setDescription(String description) {
+		this.description = description;
 	} 
 	
 }

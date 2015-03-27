@@ -5,11 +5,40 @@
     android:orientation="vertical" 
     android:layout_weight="100">
 
+<!--     <EditText
+        android:id="@+id/resourceText1"
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:entries="@array/resourceType"
+        android:prompt="@string/resources" 
+        android:inputType="text"
+        android:layout_weight="10"/>
+
+    <Button 
+   	    android:id="@+id/findnameresourcebtnn"
+    	android:layout_width="wrap_content" 
+    	android:layout_height="0dip"
+        android:background="@drawable/loginbuttonshape"
+    	android:text="@string/find" 
+    	android:shadowColor="#000"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="5"
+        android:textColor="#FFFFFF"
+        android:layout_weight="10"/> -->
+   
+    <Spinner
+        android:id="@+id/resourceSpinnerMain"
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:entries="@array/resourceType"
+        android:prompt="@string/resources" 
+        android:layout_weight="15"/>
+    
     <Spinner
         android:id="@+id/resourceSpinner"
         android:layout_width="match_parent"
         android:layout_height="0dip"
-        android:entries="@array/resourceType"
         android:prompt="@string/resources" 
         android:layout_weight="15"/>
 
