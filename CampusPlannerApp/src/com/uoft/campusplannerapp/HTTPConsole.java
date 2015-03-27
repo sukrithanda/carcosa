@@ -109,11 +109,11 @@ public class HTTPConsole {
 		
 	}
 
-	private void InitializeLoc(){
-		DatabaseHandler db = new DatabaseHandler(ctx);
-		db.deleteLocations();
-		db.Close();
-	}
+//	private void InitializeLoc(){
+//		DatabaseHandler db = new DatabaseHandler(ctx);
+//		db.deleteLocations();
+//		db.Close();
+//	}
 	public String HelloWorld(){
 		return SendGetRequest(HELLO_WORLD);
 	}
@@ -173,7 +173,7 @@ public class HTTPConsole {
 	
 	public Location LocateFriend(String user_email,String friend_email) {
 		String URL = LOCATE_FRIEND + "?userEmail=" + user_email + "&friendEmail=" + friend_email;
-		InitializeLoc();
+//		InitializeLoc();
 		String result = SendGetRequest(URL);
 		return GetLocationFromString(result);
 	}
@@ -274,10 +274,10 @@ public class HTTPConsole {
 		DatabaseHandler db = new DatabaseHandler(ctx);
 		User user = db.getUser();
 		Location loc = db.getLocationFromId(user.getUserId());
-		double lat = 43.659779,  longi = -79.397339;
-		String URL = GET_RESOURCES + "/" + type + "/" + lat + "/"+ longi + "/" + 4;
-//		String URL = GET_RESOURCES + "/" + type + "/" + loc.getLatitude() + "/"+ loc.getLongitude() + "/" 
-//				+ loc.getFloor();
+//		double lat = 43.659779,  longi = -79.397339;
+//		String URL = GET_RESOURCES + "/" + type + "/" + lat + "/"+ longi + "/" + 4;
+		String URL = GET_RESOURCES + "/" + type + "/" + loc.getLatitude() + "/"+ loc.getLongitude() + "/" 
+				+ loc.getFloor();
 		System.out.println(URL);
 		String ans = SendGetRequest(URL);
 		return GetResourcesFromString(ans);
@@ -289,10 +289,10 @@ public class HTTPConsole {
 		System.out.println("DEBUG - IN HTTPCONSOLE GET PATH");
 
 		Location loc = db.getLocationFromId(user.getUserId());
-		double lat = 43.659779,  longi = -79.397339;
-		String URL = GET_PATH + "/" + lat + "/"+ longi + "/" + 4 + "/"+ destination;
-//		String URL = GET_PATH + "/" +  loc.getLatitude() + "/"+ loc.getLongitude() + "/" + loc.getFloor() 
-//				+ "/" + destination;
+//		double lat = 43.659779,  longi = -79.397339;
+//		String URL = GET_PATH + "/" + lat + "/"+ longi + "/" + 4 + "/"+ destination;
+		String URL = GET_PATH + "/" +  loc.getLatitude() + "/"+ loc.getLongitude() + "/" + loc.getFloor() 
+				+ "/" + destination;
 		System.out.println(URL);
 		System.out.println("DEBUG - SENDING GET REQUEST");
 
