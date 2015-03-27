@@ -88,60 +88,82 @@ public class ResourceFragment extends Fragment{
              @Override
              public void onClick(View v)
              {
-            	TextView lText = new TextView(ctx);
-    	        lText.setId(0); 
-    	        Spinner spinner = (Spinner)frv.findViewById(R.id.resourceSpinner);
-    	        String text = spinner.getSelectedItem().toString();
-         		List<ResourceClass> rsc = http_console.getResources(text);
-         		if (rsc == null) {
-         			alert.create_alert("Error", "No " + text + " found near you");
-         		}
-         		ListView lv = (ListView) frv.findViewById(R.id.resourcelistview);
-         		int num_resources = 0; 
-         		if (rsc != null)
-         			num_resources = rsc.size();
-     		    String names[] = new String[num_resources];
-     		    int i = 0; 
-     		    for (i = 0; i < num_resources; i++){
-     		    	ResourceClass fr = rsc.get(i);
-     		    	names[i] = fr.getResource();
-     		    }
-     		    final List<ResourceClass> f_rsc = rsc;
-     		    final Context f_ctx = ctx;
-     		    ArrayAdapter<String> fr_adp = new ArrayAdapter<String>(ctx,android.R.layout.simple_list_item_1,lText.getId(),names);
-     		    lv.setAdapter(fr_adp);
-     		    lv.setOnItemClickListener(new OnItemClickListener() {
-     	           public void onItemClick(AdapterView<?> parent, View view,
-     	               int position, long id) {
-     	               String room = parent.getItemAtPosition(position).toString();
-     	              
-     	               ResourceClass cur = null;
-     	               int i;
-     	               for (i = 0; i < f_rsc.size(); i++) {
-     	            	   cur = f_rsc.get(i);
-     	     			   if (room.equals(cur.getResource())) {
-     	     				   break;
-     	     			   }
-     	               }
-     	               if (null == cur) {
-     	            	   return;
-     	               }
-     	               List<ResourceClass> path = http_console.getPath(cur.getResource());
-     	               for (i = 0; i < 8; i ++){
-     	              	   x.hidemarkers(i);
-     	               }
-     	               if (path !=null) {
-     	            	   System.out.println(path.get(0).getResource());
-     	               }
-     	               locateOrRoute(f_ctx,cur,path);
-     	            
-     	           }
-     	         });
+            	 findResources(frv);
              } 
 		}); 
 		
+		Spinner second = (Spinner) rootView.findViewById(R.id.resourceSpinner);
+		second.setOnItemSelectedListener(new OnItemSelectedListener() {
+
+			@Override
+			public void onItemSelected(AdapterView<?> parent, View view,
+					int position, long id) {
+				findResources(frv);
+				
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> parent) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		
 		
 	    return rootView;
+	}
+	
+	private void findResources(View frv){
+		
+    	TextView lText = new TextView(ctx);
+        lText.setId(0); 
+        Spinner spinner = (Spinner)frv.findViewById(R.id.resourceSpinner);
+        String text = spinner.getSelectedItem().toString();
+ 		List<ResourceClass> rsc = http_console.getResources(text);
+ 		if (rsc == null) {
+ 			alert.create_alert("Error", "No " + text + " found near you");
+ 		}
+ 		ListView lv = (ListView) frv.findViewById(R.id.resourcelistview);
+ 		int num_resources = 0; 
+ 		if (rsc != null)
+ 			num_resources = rsc.size();
+		    String names[] = new String[num_resources];
+		    int i = 0; 
+		    for (i = 0; i < num_resources; i++){
+		    	ResourceClass fr = rsc.get(i);
+		    	names[i] = fr.getResource();
+		    }
+		    final List<ResourceClass> f_rsc = rsc;
+		    final Context f_ctx = ctx;
+		    ArrayAdapter<String> fr_adp = new ArrayAdapter<String>(ctx,android.R.layout.simple_list_item_1,lText.getId(),names);
+		    lv.setAdapter(fr_adp);
+		    lv.setOnItemClickListener(new OnItemClickListener() {
+	           public void onItemClick(AdapterView<?> parent, View view,
+	               int position, long id) {
+	               String room = parent.getItemAtPosition(position).toString();
+	              
+	               ResourceClass cur = null;
+	               int i;
+	               for (i = 0; i < f_rsc.size(); i++) {
+	            	   cur = f_rsc.get(i);
+	     			   if (room.equals(cur.getResource())) {
+	     				   break;
+	     			   }
+	               }
+	               if (null == cur) {
+	            	   return;
+	               }
+	               List<ResourceClass> path = http_console.getPath(cur.getResource());
+	               for (i = 0; i < 8; i ++){
+	              	   x.hidemarkers(i);
+	               }
+	               if (path !=null) {
+	            	   System.out.println(path.get(0).getResource());
+	               }
+	               locateOrRoute(f_ctx,cur,path);
+	            
+	           }
+	         });
 	}
 	
 	private void locateOrRoute(Context ctx,ResourceClass cur, List<ResourceClass> path){
