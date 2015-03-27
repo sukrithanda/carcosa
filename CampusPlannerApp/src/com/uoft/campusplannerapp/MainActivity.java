@@ -330,6 +330,8 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 			{
 				case 0:
 					showFragment(mMapFragment);
+					 markers.clear();
+					 pathlines.clear();
 					mTitle = getString(R.string.title_map);
 					break;
 				case 1:
@@ -826,7 +828,8 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 		stop_process();
 		System.out.println("DEBUG - PROCESS STOPPED");
 		System.out.println("DEBUG - DRAWING MAKER");
-
+		 markers.clear();
+		 pathlines.clear();
 		LatLng pinLocation = new LatLng(latitude, longitude);
         	      Marker storeMarker = map.addMarker(new MarkerOptions()
         	      .position(pinLocation)
@@ -865,18 +868,33 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 		ArrayList<Location> points = new ArrayList<Location>();
 		//ArrayList<Integer> fl = new ArrayList<Integer>();
 
-		
 		//grab all the points and draw a marker at the end
 		double oldlat = 43.659652988335878;
-		double newlat =  43.659658;
+		double oldlong = -79.397276867154886;
 				
-		float difflat = (float) (newlat - oldlat);
-		float difflong = (float)(-79.397276867154886 - -79.397435);
+		float difflat;
+		float difflong;
 		LatLng endLocation = null;
 		
 		for (i = 0; i < size; i++) {
       	  Location l = m.get(i).getLoc();
       	  String g = m.get(i).getResource();
+      	  int pointfloor = m.get(i).getLoc().getFloor();
+      	  
+      	 
+      	 if(pointfloor == 1){
+      		difflat = (float) (43.6596355 - oldlat);
+    		difflong = (float)(oldlong - -79.397400);
+      	  }
+      	 else if(pointfloor == 2){
+      		difflat = (float) (-0.00004);
+     		difflong = (float)( 0.00015);
+       	  }
+      	 else{
+       		difflat = (float) (43.659658 - oldlat);
+     		difflong = (float)( oldlong - -79.397435);
+       	  }
+      	  
 		  LatLng pinLocation = new LatLng(l.getLatitude() + difflat, l.getLongitude() + difflong);
       	  	if (m.get(i).getType().equals("Corridor") || m.get(i).getType().equals("Elevator") || m.get(i).getType().equals("Stairs")  ){
     		  	points.add(l);
@@ -919,6 +937,20 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 		//draw the lines in between the markers!
 		int p;
 		if (points.size() > 1){
+			 int pointfloor = points.get(0).getFloor();
+
+		  	 if(pointfloor == 1){
+		  		difflat = (float) (43.6596355 - oldlat);
+	    		difflong = (float)(oldlong - -79.397400);
+		      	  }
+		      	 else if(pointfloor == 2){
+		      		difflat = (float) (-0.00004);
+		     		difflong = (float)( 0.00015);
+		       	  }
+		      	 else{
+		       		difflat = (float) (43.659658 - oldlat);
+		     		difflong = (float)( oldlong - -79.397435);
+		       	  }
    		  LatLng o = new LatLng(points.get(0).getLatitude() + difflat, points.get(0).getLongitude() + difflong);
 
 	     	  Polyline line = map.addPolyline((new PolylineOptions())
@@ -931,6 +963,20 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 	     	  
 	     	  
 			for (p = 0; p < points.size() - 1; p++){
+		      	  pointfloor = points.get(p).getFloor();
+
+			  	 if(pointfloor == 1){
+			  		difflat = (float) (43.6596355 - oldlat);
+		    		difflong = (float)(oldlong - -79.397400);
+			      	  }
+			      	 else if(pointfloor == 2){
+			      		difflat = (float) (-0.00004);
+			     		difflong = (float)( 0.00015);
+			       	  }
+			      	 else{
+			       		difflat = (float) (43.659658 - oldlat);
+			     		difflong = (float)( oldlong - -79.397435);
+			       	  }
 				
 				if(points.get(p).getFloor() == points.get(p+1).getFloor()){
 		   		  LatLng plusone = new LatLng(points.get(p).getLatitude() + difflat, points.get(p).getLongitude() + difflong);
@@ -946,7 +992,21 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 		      	 
 			}
 		}else{
-	   		  LatLng plusone = new LatLng(points.get(points.size() - 2).getLatitude() + difflat, points.get(points.size() - 2).getLongitude() + difflong);
+			 int pointfloor = points.get(0).getFloor();
+
+		  	 if(pointfloor == 1){
+		  		difflat = (float) (43.6596355 - oldlat);
+	    		difflong = (float)(oldlong - -79.397400);
+		      	  }
+		      	 else if(pointfloor == 2){
+		       		difflat = (float) (-0.00004);
+		     		difflong = (float)( 0.00015);
+		       	  }
+		      	 else{
+		       		difflat = (float) (43.659658 - oldlat);
+		     		difflong = (float)( oldlong - -79.397435);
+		       	  }
+	   		  LatLng plusone = new LatLng(points.get(0).getLatitude() + difflat, points.get(0).getLongitude() + difflong);
 
 			 Polyline line = map.addPolyline((new PolylineOptions())
 						.add(plusone, endLocation) .width(10).color(Color.BLUE)
