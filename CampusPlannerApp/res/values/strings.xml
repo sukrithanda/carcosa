@@ -39,6 +39,8 @@
     <string name="Creator">Creator: </string>
     <string name="Location">Location: </string>
     <string name="Invitees">Invitees: </string>
+    <string name="findById">Find By Id: </string>
+    <string name="findByType">Find By Type: </string>
 
     <string-array name="eventType_array">
         <item>Office Hours</item>

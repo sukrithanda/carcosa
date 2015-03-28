@@ -1,65 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:orientation="vertical" 
-    android:layout_weight="100">
+    android:layout_height="fill_parent">
 
-<!--     <EditText
-        android:id="@+id/resourceText1"
+    <TextView
+        android:id="@+id/byId"
         android:layout_width="match_parent"
-        android:layout_height="0dip"
-        android:entries="@array/resourceType"
-        android:prompt="@string/resources" 
-        android:inputType="text"
-        android:layout_weight="10"/>
-
-    <Button 
-   	    android:id="@+id/findnameresourcebtnn"
-    	android:layout_width="wrap_content" 
-    	android:layout_height="0dip"
-        android:background="@drawable/loginbuttonshape"
-    	android:text="@string/find" 
-    	android:shadowColor="#000"
-        android:shadowDx="0"
-        android:shadowDy="0"
-        android:shadowRadius="5"
-        android:textColor="#FFFFFF"
-        android:layout_weight="10"/> -->
-   
+        android:layout_height="wrap_content"
+        android:text="@string/findById"
+        android:textAppearance="?android:attr/textAppearanceMedium" >     
+    </TextView>
+    
+    <EditText
+        android:id="@+id/findRscById"
+        android:layout_width="match_parent"
+        android:layout_height="50dip"
+        android:ems="10"
+	    android:layout_below="@id/byId" 
+        android:hint="@string/findById" >
+	</EditText>
+    
+    <TextView
+        android:id="@+id/byType"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/findByType"
+	    android:layout_below="@id/findRscById" 
+        android:textAppearance="?android:attr/textAppearanceMedium" >
+        
+    </TextView>
     <Spinner
         android:id="@+id/resourceSpinnerMain"
         android:layout_width="match_parent"
-        android:layout_height="0dip"
+        android:layout_height="wrap_content"
         android:entries="@array/resourceType"
-        android:prompt="@string/resources" 
-        android:layout_weight="15"/>
-    
+	    android:layout_below="@id/byType" 
+        android:prompt="@string/resources" />
+
     <Spinner
         android:id="@+id/resourceSpinner"
         android:layout_width="match_parent"
-        android:layout_height="0dip"
-        android:prompt="@string/resources" 
-        android:layout_weight="15"/>
+        android:layout_height="wrap_content"
+	    android:layout_below="@id/resourceSpinnerMain" 
+        android:prompt="@string/resources" />
 
     <Button 
    	    android:id="@+id/findresourcebtn"
     	android:layout_width="wrap_content" 
-    	android:layout_height="0dip"
+    	android:layout_height="50dip"
         android:background="@drawable/loginbuttonshape"
     	android:text="@string/find" 
     	android:shadowColor="#000"
         android:shadowDx="0"
         android:shadowDy="0"
         android:shadowRadius="5"
-        android:textColor="#FFFFFF"
-        android:layout_weight="15"/>
+	    android:layout_below="@id/resourceSpinner" 
+        android:textColor="#FFFFFF"/>
     
     
    	<ListView 
    	    android:id="@+id/resourcelistview"
  		android:layout_width="match_parent"
- 		android:layout_height="0dip"
- 		android:layout_weight="70"/>
+	    android:layout_below="@id/findresourcebtn" 
+ 		android:layout_height="wrap_content"/>
 
-</LinearLayout>
+</RelativeLayout>

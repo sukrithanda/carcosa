@@ -1,9 +1,6 @@
 package com.uoft.campusplannerapp;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -39,7 +36,6 @@ public class ResourceFragment extends Fragment{
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		System.out.println("DEBUG: RESOURCE ONCREATE");
-
 		http_console = new HTTPConsole(ctx);
 	    alert = new CreateAlert(ctx);
 		View rootView = inflater.inflate(R.layout.resource_layout, container,
@@ -88,29 +84,70 @@ public class ResourceFragment extends Fragment{
              @Override
              public void onClick(View v)
              {
+            	 if (true == findByText(frv)) {
+            		 return;
+            	 }
             	 findResources(frv);
              } 
 		}); 
 		
-		Spinner second = (Spinner) rootView.findViewById(R.id.resourceSpinner);
-		second.setOnItemSelectedListener(new OnItemSelectedListener() {
-
-			@Override
-			public void onItemSelected(AdapterView<?> parent, View view,
-					int position, long id) {
-				findResources(frv);
-				
-			}
-
-			@Override
-			public void onNothingSelected(AdapterView<?> parent) {
-				// TODO Auto-generated method stub
-				
-			}
-		});
+//		Spinner second = (Spinner) rootView.findViewById(R.id.resourceSpinner);
+//		second.setOnItemSelectedListener(new OnItemSelectedListener() {
+//
+//			@Override
+//			public void onItemSelected(AdapterView<?> parent, View view,
+//					int position, long id) {
+//				findResources(frv);
+//				
+//			}
+//
+//			@Override
+//			public void onNothingSelected(AdapterView<?> parent) {
+//				// TODO Auto-generated method stub
+//				
+//			}
+//		});
 		
 		
 	    return rootView;
+	}
+	
+	private boolean findByText(View frv) {
+		EditText et = (EditText) frv.findViewById(R.id.findRscById);
+		try {
+			String room = et.getText().toString();
+			ResourceClass rsc = http_console.getResourceById(room);
+			String names[] = new String[1];
+			names[0] = rsc.getResource();
+			ListView lv = (ListView) frv.findViewById(R.id.resourcelistview);
+			ArrayAdapter<String> fr_adp = new ArrayAdapter<String>(ctx,android.R.layout.simple_list_item_1,names);
+			    lv.setAdapter(fr_adp);
+			final ResourceClass f_rsc = rsc;
+			final Context f_ctx = ctx;
+		    lv.setOnItemClickListener(new OnItemClickListener() {
+		           public void onItemClick(AdapterView<?> parent, View view,
+		               int position, long id) {
+		               String room = parent.getItemAtPosition(position).toString();
+		              
+		               int i;
+		               if (!f_rsc.getResource().equals(room)) {
+		            	   return;
+		               }
+		               List<ResourceClass> path = http_console.getPath(f_rsc.getResource());
+		               for (i = 0; i < 8; i ++){
+		              	   x.hidemarkers(i);
+		               }
+		               if (path !=null) {
+		            	   System.out.println(path.get(0).getResource());
+		               }
+		               locateOrRoute(f_ctx,f_rsc,path);
+		            
+		           }
+		         });
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
 	}
 	
 	private void findResources(View frv){
@@ -167,7 +204,6 @@ public class ResourceFragment extends Fragment{
 	}
 	
 	private void locateOrRoute(Context ctx,ResourceClass cur, List<ResourceClass> path){
-		int i = 0; 
 		AlertDialog.Builder custon_alert = new AlertDialog.Builder(ctx);
 		custon_alert.setTitle(cur.getResource());
 		custon_alert.setMessage(cur.getDescription());

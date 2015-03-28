@@ -54,6 +54,7 @@ public class HTTPConsole {
 	private final String GET_INVITEES = "http://104.236.85.199:8080/event/getInvitees";
 	private final String GET_RESOURCES = "http://104.236.85.199:9090/findResources";
 	private final String GET_PATH = "http://104.236.85.199:9090/path";
+	private final String GET_RESOURCE_BY_ID = "http://104.236.85.199:9090/resources";
 	
 	static HashMap<String,String> resourceHash = new HashMap<String,String>();
 	
@@ -268,6 +269,40 @@ public class HTTPConsole {
 		}
 		
 	}
+	public ResourceClass getResourceById(String room) {
+		String URL = GET_RESOURCE_BY_ID + "/" + room ;
+		System.out.println(URL);
+		String result = SendGetRequest(URL);
+		if (result.equals("Invalid Request")){
+			return null;
+		} else {
+			result.replace("Resource", "");
+			System.out.println(result.replace("Resource", ""));
+			try {
+				JSONObject obj = new JSONObject(result.replace("Resource", ""));
+				ResourceClass temp = new ResourceClass();
+		        Location loctemp = new Location();
+		        loctemp.setFloor(Integer.parseInt(obj.getString("floor")));
+		        loctemp.setLatitude(Float.parseFloat(obj.getString("entrance_lat")));
+		        loctemp.setLongitude(Float.parseFloat(obj.getString("entrance_long")));
+		        loctemp.setBldg(obj.getString("building"));
+		        loctemp.setBearing(0);
+		        loctemp.setAccuracy(0);
+		        loctemp.setUser_id(-1);
+		        loctemp.setPlot(false);
+		        
+		        temp.setLoc(loctemp);
+		        temp.setResource(obj.getString("id"));
+		        temp.setType(obj.getString("type"));
+		        temp.setDescription(obj.getString("description"));
+				return temp;
+			} catch (JSONException e) {
+				e.printStackTrace();
+				return null;
+			}
+		}
+	}
+	
 	
 	public List<ResourceClass> getResources(String looseType) {
 		String type = resourceHash.get(looseType);

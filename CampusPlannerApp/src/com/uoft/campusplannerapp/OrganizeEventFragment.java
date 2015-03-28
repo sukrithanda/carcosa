@@ -255,11 +255,6 @@ public class OrganizeEventFragment extends Fragment implements DateInterface{
  					Spinner spinner4 = (Spinner) frvbtn.findViewById(R.id.spinner4); 
  					room = spinner4.getSelectedItem().toString();
 
-			        SharedPreferences pref = ctx.getSharedPreferences("Event",ctx.MODE_PRIVATE);
-			       // String from_date = pref.getString("from_date", "None");
-			       // String to_date = pref.getString("to_date", "None");
-			       // String from_time = pref.getString("from_time", "None");
-			       // String to_time = pref.getString("to_time", "None");
  					System.out.println(from_date);
  					System.out.println(to_date);
  					System.out.println(from_time);
