@@ -977,6 +977,7 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
         }
         ft.hide(mDisplayEventsFragment);
         
+        ((OrganizeEventFragment)mOrganizeEventFragment).AddDE((DisplayEventsFragment)mDisplayEventsFragment);
  
         ft.commit();
 

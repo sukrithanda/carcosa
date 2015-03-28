@@ -50,11 +50,22 @@ public class TimePickerFragment2 extends DialogFragment implements TimePickerDia
 	public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
 		// TODO Auto-generated method stub
     	String shour = Integer.toString(hourOfDay);
-    	String sminute = Integer.toString(minute);
+    	String sminute;
+    	if(minute < 10)
+    	{
+    		sminute="0";
+    		sminute += Integer.toString(minute);
+    	}
+    	else
+    	{
+    		sminute = Integer.toString(minute);
+    	}
+    	
+    	//sminute = Integer.toString(minute);
     	
     	StringBuilder sb = new StringBuilder();
     	sb.append(shour);
-    	sb.append(".");
+    	sb.append(":");
     	sb.append(sminute);
     	
     	String time = sb.toString();

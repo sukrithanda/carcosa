@@ -23,6 +23,7 @@ public class EventClass {
 	public void setFrom_time(float from_time) {
 		this.from_time = from_time;
 	}
+	// if 1 accepted, 0 is no response, -1 is declined
 	public long isResponse() {
 		return response;
 	}

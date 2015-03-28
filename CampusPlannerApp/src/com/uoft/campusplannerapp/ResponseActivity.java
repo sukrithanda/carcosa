@@ -52,9 +52,13 @@ public class ResponseActivity extends Activity{
 				tv.setText(creator);
 				
 				tv = (TextView) findViewById(R.id.TimeAct);
-				String time = "" + event_invitees.get(i).getFrom_time() + " " + event_invitees.get(i).getFrom_date() + 
+				String sFromTime = String.format("%.2f", event_invitees.get(i).getFrom_time());
+				String colonFormatedFromTime = sFromTime.replace(".", ":");
+				String sToTime = String.format("%.2f", event_invitees.get(i).getTo_time());
+				String colonFormatedToTime = sToTime.replace(".", ":");
+				String time = "" + colonFormatedFromTime + " " + event_invitees.get(i).getFrom_date() + 
 						" - " + 
-				event_invitees.get(i).getTo_time() + " " + event_invitees.get(i).getTo_date();
+				colonFormatedToTime + " " + event_invitees.get(i).getTo_date();
 				tv.setText(time);
 				
 				tv = (TextView) findViewById(R.id.WhereAct);

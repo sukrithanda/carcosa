@@ -18,6 +18,7 @@
     <string name="signout">Signout</string>
     <string name="locate_friend">Locate Your Friend</string>
     <string name="friend_list">Your Friends</string>
+    <string name="AddedFriends">Added Friends</string>
     <string name="add_friend">Add Friend</string>
     <string name="register_message">Register your Account</string>
     <string name="event_list">Your Events</string>

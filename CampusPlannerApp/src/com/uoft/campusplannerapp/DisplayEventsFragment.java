@@ -1,15 +1,23 @@
 package com.uoft.campusplannerapp;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+
 
 import android.support.v4.app.Fragment;
 import android.app.AlertDialog;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.CalendarContract.Events;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -19,7 +27,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.TextView;
 
-public class DisplayEventsFragment extends Fragment {
+public class DisplayEventsFragment extends Fragment{
 
 	// Global Variables
 	public static final String TAG = "Display Events";
@@ -60,8 +68,16 @@ public class DisplayEventsFragment extends Fragment {
 		http_console = new HTTPConsole(ctx); 
 		get_events(rootView);
 		
+	
+		
 		return rootView;
 	}
+	
+	public ArrayAdapter<String> getEventsAdapter()
+	{
+		return this.ev_adp;
+	}
+	
 	
 	// Create function to get events
 	private void get_events(View rootView)
@@ -90,7 +106,10 @@ public class DisplayEventsFragment extends Fragment {
 		for(i = 0; i < num_events; i++)
 		{
 			EventClass ev = my_events.get(i);
-			String s = ev.getName() + " in " + ev.getLocation() + " at " + ev.getFrom_time();
+			//String sFromTime = String.valueOf(ev.getFrom_time());
+			String sFromTime = String.format("%.2f", ev.getFrom_time());
+			String colonFormatedFromTime = sFromTime.replace(".", ":");
+			String s = ev.getName() + " in " + ev.getLocation() + " at " + colonFormatedFromTime;
 			System.out.println("String output is: " + s);
 			events_array.add(s);
 		}
@@ -128,13 +147,16 @@ public class DisplayEventsFragment extends Fragment {
 		AlertDialog.Builder eventDialog = new AlertDialog.Builder(ctx);
 		TextView tv = (TextView) v;
 		String dialogMessage = null;
-		String event = tv.getText().toString();
+		final String event = tv.getText().toString();
 		
 		int i = 0;
 		for(i = 0; i < my_events.size(); i++)
 		{
 			EventClass AllEvents = my_events.get(i);
-			String thatEvent = AllEvents.getName() + " in " + AllEvents.getLocation() + " at " + AllEvents.getFrom_time();
+			//String sFromTime2 = String.valueOf(AllEvents.getFrom_time());
+			String sFromTime2 = String.format("%.2f", AllEvents.getFrom_time());
+			String colonFormatedFromTime2 = sFromTime2.replace(".", ":");
+			String thatEvent = AllEvents.getName() + " in " + AllEvents.getLocation() + " at " + colonFormatedFromTime2;
 			if(event.equals(thatEvent))
 			{
 				// Make call to get invitees
@@ -150,13 +172,50 @@ public class DisplayEventsFragment extends Fragment {
 
 					FriendClass fr = db.getFriendFromId(eventinvitees.get(j).getUser());
 					invitees[j] = fr.getFirst_name() + " " + fr.getLast_name();
-
+					// Did that person accept?
+					long responseCode = eventinvitees.get(j).isResponse();
+					//System.out.println("Invitee: " + invitees[j] + "and their response code is:" + responseCode);
+					String appendedS;
+					if(responseCode == 0)
+					{
+						appendedS = "";
+					}
+					else if (responseCode == 1)
+					{
+						appendedS = "- Accepted ";
+						
+					}
+					else if (responseCode == -1)
+					{
+						appendedS = "- Declined ";
+					}
+					else
+					{
+						System.out.println("ERROR! SHOULD NOT BE HERE!");
+						appendedS = "";
+					}
+					invitees[j] += " " + appendedS;
 				}
+				//for (EventClass accInvite: eventinvitees)
+				//{
+				//	for(j = 0; j < eventinvitees.size(); j++)
+				//	{
+						
+				//	}
+				//}
+				
+				//String sFromTime = String.valueOf(AllEvents.getFrom_time());
+				String sFromTime = String.format("%.2f", AllEvents.getFrom_time());
+				//String sToTime = String.valueOf(AllEvents.getTo_time());
+				String sToTime = String.format("%.2f", AllEvents.getTo_time());
+				
+				String colonFormatedFromTime = sFromTime.replace(".", ":");
+				String colonFormatedToTime = sToTime.replace(".", ":");
 				
 				dialogMessage = "Event Name: " + AllEvents.getName() + " \n" +
 								"Event Location: " + AllEvents.getLocation() + " \n" +
-								"From: " + AllEvents.getFrom_date() + " @ " + AllEvents.getFrom_time() + " \n" +
-								"To: " + AllEvents.getTo_date() + " @ " + AllEvents.getTo_time() + " \n" + 
+								"From: " + AllEvents.getFrom_date() + " @ " + colonFormatedFromTime + " \n" +
+								"To: " + AllEvents.getTo_date() + " @ " + colonFormatedToTime + " \n" + 
 								"Invitees: ";
 				int k = 0;
 				for (k = 0; k < eventinvitees.size(); k ++) 
@@ -167,12 +226,21 @@ public class DisplayEventsFragment extends Fragment {
 			}
 		}
 		
+		final Context f_ctx = ctx;
+		
 		eventDialog.setTitle("Event Details");
 		eventDialog.setMessage(dialogMessage);
 		eventDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int whichButton)
 			{
 				dialog.cancel();
+			}
+		});
+		eventDialog.setNegativeButton("Add Event to Calendar", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int whichButton)
+			{
+				//Calendar service = new Calendar.Builder(httpTransport, jsonFactory, credentials).setApplicationName("applicationName").build();
+				
 			}
 		});
 		eventDialog.show();
@@ -194,7 +262,9 @@ public class DisplayEventsFragment extends Fragment {
 				// Add code to remove event!
 				for(EventClass levents: my_events)
 				{
-					String s = levents.getName() + " in " + levents.getLocation() + " at " + levents.getFrom_time();
+					String sFromTime = String.format("%.2f", levents.getFrom_time());
+					String colonFormatedFromTime = sFromTime.replace(".", ":");
+					String s = levents.getName() + " in " + levents.getLocation() + " at " + colonFormatedFromTime;
 					if(s.equals(event))
 					{
 						System.out.println("events "+event);
@@ -228,7 +298,12 @@ public class DisplayEventsFragment extends Fragment {
 		{
 			get_events(rv);
 		}
+		ev_adp.notifyDataSetChanged();
 		super.onResume();
 	}
+	
+
+	
+
 	
 }

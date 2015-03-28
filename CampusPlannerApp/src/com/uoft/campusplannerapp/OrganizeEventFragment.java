@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
@@ -32,9 +34,13 @@ public class OrganizeEventFragment extends Fragment implements DateInterface{
 	private List<FriendClass> my_friends;
 	private DatabaseHandler db;
 	private String user;
+	private ArrayAdapter<String> adapter;
 	View rv;
+	DisplayEventsFragment de = null;
     
-    List<String> pickedFriends = new ArrayList<String>();
+    private List<String> pickedFriends;
+    private ListView lv;
+    private ArrayAdapter<String> Adpter; 
     String room = null;
 	
 	// Constructor of organizeEvent
@@ -48,6 +54,10 @@ public class OrganizeEventFragment extends Fragment implements DateInterface{
 		return fragment;
 	}
 	
+	public void AddDE(DisplayEventsFragment d) {
+		this.de = d;
+	}
+	
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		super.onCreateView(inflater, container, savedInstanceState);
@@ -56,8 +66,12 @@ public class OrganizeEventFragment extends Fragment implements DateInterface{
 		rv = rootView;
 		//Button addfriendbutton = (Button) rootView.findViewById(R.id.imageButton1);
 		
+		pickedFriends = new ArrayList<String>();
+		
 		http_console = new HTTPConsole(ctx); 
 		actv = (AutoCompleteTextView) rootView.findViewById(R.id.editText2);
+		
+		//lv = (ListView) rootView.findViewById(R.id.friendListView1);
 		
 	    db = new DatabaseHandler(ctx);
 		User u = db.getUser();
@@ -90,7 +104,7 @@ public class OrganizeEventFragment extends Fragment implements DateInterface{
 	    setupTime1OnClick(rootView);
 	    setupTime2OnClick(rootView);
 	    setupClearBtnOnClick(rootView);
-
+	    setupShowPickedFriendsClick(ctx, rootView);
 
 		return rootView;
 	}
@@ -119,7 +133,7 @@ public class OrganizeEventFragment extends Fragment implements DateInterface{
 	            	rooms[j] = rsc.get(j).getResource();
 	            }
 	            Spinner locList = (Spinner) frv.findViewById(R.id.spinner4);
-	            ArrayAdapter<String> adapter = new ArrayAdapter<String>(ctx,android.R.layout.simple_list_item_1,rooms);
+	            adapter = new ArrayAdapter<String>(ctx,android.R.layout.simple_list_item_1,rooms);
 	            locList.setAdapter(adapter);
 	        }
 
@@ -140,12 +154,26 @@ public class OrganizeEventFragment extends Fragment implements DateInterface{
              @Override
              public void onClick(View v)
              {
+            	 
+            	 
             	AutoCompleteTextView actv = (AutoCompleteTextView) frv.findViewById(R.id.editText2);
- 				pickedFriends.add(actv.getText().toString());
-
- 				//ListView lv = (ListView) v.findViewById(R.id.listView1);
- 				//ArrayAdapter<String> Adpter = new ArrayAdapter<String>(ctx, android.R.layout.simple_list_item_1, pickedFriends);
+            	
+            	if(!pickedFriends.contains(actv.getText().toString()))
+            	{
+            		if(!actv.getText().toString().equals(""))
+            		{
+            			pickedFriends.add(actv.getText().toString());
+            		}
+            	}
+ 				
+ 				//for(String s: pickedFriends)
+ 				//{
+ 				//	System.out.println("picked Friends: "+ s);
+ 				//}
+ 				
+ 				//Adpter.notifyDataSetChanged();
  				//lv.setAdapter(Adpter);
+ 				
  				//updateListView(frv);
 
  				actv.setText("");
@@ -159,15 +187,47 @@ public class OrganizeEventFragment extends Fragment implements DateInterface{
 	}
 	
 	private void updateListView(View rootView) {
-		System.out.println("Updated list view");
-		for (String s: pickedFriends)
-		{
-			System.out.println("Friends are: " + s);
-		}
-		ListView lv = (ListView) rootView.findViewById(R.id.friendListView1);
-		ArrayAdapter<String> Adpter = new ArrayAdapter<String>(ctx, android.R.layout.simple_list_item_1, pickedFriends);
-		lv.setAdapter(Adpter);
+		//System.out.println("Updated list view");
+		//for (String s: pickedFriends)
+		//{
+		//	System.out.println("Friends are: " + s);
+		//}
+		//ListView lv = (ListView) rootView.findViewById(R.id.friendListView1);
+		//ArrayAdapter<String> Adpter = new ArrayAdapter<String>(ctx, android.R.layout.simple_list_item_1, pickedFriends);
+		//lv.setAdapter(Adpter);
 		
+	}
+	
+	private void setupShowPickedFriendsClick(Context ctx, View rootView) {
+		final View frv = rootView;
+		final Context fctx = ctx;
+		Button shFriends = (Button) frv.findViewById(R.id.friendListView1);
+		shFriends.setOnClickListener(new View.OnClickListener()
+		{
+			public void onClick(View v)
+			{
+				showFriendPickedDialog(fctx, v);
+			}
+		});
+	}
+	
+	private void showFriendPickedDialog(Context ctx, View v)
+	{
+		AlertDialog.Builder eventDialog = new AlertDialog.Builder(ctx);
+		String listFriends = "";
+		for(String s: pickedFriends)
+		{
+			listFriends += s + "\n";
+		}
+		eventDialog.setTitle("Selected Friends");
+		eventDialog.setMessage(listFriends);
+		eventDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int whichButton)
+			{
+				dialog.cancel();
+			}
+		});
+		eventDialog.show();
 	}
 	
 	private void setupClearBtnOnClick(View rootView) {
@@ -198,7 +258,9 @@ public class OrganizeEventFragment extends Fragment implements DateInterface{
  					String from_date = ((Button) frvbtn.findViewById(R.id.datepickButton)).getText().toString();
  					String to_date = ((Button) frvbtn.findViewById(R.id.datepickButton2)).getText().toString();
  					String from_time = ((Button) frvbtn.findViewById(R.id.timepickButton)).getText().toString();
+ 					String dotFormatfromTime = from_time.replace(":", ".");
  					String to_time = ((Button) frvbtn.findViewById(R.id.timepickButton2)).getText().toString();
+ 					String dotFormattoTime = to_time.replace(":", ".");
  					String event_name = ((EditText) frvbtn.findViewById(R.id.editText1)).getText().toString();
  					String friendsStr = "";
  					for(int i = 0; i < pickedFriends.size(); i++) {
@@ -222,14 +284,15 @@ public class OrganizeEventFragment extends Fragment implements DateInterface{
 			       // String to_time = pref.getString("to_time", "None");
  					System.out.println(from_date);
  					System.out.println(to_date);
- 					System.out.println(from_time);
- 					System.out.println(to_time);
+ 					System.out.println(dotFormatfromTime);
+ 					System.out.println(dotFormattoTime);
  					System.out.println(event_name);
  					System.out.println(friendsStr);
  					System.out.println(room);
- 					http_console.CreateEventRequest(friendsStr, from_time, to_time, room, 
+ 					http_console.CreateEventRequest(friendsStr, dotFormatfromTime, dotFormattoTime, room, 
  							event_name, from_date, to_date);
  					Clear();
+ 					//de.getEventsAdapter().notifyDataSetChanged();
  					
  				} catch (Exception e) {
  					e.printStackTrace();
@@ -348,6 +411,9 @@ public class OrganizeEventFragment extends Fragment implements DateInterface{
 	public void updateTimeButton (String time)
 	{
 		Button timeButton = (Button) rv.findViewById(R.id.timepickButton);
+		System.out.println("Time is: "+ time);
+		
+		//String colonedTime = tokens[0] + ":" + tokens[1];
 		timeButton.setText(time);
 	}
 
@@ -362,6 +428,8 @@ public class OrganizeEventFragment extends Fragment implements DateInterface{
 	public void updateTimeButton2 (String time)
 	{
 		Button timeButton = (Button) rv.findViewById(R.id.timepickButton2);
+		//String[] tokens = time.split(".");
+		//String colonedTime = tokens[0] + ":" + tokens[1];
 		timeButton.setText(time);
 	}
 }
