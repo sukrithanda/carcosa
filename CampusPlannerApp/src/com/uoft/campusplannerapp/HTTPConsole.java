@@ -309,10 +309,14 @@ public class HTTPConsole {
 		DatabaseHandler db = new DatabaseHandler(ctx);
 		User user = db.getUser();
 		Location loc = db.getLocationFromId(user.getUserId());
+		float translated_lat = translateLatitude(loc.getLatitude(), loc.getFloor());
+		float translated_longi = translateLatitude(loc.getLongitude(), loc.getFloor());
+		String URL = GET_RESOURCES + "/" + type + "/" + translated_lat + "/"+ translated_longi+ "/" 
+				+ loc.getFloor();
 //		double lat = 43.659779,  longi = -79.397339;
 //		String URL = GET_RESOURCES + "/" + type + "/" + lat + "/"+ longi + "/" + 4;
-		String URL = GET_RESOURCES + "/" + type + "/" + loc.getLatitude() + "/"+ loc.getLongitude() + "/" 
-				+ loc.getFloor();
+//		String URL = GET_RESOURCES + "/" + type + "/" + loc.getLatitude() + "/"+ loc.getLongitude() + "/" 
+//				+ loc.getFloor();
 		System.out.println(URL);
 		String ans = SendGetRequest(URL);
 		return GetResourcesFromString(ans);
@@ -326,7 +330,13 @@ public class HTTPConsole {
 		Location loc = db.getLocationFromId(user.getUserId());
 //		double lat = 43.659779,  longi = -79.397339;
 //		String URL = GET_PATH + "/" + lat + "/"+ longi + "/" + 4 + "/"+ destination;
-		String URL = GET_PATH + "/" +  loc.getLatitude() + "/"+ loc.getLongitude() + "/" + loc.getFloor() 
+//		String URL = GET_PATH + "/" +  loc.getLatitude() + "/"+ loc.getLongitude() + "/" + loc.getFloor() 
+//				+ "/" + destination;
+		
+
+		float translated_lat = translateLatitude(loc.getLatitude(), loc.getFloor());
+		float translated_longi = translateLatitude(loc.getLongitude(), loc.getFloor());
+		String URL = GET_PATH + "/" +  translated_lat + "/"+ translated_longi + "/" + loc.getFloor() 
 				+ "/" + destination;
 		System.out.println(URL);
 		System.out.println("DEBUG - SENDING GET REQUEST");
@@ -724,6 +734,37 @@ public class HTTPConsole {
 				return null;
 			}
 		}
+	}
+	/* 
+       	  }*/
+	private float translateLatitude(float oldLat, int floor) {
+		float difflat; 
+		double oldlat = 43.659652988335878;
+		if(floor == 1){
+      		difflat = (float) (43.6596355 - oldlat);
+      	  }
+      	 else if(floor == 2){
+      		difflat = (float) (-0.00004);
+       	  }
+      	 else{
+       		difflat = (float) (43.659658 - oldlat);
+      	 }
+		return oldLat - difflat;
+	}
+	
+	private float translateLongitude(float oldLongi, int floor) {
+		float difflong; 
+		double oldlong = -79.397276867154886;
+		if(floor == 1){
+    		difflong = (float)(oldlong - -79.397400);
+      	  }
+      	 else if(floor == 2){
+     		difflong = (float)( 0.00015);
+       	  }
+      	 else{
+     		difflong = (float)( oldlong - -79.397435);
+      	 }
+		return oldLongi - difflong;
 	}
 
 	

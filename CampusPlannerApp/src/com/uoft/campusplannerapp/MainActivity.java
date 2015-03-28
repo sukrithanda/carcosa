@@ -900,10 +900,18 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
     		  	points.add(l);
 
       		  		if ( m.get(i).getLoc().getFloor() != m.get(i+1).getLoc().getFloor() && (m.get(i).getType().equals("Elevator") || m.get(i).getType().equals("Stairs"))  ){
+      		  			String title = "";
+      		  			String mode = "";
+      		  			if (m.get(i).getLoc().getFloor() < m.get(i+1).getLoc().getFloor()) {
+      		  				title = "Please go Up";
+      		  			} else {
+      		  				title  = "Please go down";
+      		  			}
+      		  			mode = m.get(i).getType();
       	  	    		 Marker storeMarker = map.addMarker(new MarkerOptions()
       	  	      		.position(pinLocation)
-      	  	      		.title("Please go Down or Up")
-      	  	      		.snippet("Stair or Elevator"));  
+      	  	      		.title(title)
+      	  	      		.snippet(mode));  
       	  	    		 MarkerFloorPairs x =  new MarkerFloorPairs(storeMarker, m.get(i).getLoc().getFloor() , "NO EMAIL");
       	  	    		 markers.add(x);
       		  		}
