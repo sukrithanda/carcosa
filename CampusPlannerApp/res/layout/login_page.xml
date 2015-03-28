@@ -30,6 +30,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="18dp"
         android:ems="10"
+        android:textColor="#FFFFFF"
         android:hint="@string/password"
         android:inputType="textPassword" >
 
@@ -44,6 +45,7 @@
         android:layout_alignLeft="@+id/password_id"
         android:layout_alignRight="@+id/password_id"
         android:ems="10"
+        android:textColor="#FFFFFF"
         android:hint="@string/username"
         android:inputType="text" />
 
