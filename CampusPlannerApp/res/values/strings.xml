@@ -35,6 +35,7 @@
     <string name="Yes">Accept</string>
     <string name="No">Decline</string>
     <string name="EventInvite">Event Invite</string>
+    <string name="EventUpadate">Event Update</string>
     <string name="Name">Name: </string>
     <string name="When">When: </string>
     <string name="Creator">Creator: </string>
@@ -58,6 +59,7 @@
     <string name="title_resources">Resources</string>
     <string name="title_privacySettings">Privacy Settings</string>
     <string name="title_event_invite">Event Invite</string>
+    <string name="title_event_update">Event Update</string>
     <string name="title_displayEvents">All Events</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>

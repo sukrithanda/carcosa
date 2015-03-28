@@ -714,7 +714,7 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 		// as you specify a parent activity in AndroidManifest.xml.
     	int id = item.getItemId();
          if (id == R.id.signout) {
-        	listener.setRunning(false);
+        	//listener.setRunning(false);
             boolean sts = http_console.Logout();
             if (sts == true){
             	session = false;
@@ -724,8 +724,8 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
             	System.exit(0);	
             } else { 
             	// restart client if signout failed
-            	listener.setRunning(true);
-            	listener.start();
+            	//listener.setRunning(true);
+            	//listener.start();
             	alert.create_alert("Error","Signout Failed. Try again later");
             }
             return true;

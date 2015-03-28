@@ -126,7 +126,7 @@
         
         <activity
             android:name="com.uoft.campusplannerapp.NotifActivity"
-            android:label="@string/title_event_invite" >
+            android:label="@string/title_event_update" >
         </activity>
     </application>
 

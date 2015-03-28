@@ -19,6 +19,7 @@ import com.uoft.campusplannerapp.R;
 
 public class MessageHandler extends IntentService {
 
+	final static int ICON = R.drawable.iconv2;
 	String mes, msg;
     @SuppressWarnings("unused")
 	private Handler handler;
@@ -70,7 +71,7 @@ public class MessageHandler extends IntentService {
         	Uri notisnd = Uri.parse("" + R.raw.fallbackring);
         	NotificationCompat.Builder mBuilder =
         		    new NotificationCompat.Builder(this)
-        		    .setSmallIcon(R.drawable.ic_launcher)
+        		    .setSmallIcon(ICON)
         		    .setContentTitle(from)
         		    .setSound(notisnd)
         		    .setContentText(mod_msg);
@@ -109,7 +110,7 @@ public class MessageHandler extends IntentService {
         	
         	NotificationCompat.Builder mBuilder =
         		    new NotificationCompat.Builder(this)
-        		    .setSmallIcon(R.drawable.ic_launcher)
+        		    .setSmallIcon(ICON)
         		    .setContentTitle("Event Invite")
         		    .setSound(notisnd)
         		    .setContentIntent(resultPendingIntent)
@@ -147,7 +148,7 @@ public class MessageHandler extends IntentService {
         	
         	NotificationCompat.Builder mBuilder =
         		    new NotificationCompat.Builder(this)
-        		    .setSmallIcon(R.drawable.ic_launcher)
+        		    .setSmallIcon(ICON)
         		    .setContentTitle("Event Update")
         		    .setSound(notisnd)
         		    .setContentIntent(resultPendingIntent)
