@@ -104,7 +104,11 @@ public class OrganizeEventFragment extends Fragment implements DateInterface{
 	    setupTime1OnClick(rootView);
 	    setupTime2OnClick(rootView);
 	    setupClearBtnOnClick(rootView);
+
 	    setupShowPickedFriendsClick(ctx, rootView);
+
+	    setupLocationFirstSpinnerOnClick(rootView);
+
 
 		return rootView;
 	}
@@ -114,10 +118,49 @@ public class OrganizeEventFragment extends Fragment implements DateInterface{
 		super.onAttach(activity);
 	}
 	
+	private void setupLocationFirstSpinnerOnClick(View rootView){
+		final View frv = rootView;
+		Spinner locType = (Spinner) rootView.findViewById(R.id.spinner3);
+	    locType.setOnItemSelectedListener(new OnItemSelectedListener() {
+	        @Override
+	        public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+	        	String type = parentView.getItemAtPosition(position).toString();
+				String roomList[] = {};
+				if (type.equals("Lab")) {
+					roomList = getResources().getStringArray(R.array.resourceTypeLab);
+				} else if (type.equals("Room")) {
+					roomList = getResources().getStringArray(R.array.resourceTypeRoom);
+					
+				} else if (type.equals("Washroom")) {
+					roomList = getResources().getStringArray(R.array.resourceTypeWashroom);
+					
+				} else if (type.equals("Studying")) {
+					roomList = getResources().getStringArray(R.array.resourceTypeStudyArea);
+					
+				} else if (type.equals("Elevator/Stairs")) {
+					roomList = getResources().getStringArray(R.array.resourceTypeElevatorStairs);
+					
+				} else if (type.equals("Other")) {
+					roomList = getResources().getStringArray(R.array.resourceTypeOther);
+				}
+
+	            Spinner locList = (Spinner) frv.findViewById(R.id.spinner5);
+	            ArrayAdapter<String> adapter = new ArrayAdapter<String>(ctx,android.R.layout.simple_list_item_1,roomList);
+	            locList.setAdapter(adapter);
+	        }
+
+	        @Override
+	        public void onNothingSelected(AdapterView<?> parentView) {
+	            // your code here
+	        }
+
+	    });
+	}
+	
 	private void setupLocationTypeOnClick(View rootView){
 		final View frv = rootView;
 	    
-	    Spinner locType = (Spinner) rootView.findViewById(R.id.spinner3);
+	    Spinner locType = (Spinner) rootView.findViewById(R.id.spinner5);
 	    locType.setOnItemSelectedListener(new OnItemSelectedListener() {
 	        @Override
 	        public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
@@ -277,11 +320,6 @@ public class OrganizeEventFragment extends Fragment implements DateInterface{
  					Spinner spinner4 = (Spinner) frvbtn.findViewById(R.id.spinner4); 
  					room = spinner4.getSelectedItem().toString();
 
-			        SharedPreferences pref = ctx.getSharedPreferences("Event",ctx.MODE_PRIVATE);
-			       // String from_date = pref.getString("from_date", "None");
-			       // String to_date = pref.getString("to_date", "None");
-			       // String from_time = pref.getString("from_time", "None");
-			       // String to_time = pref.getString("to_time", "None");
  					System.out.println(from_date);
  					System.out.println(to_date);
  					System.out.println(dotFormatfromTime);

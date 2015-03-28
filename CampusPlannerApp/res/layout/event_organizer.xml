@@ -161,13 +161,23 @@
 	        android:layout_toRightOf="@+id/textView3" 
 	        android:entries="@array/resourceType"
 	        android:prompt="@string/locationType" />
-
+		<View
+	        android:id="@+id/padding9"
+	        android:layout_width="match_parent"
+	        android:layout_height="10dip"
+	        android:layout_below="@id/spinner3" />	
+	    <Spinner
+	        android:id="@+id/spinner5"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_below="@id/padding9"
+	        android:prompt="@string/locationList" 
+	        android:layout_toRightOf="@+id/textView3" />
 	    <View
 	        android:id="@+id/padding7"
 	        android:layout_width="match_parent"
 	        android:layout_height="10dip"
-	        android:layout_below="@id/spinner3" />
-	    
+	        android:layout_below="@id/spinner5" />
 	    <Spinner
 	        android:id="@+id/spinner4"
 	        android:layout_width="match_parent"

@@ -40,6 +40,8 @@
     <string name="Creator">Creator: </string>
     <string name="Location">Location: </string>
     <string name="Invitees">Invitees: </string>
+    <string name="findById">Find By Id: </string>
+    <string name="findByType">Find By Type: </string>
 
     <string-array name="eventType_array">
         <item>Office Hours</item>
@@ -78,15 +80,46 @@
 
     <string-array name="resourceType">
         <item>Lab</item>
-        <item>TutorialRoom</item>
-        <item>Library</item>
-        <item>WashroomMale</item>
-        <item>WashroomFemale</item>
+        <item>Room</item>
         <item>Washroom</item>
-        <item>GradLab</item>
-        <item>StudyArea</item>
-        <item>MeetingRoom</item>
+        <item>Studying</item>
+        <item>Elevator/Stairs</item>
+        <item>Other</item>
+    </string-array>
+    
+    <string-array name="resourceTypeLab">
+        <item>Undergraduate Lab</item>
+        <item>Graduate Lab</item>
+    </string-array>
+    
+    <string-array name="resourceTypeRoom">
+        <item>Lecture Room</item>
+        <item>Meeting Room</item>
+        <item>Library</item>
+    </string-array>
+    
+    <string-array name="resourceTypeWashroom">
+        <item>Male</item>
+        <item>Female</item>
+        <item>Family</item>
+    </string-array>
+    
+    <string-array name="resourceTypeStudyArea">
+        <item>Study Area</item>
+        <item>Tutorial Rooms</item>
+        <item>Graduate Students Study Area</item>
+    </string-array>
+    
+    <string-array name="resourceTypeElevatorStairs">
+        <item>Elevator</item>
+        <item>Stairs</item>
+    </string-array>
+    
+    <string-array name="resourceTypeOther">
         <item>Cafeteria</item>
+        <item>Office</item>
+        <item>Prayer Room</item>
+        <item>Exit</item>
     </string-array>
 
     <string name="title_activity_display_event">DisplayEventActivity</string>

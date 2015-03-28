@@ -44,6 +44,9 @@ public class Location {
 	public float getLatitude(){
 		return latitude;
 	}
+	public long getID(){
+		return 	user_id;
+	}
 	
 	public float getLongitude(){
 		return longitude;

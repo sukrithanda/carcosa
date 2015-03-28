@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
@@ -53,6 +54,29 @@ public class HTTPConsole {
 	private final String GET_INVITEES = "http://104.236.85.199:8080/event/getInvitees";
 	private final String GET_RESOURCES = "http://104.236.85.199:9090/findResources";
 	private final String GET_PATH = "http://104.236.85.199:9090/path";
+	private final String GET_RESOURCE_BY_ID = "http://104.236.85.199:9090/resources";
+	
+	static HashMap<String,String> resourceHash = new HashMap<String,String>();
+	
+	static {
+		resourceHash.put("Undergraduate Lab", "Lab");
+		resourceHash.put("Graduate Lab", "GradLab");
+		resourceHash.put("Lecture Room", "LectureRoom");
+		resourceHash.put("Meeting Room", "MeetingRoom");
+		resourceHash.put("Library", "Library");
+		resourceHash.put("Male", "WashroomMale");
+		resourceHash.put("Female", "WashroomFemale");
+		resourceHash.put("Family", "Washroom");
+		resourceHash.put("Study Area", "StudyArea");
+		resourceHash.put("Tutorial Rooms", "TutorialRoom");
+		resourceHash.put("Graduate Students Study Area", "GradStudentRoom");
+		resourceHash.put("Elevator", "Elevator");
+		resourceHash.put("Stairs", "Stairs");
+		resourceHash.put("Cafeteria", "Cafeteria");
+		resourceHash.put("Office", "Office");
+		resourceHash.put("Prayer Room", "PrayerRoom");
+		resourceHash.put("Exit", "Exit");
+	}
 
 	private Context ctx;
 	
@@ -86,11 +110,11 @@ public class HTTPConsole {
 		
 	}
 
-	private void InitializeLoc(){
-		DatabaseHandler db = new DatabaseHandler(ctx);
-		db.deleteLocations();
-		db.Close();
-	}
+//	private void InitializeLoc(){
+//		DatabaseHandler db = new DatabaseHandler(ctx);
+//		db.deleteLocations();
+//		db.Close();
+//	}
 	public String HelloWorld(){
 		return SendGetRequest(HELLO_WORLD);
 	}
@@ -150,7 +174,7 @@ public class HTTPConsole {
 	
 	public Location LocateFriend(String user_email,String friend_email) {
 		String URL = LOCATE_FRIEND + "?userEmail=" + user_email + "&friendEmail=" + friend_email;
-		InitializeLoc();
+//		InitializeLoc();
 		String result = SendGetRequest(URL);
 		return GetLocationFromString(result);
 	}
@@ -245,17 +269,54 @@ public class HTTPConsole {
 		}
 		
 	}
+	public ResourceClass getResourceById(String room) {
+		String URL = GET_RESOURCE_BY_ID + "/" + room ;
+		System.out.println(URL);
+		String result = SendGetRequest(URL);
+		if (result.equals("Invalid Request")){
+			return null;
+		} else {
+			result.replace("Resource", "");
+			System.out.println(result.replace("Resource", ""));
+			try {
+				JSONObject obj = new JSONObject(result.replace("Resource", ""));
+				ResourceClass temp = new ResourceClass();
+		        Location loctemp = new Location();
+		        loctemp.setFloor(Integer.parseInt(obj.getString("floor")));
+		        loctemp.setLatitude(Float.parseFloat(obj.getString("entrance_lat")));
+		        loctemp.setLongitude(Float.parseFloat(obj.getString("entrance_long")));
+		        loctemp.setBldg(obj.getString("building"));
+		        loctemp.setBearing(0);
+		        loctemp.setAccuracy(0);
+		        loctemp.setUser_id(-1);
+		        loctemp.setPlot(false);
+		        
+		        temp.setLoc(loctemp);
+		        temp.setResource(obj.getString("id"));
+		        temp.setType(obj.getString("type"));
+		        temp.setDescription(obj.getString("description"));
+				return temp;
+			} catch (JSONException e) {
+				e.printStackTrace();
+				return null;
+			}
+		}
+	}
 	
-
-	public List<ResourceClass> getResources(String type) {
+	
+	public List<ResourceClass> getResources(String looseType) {
+		String type = resourceHash.get(looseType);
 		DatabaseHandler db = new DatabaseHandler(ctx);
 		User user = db.getUser();
 		Location loc = db.getLocationFromId(user.getUserId());
-		double lat = 43.659779,  longi = -79.397339;
-		String URL = GET_RESOURCES + "/" + type + "/" + lat + "/"+ longi + "/" + 4;
-		//System.out.println("get location for " + user.getUserId() +  " with lat = " + lat + " " +  longi);
-		//String URL = GET_RESOURCES + "/" + type + "/" + loc.getLatitude() + "/"+ loc.getLongitude() + "/" 
-		//		+ loc.getFloor();
+		float translated_lat = translateLatitude(loc.getLatitude(), loc.getFloor());
+		float translated_longi = translateLatitude(loc.getLongitude(), loc.getFloor());
+		String URL = GET_RESOURCES + "/" + type + "/" + translated_lat + "/"+ translated_longi+ "/" 
+				+ loc.getFloor();
+//		double lat = 43.659779,  longi = -79.397339;
+//		String URL = GET_RESOURCES + "/" + type + "/" + lat + "/"+ longi + "/" + 4;
+//		String URL = GET_RESOURCES + "/" + type + "/" + loc.getLatitude() + "/"+ loc.getLongitude() + "/" 
+//				+ loc.getFloor();
 		System.out.println(URL);
 		String ans = SendGetRequest(URL);
 		return GetResourcesFromString(ans);
@@ -267,10 +328,16 @@ public class HTTPConsole {
 		System.out.println("DEBUG - IN HTTPCONSOLE GET PATH");
 
 		Location loc = db.getLocationFromId(user.getUserId());
-		double lat = 43.659779,  longi = -79.397339;
-		String URL = GET_PATH + "/" + lat + "/"+ longi + "/" + 4 + "/"+ destination;
-		//String URL = GET_PATH + "/" +  loc.getLatitude() + "/"+ loc.getLongitude() + "/" + loc.getFloor() 
-		//		+ "/" + destination;
+//		double lat = 43.659779,  longi = -79.397339;
+//		String URL = GET_PATH + "/" + lat + "/"+ longi + "/" + 4 + "/"+ destination;
+//		String URL = GET_PATH + "/" +  loc.getLatitude() + "/"+ loc.getLongitude() + "/" + loc.getFloor() 
+//				+ "/" + destination;
+		
+
+		float translated_lat = translateLatitude(loc.getLatitude(), loc.getFloor());
+		float translated_longi = translateLatitude(loc.getLongitude(), loc.getFloor());
+		String URL = GET_PATH + "/" +  translated_lat + "/"+ translated_longi + "/" + loc.getFloor() 
+				+ "/" + destination;
 		System.out.println(URL);
 		System.out.println("DEBUG - SENDING GET REQUEST");
 
@@ -658,6 +725,7 @@ public class HTTPConsole {
 			        temp.setLoc(loctemp);
 			        temp.setResource(explrObject.getString("id"));
 			        temp.setType(explrObject.getString("type"));
+			        temp.setDescription(explrObject.getString("description"));
 			        resources.add(temp);
 			    }
 				return resources;
@@ -666,6 +734,37 @@ public class HTTPConsole {
 				return null;
 			}
 		}
+	}
+	/* 
+       	  }*/
+	private float translateLatitude(float oldLat, int floor) {
+		float difflat; 
+		double oldlat = 43.659652988335878;
+		if(floor == 1){
+      		difflat = (float) (43.6596355 - oldlat);
+      	  }
+      	 else if(floor == 2){
+      		difflat = (float) (-0.00004);
+       	  }
+      	 else{
+       		difflat = (float) (43.659658 - oldlat);
+      	 }
+		return oldLat - difflat;
+	}
+	
+	private float translateLongitude(float oldLongi, int floor) {
+		float difflong; 
+		double oldlong = -79.397276867154886;
+		if(floor == 1){
+    		difflong = (float)(oldlong - -79.397400);
+      	  }
+      	 else if(floor == 2){
+     		difflong = (float)( 0.00015);
+       	  }
+      	 else{
+     		difflong = (float)( oldlong - -79.397435);
+      	 }
+		return oldLongi - difflong;
 	}
 
 	
