@@ -2,16 +2,28 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FF6600"
+    android:background="#00204E"
     android:orientation="vertical" >
 	
+    <View
+        android:id="@+id/paddingsignup1"
+	    android:layout_width="wrap_content"
+	    android:layout_height="10dip">
+    </View>
+    
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="20dp"       
+        android:layout_height="wrap_content"       
         android:textColor="#FFFFFF" 
         android:textSize="20dp"
         android:lineSpacingMultiplier="2"
         android:text="@string/register_message" />
+
+    <View
+        android:id="@+id/paddingsignup2"
+	    android:layout_width="wrap_content"
+	    android:layout_height="10dip">
+    </View>
     
     <TextView
         android:layout_width="match_parent"
@@ -77,6 +89,7 @@
         android:id="@+id/button1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textColor="#FFFFFF"
         android:text="@string/signup" 
         android:onClick ="grab_signup_data"/>
 
