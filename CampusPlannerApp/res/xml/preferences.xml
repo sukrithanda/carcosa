@@ -24,5 +24,20 @@
         
   </PreferenceCategory>
   
+<PreferenceCategory android:title="Preset Location" android:key="locations" android:summary="Preset a location for demo">
+    
+        <ListPreference 
+            android:key="preset_location"
+            android:title="Pre set the location"
+            android:summary="Select a pre set location for demo"
+            android:defaultValue="0"
+            android:numeric="integer" 
+            android:entries="@array/preset_loc"
+            android:entryValues="@array/preset_loc_values"
+        /> 
+        
+        
+  </PreferenceCategory>
+  
    
 </PreferenceScreen>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-        <string-array name="wifi_localization_algorithms">
+    <string-array name="wifi_localization_algorithms">
         <item name="knn">k-Nearest-Neighbor (kNN)</item>
         <item name="cs">Compressive Sensing (CS)</item>
     </string-array>
@@ -8,6 +8,20 @@
     <string-array name="wifi_localization_algorithms_Values">
         <item name="knn">1</item>
         <item name="cs">2</item>
+    </string-array>
+    
+    <string-array name="preset_loc">
+        <item name="no_hardcoding">No Preset Location</item>
+        <item name="f_1">Outside BA1130 (first floor)</item>
+        <item name="f_2">Outside BA2135 (second floor)</item>
+        <item name="f_4">Outside BA4148 (fourth floor)</item>
+    </string-array>
+    
+    <string-array name="preset_loc_values">
+        <item name="no_hardcoding">0</item>
+        <item name="f_1">43.659706:-79.39695:1</item>
+        <item name="f_2">43.65974:-79.39719:2</item>
+        <item name="f_4">43.65969:79.397194:4</item>
     </string-array>
     
     

@@ -98,6 +98,10 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
     CreateAlert alert;
     DatabaseHandler db;
     User u;
+    int hardcoded = 0; 
+    float hard_lat = 0; 
+    float hard_longi = 0; 
+    int hard_floor = 0; 
     
     ClientReciever listener;
     
@@ -1395,6 +1399,33 @@ public void loadPref(){
 
 	  /* Startup */
 	  autostart_enable = mySharedPreferences.getBoolean("autostart_enable", true);
+	  
+	  String hardcoded_string = mySharedPreferences.getString("preset_location", "0");
+	  if (hardcoded_string.equals("0")) {
+		  hardcoded = 0;
+		  hard_lat = (float) 0.0;
+		  hard_longi = (float) 0.0;
+		  hard_floor = 0; 
+	  } else {
+		  String values[] = hardcoded_string.split(":");
+		  hardcoded = 1; 
+		  hard_lat = Float.parseFloat(values[0]); 
+		  hard_longi = Float.parseFloat(values[1]);  
+		  hard_floor = Integer.parseInt(values[2]);  User cu = db.getUser();
+		  cu = db.getUser();
+		  if (cu != null) {   
+			  Location loc = new Location();
+			  loc.setBldg("Ba");
+			  loc.setFloor(hard_floor);
+			  loc.setLatitude(hard_lat);
+			  loc.setLongitude(hard_longi);
+			  loc.setPlot(false);
+			  loc.setAccuracy(0);
+			  loc.setBearing(0);
+			  loc.setUser_id(cu.getUserId());
+			  db.addLocation(loc);
+		  }
+	  }
 			  
 }
 
@@ -1530,8 +1561,11 @@ public class WiFiScanReceiver extends BroadcastReceiver {
 				orientation_sim,rotationmatrix_sim,pressure_sim,gps_sim,gps_status_sim,wifi_rss_sim,wifi_mac_sim,wifi_status_sim,
 				ble_rss_sim,ble_mac_sim,ble_coordinates_sim,ble_tx_powers_sim,ble_status_sim,params_sim,location_sim,geolocation_sim,accuracy_sim,speed_sim,steps_sim);
 
-		SetMyLocation(geolocation_sim[0],geolocation_sim[1],(int)geolocation_sim[2],accuracy_sim[0],bearing);
-		
+		if (hardcoded == 0) {
+			SetMyLocation(geolocation_sim[0],geolocation_sim[1],(int)geolocation_sim[2],accuracy_sim[0],bearing);
+		} else if (hardcoded == 1) {
+			SetMyLocation(hard_lat,hard_longi,hard_floor,0,0);
+		}
 		//send location to server
 		
 		

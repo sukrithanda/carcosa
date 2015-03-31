@@ -43,6 +43,7 @@
     <string name="Invitees">Invitees: </string>
     <string name="findById">Find By Id: </string>
     <string name="findByType">Find By Type: </string>
+    <string name="where">Enter Location OR Select from drop down list: </string>
 
     <string-array name="eventType_array">
         <item>Office Hours</item>

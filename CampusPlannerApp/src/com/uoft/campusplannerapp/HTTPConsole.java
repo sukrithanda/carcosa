@@ -310,7 +310,7 @@ public class HTTPConsole {
 		User user = db.getUser();
 		Location loc = db.getLocationFromId(user.getUserId());
 		float translated_lat = translateLatitude(loc.getLatitude(), loc.getFloor());
-		float translated_longi = translateLatitude(loc.getLongitude(), loc.getFloor());
+		float translated_longi = translateLongitude(loc.getLongitude(), loc.getFloor());
 		String URL = GET_RESOURCES + "/" + type + "/" + translated_lat + "/"+ translated_longi+ "/" 
 				+ loc.getFloor();
 //		double lat = 43.659779,  longi = -79.397339;
@@ -335,7 +335,7 @@ public class HTTPConsole {
 		
 
 		float translated_lat = translateLatitude(loc.getLatitude(), loc.getFloor());
-		float translated_longi = translateLatitude(loc.getLongitude(), loc.getFloor());
+		float translated_longi = translateLongitude(loc.getLongitude(), loc.getFloor());
 		System.out.println("" + loc.getLatitude() + " " + translated_lat);
 		String URL = GET_PATH + "/" +  translated_lat + "/"+ translated_longi + "/" + loc.getFloor() 
 				+ "/" + destination;
