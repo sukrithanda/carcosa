@@ -336,6 +336,7 @@ public class HTTPConsole {
 
 		float translated_lat = translateLatitude(loc.getLatitude(), loc.getFloor());
 		float translated_longi = translateLatitude(loc.getLongitude(), loc.getFloor());
+		System.out.println("" + loc.getLatitude() + " " + translated_lat);
 		String URL = GET_PATH + "/" +  translated_lat + "/"+ translated_longi + "/" + loc.getFloor() 
 				+ "/" + destination;
 		System.out.println(URL);

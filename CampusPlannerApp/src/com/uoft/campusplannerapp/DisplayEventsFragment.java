@@ -169,16 +169,21 @@ public class DisplayEventsFragment extends Fragment{
 				int j = 0;
 				for(j = 0; j < eventinvitees.size(); j++)
 				{
-
+					System.out.println("Get friend " + eventinvitees.get(j).getUser());
 					FriendClass fr = db.getFriendFromId(eventinvitees.get(j).getUser());
-					invitees[j] = fr.getFirst_name() + " " + fr.getLast_name();
+					if (fr == null) {
+						invitees[j] = u.getFirstName() + " " + u.getLastName();
+					}
+					else {
+						invitees[j] = fr.getFirst_name() + " " + fr.getLast_name();
+					}
 					// Did that person accept?
 					long responseCode = eventinvitees.get(j).isResponse();
 					//System.out.println("Invitee: " + invitees[j] + "and their response code is:" + responseCode);
 					String appendedS;
 					if(responseCode == 0)
 					{
-						appendedS = "";
+						appendedS = "- No Response ";
 					}
 					else if (responseCode == 1)
 					{
@@ -216,7 +221,7 @@ public class DisplayEventsFragment extends Fragment{
 								"Event Location: " + AllEvents.getLocation() + " \n" +
 								"From: " + AllEvents.getFrom_date() + " @ " + colonFormatedFromTime + " \n" +
 								"To: " + AllEvents.getTo_date() + " @ " + colonFormatedToTime + " \n" + 
-								"Invitees: ";
+								"Invitees: \n";
 				int k = 0;
 				for (k = 0; k < eventinvitees.size(); k ++) 
 				{

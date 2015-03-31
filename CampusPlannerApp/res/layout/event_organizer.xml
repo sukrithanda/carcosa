@@ -153,11 +153,41 @@
 	        android:layout_height="10dip"
 	        android:layout_below="@id/friendListView1" />
 	    
+	    <TextView
+	        android:id="@+id/where"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="@string/where"
+	        android:layout_below="@id/padding6">
+	        
+	    </TextView>
+	    
+	    <View
+	        android:id="@+id/padding11"
+	        android:layout_width="wrap_content"
+	        android:layout_height="10dip"
+	        android:layout_below="@id/where" />
+	    
+	    <EditText
+	        android:id="@+id/editTextLocation"
+	        android:layout_width="match_parent"
+	        android:layout_height="49dp"
+	        android:ems="10"
+	        android:layout_below="@id/padding11" 
+	        android:hint="@string/EventHint" >
+	    </EditText>
+	    
+	    <View
+	        android:id="@+id/padding12"
+	        android:layout_width="wrap_content"
+	        android:layout_height="10dip"
+	        android:layout_below="@id/editTextLocation" />
+	    
 	    <Spinner
 	        android:id="@+id/spinner3"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
-	        android:layout_below="@id/padding6"
+	        android:layout_below="@id/padding12"
 	        android:layout_toRightOf="@+id/textView3" 
 	        android:entries="@array/resourceType"
 	        android:prompt="@string/locationType" />

@@ -318,7 +318,12 @@ public class OrganizeEventFragment extends Fragment implements DateInterface{
  						}
  					}
  					Spinner spinner4 = (Spinner) frvbtn.findViewById(R.id.spinner4); 
- 					room = spinner4.getSelectedItem().toString();
+ 					if (spinner4.getSelectedItem() == null) {
+ 						room = ((EditText) frvbtn.findViewById(R.id.editTextLocation)).getText().toString();
+ 					} else {
+ 						room = spinner4.getSelectedItem().toString();
+ 					}
+ 					
 
  					System.out.println(from_date);
  					System.out.println(to_date);

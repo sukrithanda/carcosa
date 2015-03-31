@@ -1545,7 +1545,11 @@ public class WiFiScanReceiver extends BroadcastReceiver {
 public void SetMyLocation(float latitude,float longitude,int floor,float accuracy,float bearing){
 	// latitude and longitude
 	//Log.d("FLOOR",Integer.toString(floor)+Integer.toString(load_floor));
-	if (floor != load_floor){
+	/*if (groundOverlay == null) {
+		//alert.create_alert("Error", "Can't connect to internet right now\n. Try again later");
+		return;
+	}*/
+	if ((floor != load_floor) && (groundOverlay != null)){
 	switch(floor){
 	case 1:
 		hidemarkers(floor);	
@@ -1585,7 +1589,8 @@ public void SetMyLocation(float latitude,float longitude,int floor,float accurac
 	}
 	load_floor=floor;
 
-  mylocation.push_location(latitude, longitude, 0f, accuracy, bearing);
+	if (mylocation != null)
+		mylocation.push_location(latitude, longitude, 0f, accuracy, bearing);
 
   if (session == false) {
 	  return;
