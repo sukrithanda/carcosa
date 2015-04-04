@@ -332,6 +332,15 @@ public class OrganizeEventFragment extends Fragment implements DateInterface{
  					System.out.println(event_name);
  					System.out.println(friendsStr);
  					System.out.println(room);
+ 					if (from_date.equals("Select a date") || to_date.equals("Select a date")) {
+ 						alert.create_alert("Error", "You forgot to enter date");
+ 						return;
+ 					}
+ 					if (from_time.equals("Select Time") || to_time.equals("Select Time")) {
+ 						alert.create_alert("Error", "You forgot to enter time");
+ 						return;
+ 					}
+ 					
  					http_console.CreateEventRequest(friendsStr, dotFormatfromTime, dotFormattoTime, room, 
  							event_name, from_date, to_date);
  					Clear();
@@ -357,6 +366,7 @@ public class OrganizeEventFragment extends Fragment implements DateInterface{
 		((Button) rv.findViewById(R.id.timepickButton2)).setText("Select a time");
 		pickedFriends.clear();
 		((EditText) rv.findViewById(R.id.editText1)).setText("");
+		((EditText) rv.findViewById(R.id.editTextLocation)).setText("");
 		((AutoCompleteTextView) rv.findViewById(R.id.editText2)).setText("");
 	}
 	

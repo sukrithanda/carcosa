@@ -353,17 +353,17 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 					//addItemOnSpinner2();
 					mTitle = getString(R.string.title_OrganizeEvent);
 					break;
+//				case 4:
+//					showFragment(mSetUpOfficeHoursFragment);
+//					//addItemOnSpinner2();
+//					mTitle = getString(R.string.title_SetupOfficeHours);
+//					break;
 				case 4:
-					showFragment(mSetUpOfficeHoursFragment);
-					//addItemOnSpinner2();
-					mTitle = getString(R.string.title_SetupOfficeHours);
-					break;
-				case 5:
 					showFragment(mPrivacyFragment);
 					mPrivacyFragment.onResume();
 					mTitle = getString(R.string.title_privacySettings);
 					break;
-				case 6:
+				case 5:
 					showFragment(mDisplayEventsFragment);
 					mTitle = getString(R.string.title_displayEvents);
 					break;
@@ -386,13 +386,13 @@ public class MainActivity extends ActionBarActivity  implements NavigationDrawer
 			case 4:
 				mTitle = getString(R.string.title_OrganizeEvent);
 				break;
+//			case 5:
+//				mTitle = getString(R.string.title_SetupOfficeHours);
+//				break;
 			case 5:
-				mTitle = getString(R.string.title_SetupOfficeHours);
-				break;
-			case 6:
 				mTitle = getString(R.string.title_privacySettings);
 				break;
-			case 7:
+			case 6:
 				mTitle = getString(R.string.title_displayEvents);
 			}
 		}	
@@ -1409,9 +1409,12 @@ public void loadPref(){
 	  } else {
 		  String values[] = hardcoded_string.split(":");
 		  hardcoded = 1; 
-		  hard_lat = Float.parseFloat(values[0]); 
-		  hard_longi = Float.parseFloat(values[1]);  
-		  hard_floor = Integer.parseInt(values[2]);  User cu = db.getUser();
+		  float lat = Float.parseFloat(values[0]); 
+		  float longi = Float.parseFloat(values[1]); 
+		  hard_floor = Integer.parseInt(values[2]);
+		  hard_lat = translateLatitude(lat, hard_floor);
+		  hard_longi = translateLongitude(longi, hard_floor);
+		  User cu = db.getUser();
 		  cu = db.getUser();
 		  if (cu != null) {   
 			  Location loc = new Location();
@@ -1723,6 +1726,35 @@ public boolean onKeyDown(int keyCode, KeyEvent event) {
 	return super.onKeyDown(keyCode, event);
 }
 
+private float translateLatitude(float oldLat, int floor) {
+	float difflat; 
+	double oldlat = 43.659652988335878;
+	if(floor == 1){
+  		difflat = (float) (43.6596355 - oldlat);
+  	  }
+  	 else if(floor == 2){
+  		difflat = (float) (-0.00004);
+   	  }
+  	 else{
+   		difflat = (float) (43.659658 - oldlat);
+  	 }
+	return oldLat + difflat;
+}
+
+private float translateLongitude(float oldLongi, int floor) {
+	float difflong; 
+	double oldlong = -79.397276867154886;
+	if(floor == 1){
+		difflong = (float)(oldlong - -79.397400);
+  	  }
+  	 else if(floor == 2){
+ 		difflong = (float)( 0.00015);
+   	  }
+  	 else{
+ 		difflong = (float)( oldlong - -79.397435);
+  	 }
+	return oldLongi + difflong;
+}
 
 
   
